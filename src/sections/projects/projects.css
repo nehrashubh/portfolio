@@ -2,10 +2,16 @@
   position: absolute;
   inset: 0;
   overflow: hidden;
-  /* Built from the brown the artist outlined the hands with. This is CSS behind
-     a transparent canvas, so it doubles as the loading state and there is never
-     a flash while the glb lands. */
-  background: radial-gradient(130% 100% at 50% 6%, #2b211b 0%, #201814 60%, #150f0c 100%);
+  /* The brown the artist outlined the hands with, lifted two steps and left
+     partly open so the late-afternoon veil — and the blurred meadow behind
+     it — shows through. Same place, later hour, rather than a sealed box.
+     CSS behind a transparent canvas, so it is also the loading state. */
+  background: radial-gradient(
+    130% 100% at 50% 6%,
+    rgba(92, 72, 58, 0.55) 0%,
+    rgba(66, 50, 40, 0.66) 60%,
+    rgba(46, 34, 27, 0.78) 100%
+  );
   touch-action: none;
   font-family: var(--font-sans);
   -webkit-font-smoothing: antialiased;

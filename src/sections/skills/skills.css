@@ -397,7 +397,8 @@
   transition: background-color 120ms ease;
 }
 
-.link:hover { background: var(--slate-raised); }
+.link--static { cursor: default; }
+.link:not(.link--static):hover { background: var(--slate-raised); }
 .link:hover .link__label { color: var(--brass); }
 
 .link:focus-visible {
@@ -421,6 +422,12 @@
    step with NARROW_QUERY in stageLayout.ts. */
 @media (max-width: 900px) {
   .skills-section {
+    position: absolute;
+    top: var(--overlay-chrome);
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: auto;
     overflow-y: auto;
     overscroll-behavior: contain;
   }
@@ -428,6 +435,7 @@
   .page {
     height: auto;
     min-height: 100%;
+    padding-top: var(--gap);
     grid-template-columns: minmax(0, 1fr);
     grid-template-rows: min(46dvh, 360px) auto;
   }

@@ -1,4 +1,4 @@
-import { Suspense, useRef, useState, type RefObject } from 'react'
+import { Suspense, useEffect, useRef, useState, type RefObject } from 'react'
 import { Canvas, useFrame, useThree } from '@react-three/fiber'
 import { useProgress } from '@react-three/drei'
 import { Matrix4, Vector3 } from 'three'
@@ -118,7 +118,7 @@ function LoadingLine() {
   return active ? <p className="journey__loading">Clearing the clouds…</p> : null
 }
 
-export function JourneyScene() {
+export function JourneyScene({ stopId }: { stopId?: string }) {
   const containerRef = useRef<HTMLDivElement>(null)
   const cueRef = useRef<HTMLParagraphElement>(null)
   const progressRef = useScrollFlight(containerRef)
@@ -130,16 +130,23 @@ export function JourneyScene() {
   // gains nothing above 1.5x. Phones drop further via the shared hook.
   const dpr = useDpr(1.5)
 
+  // `#work/<stop>` sets the scroller to that stop; the camera then flies
+  // there from the start of the route, which is the arrival it deserves.
+  useEffect(() => {
+    const el = containerRef.current
+    const stop = WAYPOINTS.find((w) => w.id === stopId)
+    if (!el || !stop) return
+    el.scrollTop = stop.t * (el.scrollHeight - el.clientHeight)
+  }, [stopId])
+
   return (
-    // The section scrolls itself: a sticky stage over an eight-viewport
-    // spacer. There is no document scroll to pin against inside the overlay.
-    <div
-      ref={containerRef}
-      className="journey"
-      tabIndex={0}
-      role="region"
-      aria-label="Work and education. Scroll to travel."
-    >
+    // The scene never moves. The stage is pinned to the section and a
+    // transparent scroller sits over it whose only job is to be scrolled:
+    // the wheel drives that element's scrollTop, and the camera reads it.
+    // A sticky stage inside the scroller was tried first, and a fast wheel
+    // showed the container's bare background above and below it for a
+    // frame — sticky is repositioned after the scroll, not with it.
+    <div className="journey">
       <div className="journey__stage">
         <Canvas
           dpr={dpr}
@@ -186,7 +193,15 @@ export function JourneyScene() {
           Scroll
         </p>
       </div>
-      <div className="journey__spacer" aria-hidden="true" />
+      <div
+        ref={containerRef}
+        className="journey__scroller"
+        tabIndex={0}
+        role="region"
+        aria-label="Work and education. Scroll to travel."
+      >
+        <div className="journey__spacer" aria-hidden="true" />
+      </div>
     </div>
   )
 }

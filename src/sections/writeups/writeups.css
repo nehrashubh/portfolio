@@ -6,8 +6,14 @@
   --ink-faint: rgba(251, 234, 223, 0.34);
   color-scheme: dark;
 
-  width: 100%;
-  height: 100%;
+  /* The scroll region starts BELOW the chrome band rather than padding under
+     it, so scrolled content can never slide up behind the title. The mask
+     fades the top edge so a heading leaves softly instead of being cut. */
+  position: absolute;
+  top: var(--overlay-chrome);
+  left: 0;
+  right: 0;
+  bottom: 0;
   overflow-y: auto;
   overscroll-behavior: contain;
   color: var(--ink);
@@ -18,7 +24,7 @@
 .writeups__page {
   max-width: 1180px;
   margin: 0 auto;
-  padding: var(--overlay-chrome) clamp(1.25rem, 4vw, 3.5rem) 6rem;
+  padding: 2.5rem clamp(1.25rem, 4vw, 3.5rem) 6rem;
 }
 
 /* The reader is a modal over the section, and the section lives under the

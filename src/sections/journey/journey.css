@@ -1,25 +1,35 @@
-/* The section scrolls itself. A sticky stage holds the canvas and the labels;
-   the spacer under it gives the wheel eight viewport-heights to travel, as
-   the old ScrollTrigger pin did. */
+/* The scene is pinned; only the transparent scroller over it moves. Its
+   spacer gives the wheel eight viewport-heights to travel, as the old
+   ScrollTrigger pin did, and the camera reads its scrollTop. */
 .journey {
   position: relative;
   width: 100%;
   height: 100%;
-  overflow-y: auto;
-  overscroll-behavior: contain;
-  background: #0b0b0f;
-  outline: none;
+  overflow: hidden;
+  /* The canvas clear colour, so nothing else can ever show at an edge. */
+  background: #05050a;
 }
 
 .journey__stage {
-  position: sticky;
-  top: 0;
-  height: 100%;
+  position: absolute;
+  inset: 0;
   overflow: hidden;
 }
 
+.journey__scroller {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  outline: none;
+  /* Firefox paints a scrollbar track; keep the rail but let the art through. */
+  scrollbar-width: thin;
+  scrollbar-color: rgba(232, 184, 119, 0.35) transparent;
+}
+
 .journey__spacer {
-  height: 800%;
+  height: 900%;
 }
 
 .journey__stage canvas {

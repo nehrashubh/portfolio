@@ -55,3 +55,13 @@
   color: rgba(50, 80, 115, 0.6);
   margin: 0;
 }
+
+/* Fills its panel. The panel is a full viewport, and anything the footer
+   does not cover is transparent — the meadow showed through underneath it. */
+.descent__panel--footer .footer {
+  width: 100%;
+  min-height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+}

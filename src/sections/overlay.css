@@ -16,6 +16,10 @@
   inset: 0;
   z-index: 9999;
   color: var(--ink);
+  /* One size for the title and the cross, so the cross can sit on the
+     title's own line rather than in a box that happens to start beside it. */
+  --title-size: clamp(20px, 2.6vw, 38px);
+  --title-top: 3.4vh;
 }
 
 .overlay__ground {
@@ -118,19 +122,21 @@
 
 .overlay__title {
   position: absolute;
-  top: 3.4vh;
+  top: var(--title-top);
   left: 3.6vw;
   z-index: 3;
   margin: 0;
   font-family: var(--font-display);
-  font-size: clamp(20px, 2.6vw, 38px);
+  font-size: var(--title-size);
   line-height: 1;
   width: fit-content;
 }
 
 .overlay__close {
   position: absolute;
-  top: 3.4vh;
+  /* Centred on the title's line: the 54px hit box straddles the middle of
+     the title's em box instead of hanging from its top edge. */
+  top: calc(var(--title-top) + var(--title-size) / 2 - 27px);
   right: 3.6vw;
   z-index: 3;
   width: 54px;
@@ -138,6 +144,9 @@
   padding: 0;
   border: 0;
   background: transparent;
+  /* Buttons do not inherit colour by default — the UA gives them ButtonText,
+     which is why the cross was black on every veil. Same ink as the title. */
+  color: inherit;
   cursor: pointer;
   opacity: 1;
   /* The entrance delay belongs to opacity only. A blanket transition-delay
@@ -158,9 +167,11 @@
   position: absolute;
   left: 50%;
   top: 50%;
-  width: 40px;
+  /* Scales with the title, so it does not dwarf a 20px title on a phone. */
+  --cross: clamp(24px, 2.8vw, 40px);
+  width: var(--cross);
   height: 1.5px;
-  margin: -0.75px 0 0 -20px;
+  margin: -0.75px 0 0 calc(var(--cross) / -2);
   background: currentColor;
 }
 
@@ -189,4 +200,12 @@
   .overlay__close {
     transition: none;
   }
+}
+
+/* Focus lands here on open, and a keyboard or a pasted URL makes that focus
+   visible. The UA's black box fought every veil; this is the ink, held off
+   the strokes. */
+.overlay__close:focus-visible {
+  outline: 1px solid currentColor;
+  outline-offset: 6px;
 }
