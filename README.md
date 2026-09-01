@@ -31,6 +31,9 @@ nothing here reads from them at runtime.
 
 - The landing bundle (~62 KB gzipped) contains no three.js. Nothing 3D is
   fetched until a card is opened.
+- Scrolling the landing is damped: the scene and the panels follow the
+  scrollbar at a walking pace (`src/landing/Landing.tsx`, DAMPING and
+  MAX_SPEED), so a flick cannot throw the descent.
 - Each section is a lazy chunk. Hovering, focusing or pressing a card starts
   its download; opening it mounts it into the overlay's slot; closing
   unmounts it.
@@ -80,15 +83,40 @@ Four faces, four jobs, all self-hosted woff2:
 - **JetBrains Mono 400** — meta, labels, numerals, code
 - **IBM Plex Sans** (variable) — small dense UI text inside the sections
 
-## Still placeholder
+## Content
 
-These need the author before the site ships:
+Everything on the site comes from the résumé at `public/shubhankarnehra_resume.pdf`:
 
-- `src/sections/projects/data/projects.ts` — all eight projects
-- `src/sections/skills/fischerPosition.ts` — every skill's `links` list is empty
-- `src/theme.ts` — `LINKS` for GitHub, LinkedIn and the résumé are `#`;
-  the footer's "Say hello." and internship line were never confirmed
-- `src/sections/journey/waypoints.ts` — the five stops, worth a read-through
+- `src/sections/projects/data/projects.ts` — the six projects
+- `src/sections/skills/fischerPosition.ts` — fifteen skills, each linked to the
+  work that proves it
+- `src/sections/journey/waypoints.ts` — the five stops
+- `src/theme.ts` — facts, footer links, copy
+- `content/writeups/` — synced from the Obsidian vault by `npm run sync:writeups`
+
+Still to confirm: the footer's "open to summer 2027 internships" line, and a
+public repository for this site once it has one (the "This site" card links
+to the GitHub profile until then).
+
+## URLs
+
+The open section is the URL fragment, so every section and every thing in
+one is a link:
+
+    /#skills                   /#skills/piece_queen_white
+    /#projects                 /#projects/faith-crm
+    /#writeups                 /#writeups/massagold
+    /#work                     /#work/dbworkout
+
+The back button leaves a section; closing one clears the fragment without
+adding history. Skills use these to point at projects, writeups and journey
+stops. `src/sections/route.ts` parses them.
+
+## Plates
+
+`tools/cut_branch.py` keys the blossom branch off its green screen (source in
+`../hero/assets/plates/`) and writes `public/plates/branch.webp`. The sky and
+ground plates are carried over from the hero prototype as built there.
 
 ## Attribution
 
