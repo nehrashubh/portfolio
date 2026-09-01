@@ -54,3 +54,17 @@
   text-transform: uppercase;
   color: var(--ink-fact);
 }
+
+@media (max-width: 520px) {
+  .about__text {
+    font-size: 16px;
+  }
+
+  /* The facts and bio stop shrinking to fit one line and wrap instead. */
+  .about__facts,
+  .about__bio {
+    white-space: normal;
+    font-size: 10px;
+    line-height: 1.7;
+  }
+}

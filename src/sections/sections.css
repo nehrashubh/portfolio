@@ -118,3 +118,27 @@
     transform: none;
   }
 }
+
+@media (max-width: 520px) {
+  .card {
+    padding: 18px 16px;
+  }
+
+  .card__title {
+    font-size: 19px;
+  }
+
+  .card__desc {
+    font-size: 12.5px;
+    margin-top: 6px;
+  }
+
+  .card__ghost {
+    font-size: 34px;
+  }
+
+  /* No hover on touch: the pane clears on press instead. */
+  .card:active {
+    background: rgba(255, 255, 255, 0.07);
+  }
+}

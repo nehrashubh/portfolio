@@ -46,6 +46,7 @@
   position: sticky;
   top: 0;
   height: 100vh;
+  height: 100dvh;
   overflow: hidden;
   z-index: 0;
 }
@@ -141,10 +142,12 @@
 
 .descent__panel--hero {
   height: 110vh;
+  height: 110dvh;
 }
 
 .descent__panel--about {
   height: 140vh;
+  height: 140dvh;
 }
 
 /* Bottom-aligned, so the cards sit low in the meadow rather than floating in
@@ -152,6 +155,7 @@
    footer follows right behind them instead of after a long empty run. */
 .descent__panel--cards {
   height: 150vh;
+  height: 150dvh;
   align-items: end;
   padding-bottom: 6vh;
 }

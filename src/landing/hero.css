@@ -101,3 +101,13 @@
     opacity: 0.7;
   }
 }
+
+@media (max-width: 520px) {
+  /* One line was the rule at desktop; at phone width it would need 11px to
+     hold, which nobody can read. Two balanced lines instead. */
+  .hero__hook {
+    white-space: normal;
+    font-size: 15px;
+    text-wrap: balance;
+  }
+}

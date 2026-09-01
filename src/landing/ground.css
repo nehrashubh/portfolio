@@ -57,3 +57,10 @@
     will-change: auto;
   }
 }
+
+@media (max-width: 520px) {
+  .ground__heading {
+    letter-spacing: 0.22em;
+    text-indent: 0.22em;
+  }
+}
