@@ -1,8 +1,26 @@
 import { describe, it, expect, vi } from 'vitest'
 import { render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
+import { lazy } from 'react'
 import { SectionOverlay } from './SectionOverlay'
 import { SECTIONS } from '../theme'
+
+// The real sections mount WebGL canvases, which jsdom cannot run. The overlay
+// only needs *a* lazy component per key to prove the mount, so give it stubs.
+vi.mock('./registry', async () => {
+  const { SECTIONS } = await import('../theme')
+  const stub = (title: string) => {
+    const load = () =>
+      Promise.resolve({
+        default: () => <p className="overlay__placeholder">{title} — section stub</p>,
+      })
+    return { load, Component: lazy(load) }
+  }
+  return {
+    SECTION_REGISTRY: Object.fromEntries(SECTIONS.map((s) => [s.key, stub(s.title)])),
+    prefetchSection: vi.fn(),
+  }
+})
 
 const projects = SECTIONS[1]
 
