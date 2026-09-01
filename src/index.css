@@ -1,0 +1,47 @@
+/* @import must come before any other statement. */
+@import './fonts.css';
+
+:root {
+  /* Three faces, three jobs, no overlap. Gloock is for large titles only. */
+  --font-display: 'Gloock', Georgia, serif;
+  --font-body: 'Cormorant Garamond', Georgia, serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
+  /* Small dense UI text inside the sections, where a 300-weight Garamond
+     would lose its hairlines on a dark panel. */
+  --font-sans: 'IBM Plex Sans', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+
+  --ink-dark: #14263a;
+  --ink-fact: #16304f;
+  --veil-landing: rgba(238, 246, 252, 0.86);
+
+  --ease: cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+}
+
+/* No white gutter when you force past either end. The root carries the sky's
+   own blue, so the rubber-band area at the top shows sky rather than paper,
+   and overscroll is contained so the page cannot chain to the browser's. */
+html {
+  background: #0674c4;
+  overscroll-behavior-y: none;
+}
+
+body {
+  overflow-x: hidden;
+  overscroll-behavior-y: none;
+  font-family: var(--font-body);
+  color: var(--ink-dark);
+  /* The footer's own colour, so the bottom rubber-band matches it. */
+  background: #e4edf6;
+}

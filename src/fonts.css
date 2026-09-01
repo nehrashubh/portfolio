@@ -1,0 +1,32 @@
+/* Latin subsets only, self-hosted. Four faces, four jobs — see the spec. */
+
+@font-face {
+  font-family: 'Gloock';
+  src: url('/fonts/gloock.woff2') format('woff2');
+  font-weight: 400;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Cormorant Garamond';
+  src: url('/fonts/cormorant-300.woff2') format('woff2');
+  font-weight: 300;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'JetBrains Mono';
+  src: url('/fonts/jetbrains-400.woff2') format('woff2');
+  font-weight: 400;
+  font-display: swap;
+}
+
+/* Only the sections use this. A browser will not fetch an @font-face that
+   nothing on the page references, so declaring it here costs the landing
+   nothing. */
+@font-face {
+  font-family: 'IBM Plex Sans';
+  src: url('/fonts/plex-sans-var.woff2') format('woff2');
+  font-weight: 100 700;
+  font-display: swap;
+}
