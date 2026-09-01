@@ -1,0 +1,475 @@
+.skills-section {
+  /* The section's own palette; the site's faces. */
+  --paper: #e4dccc;
+  --slate: #191c18;
+  --slate-raised: #23271f;
+  --bone: #ede7d9;
+  --sage: #9ba492;
+  --brass: #d2a75e;
+  --hairline: #33382f;
+  --display: var(--font-display);
+  --sans: var(--font-sans);
+  --mono: var(--font-mono);
+  --gap: 24px;
+  --radius: 14px;
+  /* Fallbacks only — SkillsPanel sets both from ENTRANCE in entrance.ts at
+     runtime, so a row and its piece always share one duration. */
+  --card-fade: 380ms;
+  --item-in: 520ms;
+  --settle: cubic-bezier(0.22, 0.7, 0.3, 1);
+
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  color: var(--slate);
+  font-family: var(--sans);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* No paper. The board's canvas is alpha and the panel is slate, so both sit
+   straight on the morning veil — the same meadow, at a different hour. The
+   top padding keeps the board clear of the overlay's title and cross. */
+.page {
+  display: grid;
+  gap: var(--gap);
+  padding: var(--overlay-chrome) var(--gap) var(--gap);
+  height: 100%;
+  /* Wider than before: three columns of skills need the room. */
+  grid-template-columns: minmax(0, 1fr) clamp(340px, 42vw, 620px);
+}
+
+.page__stage,
+.page__panel {
+  min-width: 0;
+  min-height: 0;
+}
+
+/* ---------- stage ---------- */
+
+.stage {
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+
+.stage__loading {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  margin: 0;
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--bone);
+  opacity: 0.7;
+}
+
+/* Sits over the hovered piece. Positioned from a one-off projection rather
+   than tracked per frame — the piece doesn't move while hovered. */
+.stage__label {
+  position: absolute;
+  transform: translate(-50%, calc(-100% - 10px));
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  margin: 0;
+  padding: 6px 11px;
+  border-radius: 7px;
+  background: var(--slate);
+  color: var(--bone);
+  font-size: 13px;
+  line-height: 1.2;
+  white-space: nowrap;
+  box-shadow: 0 6px 18px rgb(0 0 0 / 0.28);
+  pointer-events: none;
+}
+
+.stage__label--flip {
+  transform: translate(-88%, calc(-100% - 10px));
+}
+
+.stage__label-square {
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--brass);
+}
+
+/* ---------- panel shell ---------- */
+
+.skills {
+  height: 100%;
+  overflow: hidden;
+  background: var(--slate);
+  border-radius: var(--radius);
+  color: var(--bone);
+}
+
+.skills--waiting {
+  opacity: 0;
+}
+
+.skills--playing {
+  animation: cardIn var(--card-fade) ease both;
+}
+
+/* Card content swap: the outgoing half fades up and away, the incoming half
+   rises into place. Durations come from SWAP in SkillsPanel. */
+.swap { height: 100%; }
+.swap--out { animation: swapOut var(--swap-out) ease-in both; }
+.swap--in { animation: swapIn var(--swap-in) var(--settle) both; }
+
+@keyframes swapOut {
+  from { opacity: 1; transform: none; }
+  to { opacity: 0; transform: translateY(-6px); }
+}
+
+@keyframes swapIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: none; }
+}
+
+@keyframes cardIn {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: none; }
+}
+
+.eyebrow {
+  margin: 0 0 12px;
+  font-family: var(--mono);
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--sage);
+}
+
+.badge {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 21px;
+  height: 21px;
+  border-radius: 4px;
+  font-family: var(--mono);
+  font-size: 10.5px;
+  font-weight: 500;
+  line-height: 1;
+}
+
+/* Filled for a white piece, outlined for a black one — the same way you tell
+   them apart on the board. */
+.badge--white { background: var(--bone); color: var(--slate); }
+.badge--black { border: 1px solid var(--sage); color: var(--bone); }
+
+/* ---------- index ---------- */
+
+.index {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  padding: 30px 26px 26px;
+}
+
+.index__head {
+  flex: none;
+  padding-bottom: 22px;
+  border-bottom: 1px solid var(--hairline);
+}
+
+.index__lede {
+  margin: 10px 0 0;
+  max-width: 46ch;
+  font-size: 13.5px;
+  line-height: 1.55;
+  color: var(--sage);
+}
+
+.index__columns {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  align-content: start;
+  gap: 18px;
+  padding-top: 26px;
+  /* Takes the slack so the legend sits at the foot of the card. */
+  flex: 1;
+}
+
+.column__label {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 8px;
+  margin: 0 0 10px;
+  /* Two of the three labels wrap; a fixed height keeps their rules and counts
+     on one line across all three columns. */
+  min-height: 2.6em;
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--hairline);
+  font-family: var(--mono);
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--sage);
+}
+
+.column__count {
+  font-variant-numeric: tabular-nums;
+}
+
+.column__items {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+/* Each row arrives as its own piece lands on the board; the delay comes from
+   revealDelayMs, the same function the pieces use. */
+.skills--waiting .column__item { opacity: 0; }
+.skills--playing .column__item { animation: itemIn var(--item-in) var(--settle) both; }
+
+@keyframes itemIn {
+  from { opacity: 0; transform: translateY(7px); }
+  to { opacity: 1; transform: none; }
+}
+
+.chip {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  width: 100%;
+  padding: 10px 10px;
+  border: 0;
+  border-left: 2px solid transparent;
+  border-radius: 7px;
+  background: none;
+  color: var(--bone);
+  font-family: inherit;
+  font-size: 14px;
+  line-height: 1.3;
+  text-align: left;
+  cursor: pointer;
+  transition: background-color 120ms ease, border-color 120ms ease;
+}
+
+.chip:hover {
+  background: var(--slate-raised);
+  border-left-color: var(--brass);
+}
+
+.chip:focus-visible {
+  outline: 2px solid var(--brass);
+  outline-offset: 2px;
+}
+
+.chip__name { min-width: 0; }
+
+.index__legend {
+  flex: none;
+  margin: 22px 0 0;
+  padding-top: 16px;
+  border-top: 1px solid var(--hairline);
+  max-width: 52ch;
+  font-size: 12px;
+  line-height: 1.5;
+  color: var(--sage);
+}
+
+/* ---------- detail ---------- */
+
+.detail {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  overflow-y: auto;
+  padding: 30px 26px 26px;
+}
+
+.detail__back {
+  align-self: flex-start;
+  margin: 0 0 22px;
+  padding: 0 0 3px;
+  border: 0;
+  border-bottom: 1px solid var(--hairline);
+  background: none;
+  font-family: var(--mono);
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--sage);
+  cursor: pointer;
+}
+
+.detail__back::before {
+  content: '\2190';
+  margin-right: 8px;
+}
+
+.detail__back:hover {
+  color: var(--brass);
+  border-bottom-color: var(--brass);
+}
+
+.detail__back:focus-visible {
+  outline: 2px solid var(--brass);
+  outline-offset: 3px;
+}
+
+.detail__title {
+  margin: 0 0 14px;
+  font-family: var(--display);
+  font-weight: 400;
+  font-size: clamp(30px, 3.6vw, 44px);
+  line-height: 1.06;
+  letter-spacing: -0.01em;
+  text-wrap: balance;
+}
+
+.detail__desc {
+  margin: 0 0 14px;
+  max-width: 48ch;
+  font-size: 15px;
+  line-height: 1.6;
+  color: var(--bone);
+}
+
+/* The metaphor, stated once. Set apart so it reads as an aside, not a claim. */
+.detail__why {
+  margin: 0 0 30px;
+  padding-left: 14px;
+  border-left: 2px solid var(--brass);
+  max-width: 46ch;
+  font-family: var(--font-body);
+  font-size: 19px;
+  line-height: 1.4;
+  color: #c9cfc0;
+}
+
+.detail__block + .detail__block { margin-top: 26px; }
+
+.detail__label {
+  margin: 0 0 12px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--hairline);
+  font-family: var(--mono);
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--sage);
+}
+
+.detail__empty {
+  margin: 0;
+  font-size: 13px;
+  color: var(--sage);
+  font-style: italic;
+}
+
+.links,
+.related {
+  display: flex;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.links { flex-direction: column; gap: 2px; }
+.related { flex-wrap: wrap; gap: 6px; }
+.related li { flex: 0 1 auto; }
+.related .chip { width: auto; padding-right: 12px; }
+
+.link {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+  padding: 9px 10px;
+  border-radius: 7px;
+  color: var(--bone);
+  font-size: 14px;
+  text-decoration: none;
+  transition: background-color 120ms ease;
+}
+
+.link:hover { background: var(--slate-raised); }
+.link:hover .link__label { color: var(--brass); }
+
+.link:focus-visible {
+  outline: 2px solid var(--brass);
+  outline-offset: 2px;
+}
+
+.link__kind {
+  flex: none;
+  width: 62px;
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--sage);
+}
+
+/* ---------- narrow ---------- */
+
+/* Board above the panel, page scrolls as one column. Keep the breakpoint in
+   step with NARROW_QUERY in stageLayout.ts. */
+@media (max-width: 900px) {
+  .skills-section {
+    overflow-y: auto;
+    overscroll-behavior: contain;
+  }
+
+  .page {
+    height: auto;
+    min-height: 100%;
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: min(46dvh, 360px) auto;
+  }
+
+  .skills {
+    height: auto;
+    overflow: visible;
+  }
+
+  .swap { height: auto; }
+
+  .index,
+  .detail {
+    height: auto;
+    overflow: visible;
+    padding: 24px 20px;
+  }
+
+  .index__columns {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 22px;
+  }
+
+  /* No hover on touch, so the label would only ever flash on tap. */
+  .stage__label { display: none; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .chip,
+  .link {
+    transition: none;
+  }
+
+  .skills--playing,
+  .skills--playing .column__item,
+  .swap--out,
+  .swap--in {
+    animation: none;
+  }
+
+  .skills--waiting,
+  .skills--waiting .column__item {
+    opacity: 1;
+  }
+}
