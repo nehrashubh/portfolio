@@ -1,5 +1,8 @@
 import type { SectionProps } from '../SectionProps'
+import { ReducedMotionFallback } from './ReducedMotionFallback'
+import { JourneyScene } from './JourneyScene'
+import './journey.css'
 
-export default function JourneySection(_props: SectionProps) {
-  return <p className="overlay__placeholder">Work & Education — section stub</p>
+export default function JourneySection({ reducedMotion }: SectionProps) {
+  return reducedMotion ? <ReducedMotionFallback /> : <JourneyScene />
 }

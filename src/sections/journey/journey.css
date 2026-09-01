@@ -1,0 +1,237 @@
+/* The section scrolls itself. A sticky stage holds the canvas and the labels;
+   the spacer under it gives the wheel eight viewport-heights to travel, as
+   the old ScrollTrigger pin did. */
+.journey {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  background: #0b0b0f;
+  outline: none;
+}
+
+.journey__stage {
+  position: sticky;
+  top: 0;
+  height: 100%;
+  overflow: hidden;
+}
+
+.journey__spacer {
+  height: 800%;
+}
+
+.journey__stage canvas {
+  position: absolute;
+  inset: 0;
+}
+
+.journey__loading,
+.journey__cue {
+  position: absolute;
+  margin: 0;
+  pointer-events: none;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.32em;
+  text-transform: uppercase;
+  color: rgba(232, 184, 119, 0.75);
+}
+
+.journey__loading {
+  inset: 0;
+  display: grid;
+  place-items: center;
+}
+
+.journey__cue {
+  left: 50%;
+  bottom: 4vh;
+  transform: translateX(-50%);
+  transition: opacity 0.6s ease;
+}
+
+.journey-scene__overlay {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+/* Anchored to a projected marker position. The element sits at the marker and
+   the body is offset from it, so `transform` carries only the marker's own
+   screen position. */
+.waypoint-label {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 0;
+  height: 0;
+  will-change: transform, opacity;
+  font-family: var(--font-sans);
+}
+
+.waypoint-label__leader {
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  width: 1px;
+  height: 56px;
+  background: rgba(232, 184, 119, 0.8);
+}
+
+.waypoint-label__body {
+  position: absolute;
+  bottom: 56px;
+  width: var(--label-w, 240px);
+  padding: 12px 16px 16px;
+  /* Contain the scrim's negative z-index so it paints behind this text but not
+     behind the canvas. */
+  isolation: isolate;
+}
+
+/* The scrim. A marker travels through the scene, so a label lands on
+   near-white cloud as often as deep blue and light type vanishes on the bright
+   half. This is invisible over dark cloud and quietly darkens bright cloud.
+
+   It lives on an oversized pseudo-element rather than as a background on the
+   body itself. Painting it on the body meant the gradient was still partly
+   opaque where the box ended, so it got cut off square and the "no panel"
+   scrim read as a dark rectangle — the exact thing it exists to avoid. Given
+   its own box, inset well beyond the text, it always reaches full transparency
+   before any edge, whatever the text measures. */
+.waypoint-label__body::before {
+  content: '';
+  position: absolute;
+  inset: -40px -48px -40px -44px;
+  z-index: -1;
+  pointer-events: none;
+  /* 50% radii centred at 50% is the point: the ellipse is exactly INSCRIBED in
+     this box, so it reaches full transparency on every side rather than being
+     clipped flat by an edge. An off-centre gradient with larger radii spilled
+     past the left and top, which is what drew the straight edges. */
+  background: radial-gradient(
+    50% 50% at 50% 50%,
+    rgba(6, 8, 16, 0.82) 0%,
+    rgba(6, 8, 16, 0.6) 38%,
+    rgba(6, 8, 16, 0.26) 66%,
+    rgba(6, 8, 16, 0) 100%
+  );
+}
+
+.waypoint-label[data-side='right'] .waypoint-label__body {
+  left: -16px;
+  text-align: left;
+}
+
+.waypoint-label[data-side='left'] .waypoint-label__body {
+  left: calc(-1 * var(--label-w, 240px));
+  text-align: right;
+}
+
+.waypoint-label[data-side='left'] .waypoint-label__body::before {
+  inset: -40px -44px -40px -48px;
+}
+
+.waypoint-label__year {
+  margin: 0 0 4px;
+  font-family: var(--font-mono);
+  font-size: 0.85rem;
+  font-weight: 400;
+  letter-spacing: 0.18em;
+  color: #e8b877;
+  text-shadow: 0 1px 12px rgba(0, 0, 0, 0.8);
+}
+
+.waypoint-label__title {
+  margin: 0 0 7px;
+  font-family: var(--font-display);
+  font-size: 1.35rem;
+  line-height: 1.12;
+  font-weight: 400;
+  letter-spacing: 0;
+  color: #fff6e8;
+  text-shadow: 0 2px 16px rgba(0, 0, 0, 0.75);
+}
+
+.waypoint-label__rule {
+  display: block;
+  width: 24px;
+  height: 1.5px;
+  margin: 0 0 8px;
+  background: rgba(232, 184, 119, 0.8);
+}
+
+.waypoint-label[data-side='left'] .waypoint-label__rule {
+  margin-left: auto;
+}
+
+.waypoint-label__role {
+  margin: 0 0 6px;
+  font-family: var(--font-mono);
+  font-size: 0.66rem;
+  font-weight: 400;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: #e8b877;
+  text-shadow: 0 1px 12px rgba(0, 0, 0, 0.85);
+}
+
+.waypoint-label__description {
+  margin: 0;
+  font-size: 0.8rem;
+  line-height: 1.55;
+  color: rgba(255, 246, 232, 0.86);
+  text-shadow: 0 1px 12px rgba(0, 0, 0, 0.85);
+}
+
+
+/* Reduced motion: the same five stops as a plain list on the twilight veil. */
+.journey-static {
+  width: 100%;
+  height: 100%;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
+.reduced-motion-list {
+  list-style: none;
+  margin: 0;
+  padding: var(--overlay-chrome, 3rem) 8% 4rem;
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+  max-width: 40rem;
+  color: #fff6e8;
+  font-family: var(--font-sans);
+}
+
+.reduced-motion-list__year {
+  margin: 0 0 0.15rem;
+  font-family: var(--font-mono);
+  font-size: 0.85rem;
+  letter-spacing: 0.18em;
+  color: #e8b877;
+}
+
+.reduced-motion-list__role {
+  margin: 0 0 0.3rem;
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: #e8b877;
+}
+
+.reduced-motion-list__title {
+  margin: 0 0 0.4rem;
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: 1.5rem;
+}
+
+.reduced-motion-list__description {
+  margin: 0;
+  line-height: 1.5;
+  color: rgba(255, 246, 232, 0.86);
+}
