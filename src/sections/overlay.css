@@ -1,0 +1,187 @@
+/* ── Section overlay ──────────────────────────────────────────────────────
+   Every element here RESTS at its final state and animates in with a `from`
+   keyframe, rather than resting at 0 and animating forwards.
+
+   The reason matters: adding `.overlay--closing` replaces an element's
+   animation, which discards the previous animation's `forwards` fill and
+   snaps the element back to its base value. With `opacity: 0` as the base,
+   the exit animation began on an already-invisible element — which is why
+   closing looked instant no matter how long the exit was set to.
+
+   Resting at the final state means a replaced animation leaves the element
+   where it is, and the exit has something to animate away from.           */
+
+.overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  color: var(--ink);
+}
+
+.overlay__ground {
+  position: absolute;
+  inset: 0;
+  background-image: url('/plates/ground.webp');
+  background-size: cover;
+  background-position: center;
+  opacity: 1;
+  animation: backdrop-in 0.45s ease both;
+}
+
+/* Starts at the landing's pale blue and grades into the section's hour, so
+   entering a section reads as time passing rather than as a page change.
+   Closing grades it back the other way. */
+.overlay__veil {
+  position: absolute;
+  inset: 0;
+  backdrop-filter: blur(18px) saturate(1.05);
+  background: var(--veil);
+  opacity: 1;
+  animation:
+    backdrop-in 0.45s ease both,
+    veil-grade var(--grade-ms) ease both;
+}
+
+@keyframes backdrop-in {
+  from {
+    opacity: 0;
+  }
+}
+
+@keyframes veil-grade {
+  from {
+    background: var(--veil-landing);
+  }
+}
+
+/* Exit: the colour grades back toward the landing while the whole backdrop
+   fades, so the cards are revealed underneath as the title travels home. */
+.overlay--closing .overlay__ground {
+  animation: backdrop-out var(--close-ms) ease both;
+}
+
+.overlay--closing .overlay__veil {
+  animation:
+    backdrop-out var(--close-ms) ease both,
+    veil-return var(--close-ms) ease both;
+}
+
+@keyframes backdrop-out {
+  to {
+    opacity: 0;
+  }
+}
+
+@keyframes veil-return {
+  to {
+    background: var(--veil-landing);
+  }
+}
+
+/* The cards underneath are live again the moment the exit starts. */
+.overlay--closing {
+  pointer-events: none;
+}
+
+.overlay__mount {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  display: grid;
+  place-content: center;
+  justify-items: center;
+  gap: 1.6vh;
+  text-align: center;
+  padding: 4vh 2vw;
+  opacity: 1;
+  animation: backdrop-in 0.6s ease both 0.3s;
+}
+
+.overlay--closing .overlay__mount {
+  animation: backdrop-out 0.4s ease both;
+}
+
+.overlay__placeholder {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  line-height: 2;
+  opacity: 0.6;
+  margin: 0;
+}
+
+.overlay__title {
+  position: absolute;
+  top: 3.4vh;
+  left: 3.6vw;
+  z-index: 3;
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: clamp(20px, 2.6vw, 38px);
+  line-height: 1;
+  width: fit-content;
+}
+
+.overlay__close {
+  position: absolute;
+  top: 3.4vh;
+  right: 3.6vw;
+  z-index: 3;
+  width: 54px;
+  height: 54px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+  opacity: 1;
+  /* The entrance delay belongs to opacity only. A blanket transition-delay
+     would also stall the hover rotation by the same amount. */
+  animation: backdrop-in 0.6s ease both 0.42s;
+  transition: transform var(--cross-ms) var(--ease);
+}
+
+/* The cross leaves first — it is the thing you just used. */
+.overlay--closing .overlay__close {
+  animation: backdrop-out 0.28s ease both;
+  pointer-events: none;
+}
+
+.overlay__close::before,
+.overlay__close::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 40px;
+  height: 1.5px;
+  margin: -0.75px 0 0 -20px;
+  background: currentColor;
+}
+
+.overlay__close::before {
+  transform: rotate(45deg);
+}
+
+.overlay__close::after {
+  transform: rotate(-45deg);
+}
+
+.overlay__close:hover,
+.overlay__close:focus-visible {
+  transform: rotate(90deg);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .overlay__ground,
+  .overlay__veil,
+  .overlay__mount,
+  .overlay__close {
+    animation: none;
+    opacity: 1;
+  }
+
+  .overlay__close {
+    transition: none;
+  }
+}

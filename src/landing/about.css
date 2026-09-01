@@ -1,0 +1,56 @@
+/* Content only — the cloud layer behind this lives in the descent column. */
+.about {
+  /* Wide enough that the facts and bio each hold one line. */
+  max-width: min(94vw, 1180px);
+  text-align: left;
+}
+
+.about__label {
+  font-family: var(--font-mono);
+  font-size: clamp(11px, 1.05vw, 15px);
+  letter-spacing: 0.32em;
+  text-transform: uppercase;
+  color: rgba(40, 68, 104, 0.8);
+  margin: 0 0 18px;
+}
+
+.about__text {
+  font-family: var(--font-body);
+  font-weight: 300;
+  font-size: clamp(15px, 2vw, 28px);
+  line-height: 1.5;
+  color: #24354a;
+  margin: 0;
+  max-width: 46ch;
+}
+
+/* One line each, sitting just under the description. Both shrink with the
+   viewport rather than wrapping — a wrapped credentials line reads as a
+   paragraph, and a recruiter scans it as one. */
+.about__facts,
+.about__bio {
+  white-space: nowrap;
+  font-family: var(--font-mono);
+  margin: 0;
+}
+
+.about__bio {
+  font-size: clamp(6.5px, 1vw, 12px);
+  line-height: 1.8;
+  color: rgba(45, 72, 108, 0.78);
+  margin-top: clamp(18px, 2.6vh, 30px);
+}
+
+.about__rule {
+  width: 34px;
+  height: 1px;
+  background: rgba(24, 48, 78, 0.42);
+  margin: clamp(14px, 2vh, 22px) 0;
+}
+
+.about__facts {
+  font-size: clamp(6.5px, 1.03vw, 12px);
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--ink-fact);
+}

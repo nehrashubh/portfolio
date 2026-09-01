@@ -1,0 +1,164 @@
+import {
+  useEffect,
+  useLayoutEffect,
+  useRef,
+  type CSSProperties,
+  type RefObject,
+} from 'react'
+import { createPortal } from 'react-dom'
+import { MOTION, type Section } from '../theme'
+import { flipScale, flipTransform } from '../lib/flip'
+import './overlay.css'
+
+interface Props {
+  section: Section | null
+  /** Ask to close. The overlay then plays its exit and calls onClosed. */
+  onClose: () => void
+  /** True once the exit is running; the overlay stays mounted until it ends. */
+  closing?: boolean
+  /** Fired when the exit has finished and the overlay may unmount. */
+  onClosed?: () => void
+  reducedMotion: boolean
+  /** The card title this overlay's title flies out of and back into. */
+  originRef?: RefObject<HTMLElement | null>
+}
+
+function fontPx(el: Element): number {
+  return parseFloat(getComputedStyle(el).fontSize) || 1
+}
+
+export function SectionOverlay({
+  section,
+  onClose,
+  closing = false,
+  onClosed,
+  reducedMotion,
+  originRef,
+}: Props) {
+  const titleRef = useRef<HTMLParagraphElement>(null)
+
+  // Entrance: the title travels out of the card it came from. Measured before
+  // paint so there is no frame where it sits at its destination.
+  useLayoutEffect(() => {
+    if (!section || closing || reducedMotion) return
+    const title = titleRef.current
+    const origin = originRef?.current
+    if (!title || !origin) return
+
+    const from = origin.getBoundingClientRect()
+    const to = title.getBoundingClientRect()
+    const scale = flipScale(fontPx(origin), fontPx(title))
+
+    title.style.transition = 'none'
+    title.style.transformOrigin = 'top left'
+    title.style.transform = flipTransform(from, to, scale)
+    // Colour travels with the title. Without this it is the section's ink from
+    // the first frame, so a dark section's title arrives already light.
+    title.style.color = getComputedStyle(origin).color
+    void title.getBoundingClientRect()
+
+    const raf = requestAnimationFrame(() => {
+      title.style.transition =
+        `transform ${MOTION.openMs}ms ${MOTION.ease}, color ${MOTION.openMs}ms ease`
+      title.style.transform = ''
+      title.style.color = '' // back to the section's --ink
+    })
+    return () => cancelAnimationFrame(raf)
+  }, [section, closing, reducedMotion, originRef])
+
+  // Exit: everything fades out while the title travels back down into the row
+  // it came from. The overlay stays mounted until that finishes.
+  useLayoutEffect(() => {
+    if (!closing || !section) return
+
+    if (reducedMotion) {
+      onClosed?.()
+      return
+    }
+
+    const title = titleRef.current
+    const origin = originRef?.current
+    if (title && origin) {
+      const to = origin.getBoundingClientRect()
+      const now = title.getBoundingClientRect()
+      const scale = flipScale(fontPx(origin), fontPx(title))
+      title.style.transition =
+        `transform ${MOTION.closeMs}ms ${MOTION.ease}, color ${MOTION.closeMs}ms ease`
+      title.style.transformOrigin = 'top left'
+      title.style.transform = flipTransform(to, now, scale)
+      // …and back again, so it does not land on the card still wearing the
+      // section's ink.
+      title.style.color = getComputedStyle(origin).color
+    }
+
+    const timer = window.setTimeout(() => onClosed?.(), MOTION.closeMs)
+    return () => window.clearTimeout(timer)
+  }, [closing, section, reducedMotion, onClosed, originRef])
+
+  useEffect(() => {
+    if (!section) return
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') onClose()
+    }
+    document.addEventListener('keydown', onKey)
+    const prev = document.body.style.overflow
+    document.body.style.overflow = 'hidden'
+    return () => {
+      document.removeEventListener('keydown', onKey)
+      document.body.style.overflow = prev
+    }
+  }, [section, onClose])
+
+  if (!section) return null
+
+  /**
+   * Portalled to <body> deliberately. A modal belongs at the document root,
+   * and this one is position:fixed inside a subtree where the descent column
+   * already carries a transform — any transformed or filtered ancestor
+   * captures position:fixed and would anchor it to that ancestor instead of
+   * the viewport. Rendering at the root makes it immune to that.
+   */
+  return createPortal(
+    <div
+      className={`overlay${closing ? ' overlay--closing' : ''}`}
+      role="dialog"
+      aria-modal="true"
+      aria-label={section.title}
+      style={
+        {
+          '--veil': section.veil,
+          '--ink': section.ink,
+          '--open-ms': `${MOTION.openMs}ms`,
+          '--close-ms': `${MOTION.closeMs}ms`,
+          '--grade-ms': `${MOTION.veilGradeMs}ms`,
+          '--cross-ms': `${MOTION.crossMs}ms`,
+          '--ease': MOTION.ease,
+        } as CSSProperties
+      }
+    >
+      <div className="overlay__ground" aria-hidden="true" />
+      <div className="overlay__veil" aria-hidden="true" />
+
+      {/* The section owns the whole viewport; the chrome floats over it. */}
+      <div className="overlay__mount">
+        <p className="overlay__placeholder">
+          {section.title} — 3D scene and content mount here
+          <br />
+          designed separately · loaded on open
+        </p>
+      </div>
+
+      <p className="overlay__title" ref={titleRef}>
+        {section.title}
+      </p>
+
+      <button
+        type="button"
+        className="overlay__close"
+        aria-label={`Close ${section.title}`}
+        onClick={onClose}
+      />
+    </div>,
+    document.body,
+  )
+}

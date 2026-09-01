@@ -1,0 +1,120 @@
+.card {
+  position: relative;
+  display: flex;
+  align-items: center;
+  width: 100%;
+  padding: 3.2% 3.6%;
+  overflow: hidden;
+  cursor: pointer;
+  text-align: left;
+  /* Square corners. Rounded was rejected — it is the common choice. */
+  border-radius: 0;
+  border: 1px solid rgba(255, 255, 255, 0.6);
+  background: rgba(255, 255, 255, 0.26);
+  /* No backdrop-filter. Four of them over a moving background forced a
+     full readback every frame and was the single biggest cost in the
+     scroll path — and it bought nothing, because the meadow plate behind
+     the cards is already blurred. */
+  transition:
+    background 0.45s ease,
+    border-color 0.45s ease,
+    transform 0.45s var(--ease),
+    box-shadow 0.45s ease;
+}
+
+.card__tint {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0.34;
+  transition: opacity 0.5s ease;
+}
+
+/* Hover clears the glass: the meadow snaps into focus through the pane, and
+   the hour behind it deepens. These are panes of glass sitting in a field —
+   hovering wipes one. */
+/* The glass clears — the white drains away and the meadow reads through —
+   and the pane comes forward. The lift is what tells you it is a door: the
+   colour change alone reads as decoration, the movement reads as a target. */
+.card:hover,
+.card:focus-visible {
+  background: rgba(255, 255, 255, 0.07);
+  border-color: rgba(255, 255, 255, 0.95);
+  transform: scale(1.018) translateX(10px);
+  box-shadow: 0 10px 30px rgba(28, 60, 96, 0.16);
+}
+
+.card:hover .card__tint,
+.card:focus-visible .card__tint {
+  opacity: 0.78;
+}
+
+.card__ghost {
+  position: absolute;
+  right: 3%;
+  top: 50%;
+  translate: 0 -50%;
+  z-index: 2;
+  font-family: var(--font-display);
+  font-size: clamp(30px, 5.6vw, 86px);
+  line-height: 0.8;
+  color: rgba(255, 255, 255, 0.46);
+  pointer-events: none;
+  transition: color 0.5s ease;
+}
+
+/* The numeral leads the movement and the row follows it. */
+.card:hover .card__ghost,
+.card:focus-visible .card__ghost {
+  color: rgba(255, 255, 255, 0.86);
+  transform: translateX(10px);
+}
+
+.card__ghost {
+  transition:
+    color 0.45s ease,
+    transform 0.55s var(--ease);
+}
+
+.card__body {
+  position: relative;
+  z-index: 3;
+}
+
+.card__title {
+  font-family: var(--font-display);
+  font-size: clamp(14px, 2vw, 30px);
+  line-height: 1;
+  color: var(--ink-dark);
+  margin: 0;
+  width: fit-content;
+}
+
+.card__desc {
+  font-family: var(--font-body);
+  font-weight: 300;
+  font-size: clamp(8.5px, 1.06vw, 14px);
+  line-height: 1.28;
+  color: rgba(24, 48, 76, 0.84);
+  margin: 0.4em 0 0;
+  width: fit-content;
+}
+
+/* visibility, not display — the element must keep its box so the closing
+   FLIP can still measure where the title is going back to. */
+.card--sending .card__title {
+  visibility: hidden;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .card,
+  .card__tint,
+  .card__ghost {
+    transition: none;
+  }
+
+  .card:hover,
+  .card:focus-visible {
+    transform: none;
+  }
+}

@@ -1,0 +1,59 @@
+/* Content only — the meadow behind this lives in the descent column. */
+.ground {
+  width: 100%;
+}
+
+/* Centred over the stack. --t is written per frame by the descent loop and
+   runs 0 (scattered) to 1 (level). */
+.ground__heading {
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: clamp(22px, 3.4vw, 52px);
+  line-height: 1;
+  color: #17293d;
+  margin: 0 0 clamp(16px, 2.6vh, 34px);
+  text-align: center;
+  text-transform: uppercase;
+  /* Wide. The staircase's horizontal step is the letters' own advance
+     widths, so tracking them apart widens the diagonal too. */
+  letter-spacing: 0.34em;
+  /* Offsets the trailing space so the word still reads as centred. */
+  text-indent: 0.34em;
+  --t: 1;
+}
+
+/* Purely vertical. The horizontal step of the staircase is just the letters'
+   own advance widths — they are already side by side in the flow, so lifting
+   each one by its own number of lines produces the diagonal for free.
+   inline-block, or the transform would be ignored. */
+/* Each letter's position is written by the descent loop. This was tried as a
+   CSS clamp() over unitless custom properties and failed silently — an
+   invalid value simply drops the whole declaration, so every letter sat level
+   and the staircase never appeared at all. */
+.ground__letter {
+  display: inline-block;
+  will-change: transform, opacity;
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+.ground__stack {
+  display: flex;
+  flex-direction: column;
+  gap: 1.1vh;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ground__letter {
+    transform: none;
+    opacity: 1;
+    will-change: auto;
+  }
+}

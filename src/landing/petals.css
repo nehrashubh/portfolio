@@ -1,0 +1,46 @@
+.petals {
+  position: absolute;
+  inset: -14% -8%;
+  z-index: 3;
+  pointer-events: none;
+}
+
+.petal {
+  position: absolute;
+  overflow: visible;
+  will-change: transform;
+  animation-name: petal-drift;
+  animation-timing-function: linear;
+  animation-iteration-count: infinite;
+}
+
+/* Petals do not fall straight. They stall, slip sideways, and turn over.
+   The mid-path stops push the drift past its endpoint and back, which reads
+   as a flutter rather than a diagonal slide, and the uneven rotation stops
+   the spin looking motorised. */
+@keyframes petal-drift {
+  0% {
+    transform: translate3d(0, 0, 0) rotate(0deg) scaleX(1);
+  }
+  28% {
+    transform: translate3d(calc(var(--dx) * 0.75), 34vh, 0)
+      rotate(calc(var(--spin) * 0.22)) scaleX(0.55);
+  }
+  55% {
+    transform: translate3d(calc(var(--dx) * 0.25), 68vh, 0)
+      rotate(calc(var(--spin) * 0.58)) scaleX(1);
+  }
+  78% {
+    transform: translate3d(calc(var(--dx) * 1.1), 96vh, 0)
+      rotate(calc(var(--spin) * 0.8)) scaleX(0.7);
+  }
+  100% {
+    transform: translate3d(var(--dx), 132vh, 0) rotate(var(--spin)) scaleX(1);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .petal {
+    animation: none;
+  }
+}

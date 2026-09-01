@@ -1,0 +1,103 @@
+/* Content only — the sky and branch behind this live in the descent column. */
+.hero {
+  text-align: center;
+  /* Wide enough that the name sits on one line at desktop widths; it was
+     wrapping mid-name against a narrow ch-based clamp. */
+  max-width: min(90vw, 1100px);
+}
+
+.hero__name {
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: clamp(34px, 6.4vw, 92px);
+  line-height: 1.04;
+  letter-spacing: -0.008em;
+  color: #fff;
+  margin: 0;
+  text-shadow: 0 2px 34px rgba(12, 44, 86, 0.45);
+  /* Keeps a two-line wrap balanced on narrow screens instead of leaving a
+     single orphaned word on the second line. */
+  text-wrap: balance;
+}
+
+.hero__hook {
+  font-family: var(--font-body);
+  font-weight: 300;
+  font-style: italic;
+  font-size: clamp(11px, 1.95vw, 27px);
+  line-height: 1.4;
+  color: rgba(255, 255, 255, 0.96);
+  /* Sits clearly under the name as a separate beat, not crowded against it.
+     One line always — it is a single sentence and reads as one breath.
+     The vw term shrinks it on narrow screens instead of wrapping. */
+  margin: clamp(18px, 2.4vh, 34px) auto 0;
+  white-space: nowrap;
+  text-shadow: 0 1px 20px rgba(12, 44, 86, 0.4);
+}
+
+/* Anchored at the top so the stretch pulls downward from there — as though
+   the words are being drawn up past you as you fall, rather than scaled in
+   place. The rAF loop writes the transform. */
+.hero {
+  transform-origin: top center;
+  will-change: transform;
+}
+
+/* A quiet instruction, gone the moment it has been obeyed. */
+.hero__scroll {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  margin-top: clamp(34px, 6vh, 76px);
+}
+
+.hero__scroll-label {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  letter-spacing: 0.42em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.82);
+  text-indent: 0.42em; /* offsets the trailing letter-space, so it centres */
+}
+
+.hero__scroll-line {
+  width: 1px;
+  height: clamp(28px, 5vh, 54px);
+  background: linear-gradient(
+    to bottom,
+    rgba(255, 255, 255, 0.85),
+    rgba(255, 255, 255, 0)
+  );
+  transform-origin: top;
+  animation: scroll-cue 2.4s var(--ease) infinite;
+}
+
+@keyframes scroll-cue {
+  0% {
+    transform: scaleY(0);
+    opacity: 0;
+  }
+  35% {
+    opacity: 1;
+  }
+  70% {
+    transform: scaleY(1);
+    opacity: 1;
+  }
+  100% {
+    transform: scaleY(1);
+    opacity: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero {
+    transform: none !important;
+  }
+
+  .hero__scroll-line {
+    animation: none;
+    opacity: 0.7;
+  }
+}

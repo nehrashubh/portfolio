@@ -1,0 +1,187 @@
+/* ── The descent ──────────────────────────────────────────────────────────
+   The scene sits in a sticky 100vh viewport and travels upward as you
+   scroll; the content panels ride over it in normal flow at the page's own
+   speed. Nothing fades — you are moving down through one continuous place,
+   and the panels move up past you.
+
+   Column geometry, in vh from the top. Layers overlap generously and are
+   masked across the whole overlap, so no edge ever lands on a hard boundary:
+
+       sky      0 → 300    cerulean, its cloud, then pale sky beneath it
+       ground 150 → 320    the meadow, fading up out of that pale sky
+
+   The ground sits high in the column on purpose: with it lower, the meadow
+   only filled a third of the frame behind the cards and the flower field was
+   barely there. It now fills roughly three quarters.
+
+   The sky runs PAST the point where the mountain becomes fully opaque, so
+   the plate is the only thing ever visible behind the mountain's fade. The
+   column's own background is never exposed at all — that last boundary,
+   two points apart, was the pale strip between the About and the mountain.
+
+   The air below the cloud is part of the sky PLATE, not a separate layer or
+   a CSS gradient standing in for one. That is what finally removed the line:
+   the cloud and the run beneath it are one image, so there is no boundary
+   between them at all, and the plate's last colour is what the mountain
+   fades up into — measured, they meet at 204,231,245 against 204,230,244.
+
+   The column travels 170vh while the panels travel 300vh. The scene moving
+   slower than the text is the whole of the parallax.
+
+   The footer is NOT part of this track. It is a plain element straight
+   after it, in normal flow, sized to its own content. It used to be pulled
+   in as a panel so it could ride the same damped progress as everything
+   else and not arrive early — but that was curing a problem the damping
+   itself caused. With no damping, native scroll keeps everything in sync
+   for free, and the footer can go back to just being the next thing on the
+   page once the meadow scrolls past. */
+
+.descent {
+  position: relative;
+  /* 110 + 140 + 150. */
+  height: 400vh;
+}
+
+.descent__viewport {
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  overflow: hidden;
+  z-index: 0;
+}
+
+/* The safety net: sky colour behind the entire column, so no layer can ever
+   be composited over nothing. Stops match the sky plate's own gradient. */
+.descent__column {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  will-change: transform;
+  /* The last stop is the sky plate's own final row, sampled — #c5edfe, not
+     #c5edff. One point out is still a visible edge on a gradient this flat.
+     53% is where the sky plate ends, so the gradient is already sitting on
+     that colour by the time the plate stops covering it. */
+  /* Flat, and only a backstop — the sky plate now covers every pixel the
+     mountain does not, so this should never actually be seen. It matches the
+     plate's final colour so that even a rounding error cannot show an edge. */
+  background: #b8dfef;
+}
+
+.descent__layer {
+  background-size: cover;
+  background-position: center;
+}
+
+.descent__layer--sky {
+  height: 300vh;
+  background-image: url('/plates/sky.webp');
+  /* Stretched, not covered. `cover` on a tall box scales the plate to the
+     width and crops a third off the bottom, so the visible bottom edge was a
+     mid-blue row from the middle of the image meeting a pale gradient — which
+     is what drew the hard line. A sky gradient stretches invisibly. */
+  background-size: 100% 100%;
+  background-repeat: no-repeat;
+  background-color: #0674c4;
+}
+
+.descent__layer--ground {
+  height: 170vh;
+  /* Overlaps the pale tail of the sky plate and fades up out of it. Both are
+     the same colour there, so the overlap is invisible. */
+  margin-top: -150vh;
+  /* Stretched, not covered — same reason as the sky. `cover` on a box this
+     tall crops the plate, and the row it crops away is the one whose colour
+     was matched to the sky's foot. */
+  background-size: 100% 100%;
+  background-repeat: no-repeat;
+  background-image: url('/plates/ground.webp');
+  background-position: center bottom;
+  -webkit-mask-image: linear-gradient(to bottom, transparent 0, #000 26vh);
+  mask-image: linear-gradient(to bottom, transparent 0, #000 26vh);
+}
+
+/* The branch has its own transparent layer, keyed off a green screen with the
+   edge pixels un-composited so it carries neither a dark rim nor a green one.
+   Anchored at the corner it enters from, so the tip travels furthest. */
+.descent__branch {
+  position: absolute;
+  /* Lifted slightly, so the branch reads as reaching in from above the frame
+     rather than starting at its very edge. */
+  top: -5vh;
+  left: 0;
+  width: 100%;
+  height: 100vh;
+  background-image: url('/plates/branch.webp');
+  background-size: cover;
+  background-position: center top;
+  transform-origin: 88% 2%;
+  will-change: transform;
+  pointer-events: none;
+}
+
+/* A sibling of the sticky viewport, not a child of it — it needs to scroll
+   normally with the rest of the page, not be clipped by the viewport's own
+   overflow:hidden. position:absolute here only lifts it out of document
+   flow (.descent already reserves the height for it via its own explicit
+   height); it is never transformed, so it rides native scroll at 1×. */
+.descent__panels {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 2;
+}
+
+.descent__panel {
+  display: grid;
+  place-items: center;
+  padding: 0 6vw;
+}
+
+.descent__panel--hero {
+  height: 110vh;
+}
+
+.descent__panel--about {
+  height: 140vh;
+}
+
+/* Bottom-aligned, so the cards sit low in the meadow rather than floating in
+   the middle of it, and close enough to the panel's own foot that the
+   footer follows right behind them instead of after a long empty run. */
+.descent__panel--cards {
+  height: 150vh;
+  align-items: end;
+  padding-bottom: 6vh;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .descent {
+    height: auto;
+  }
+
+  .descent__viewport {
+    position: fixed;
+    inset: 0;
+    height: 100vh;
+  }
+
+  .descent__column,
+  .descent__branch {
+    transform: none !important;
+  }
+
+  .descent__panels {
+    position: relative;
+    inset: auto;
+  }
+
+  .descent__panel--hero,
+  .descent__panel--about,
+  .descent__panel--cards {
+    height: 100vh;
+    align-items: center;
+    padding-bottom: 0;
+  }
+}
