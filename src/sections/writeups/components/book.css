@@ -1,0 +1,100 @@
+.book {
+  --size: 72px;
+  appearance: none;
+  border: 0;
+  background: none;
+  padding: 0;
+  margin: 0;
+  cursor: default;
+  display: inline-grid;
+  place-items: center;
+  line-height: 0;
+  transition: transform 160ms var(--ease);
+}
+.book[data-open] {
+  cursor: pointer;
+}
+
+.book__sprite {
+  position: relative;
+  display: block;
+  width: var(--size);
+  height: var(--size);
+  transition: transform 160ms var(--ease), filter 160ms var(--ease);
+  filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.35));
+}
+
+/* All layers share the sprite box and render nearest-neighbour. */
+.book__base,
+.book__tint,
+.book__fill,
+.book__shade {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  image-rendering: pixelated;
+}
+
+.book__base {
+  display: block;
+}
+
+/* Isolate so the multiply below only blends within this group, never against
+   the base image or the page behind it. */
+.book__tint {
+  isolation: isolate;
+}
+
+/* Solid category colour, punched to the overlay's shape. */
+.book__fill {
+  background-color: var(--cat);
+  mask-size: 100% 100%;
+  -webkit-mask-size: 100% 100%;
+  mask-repeat: no-repeat;
+  -webkit-mask-repeat: no-repeat;
+}
+
+/* The grayscale overlay, multiplied over the fill → C × (gray/255), i.e. the
+   game's exact tint, clipped to the same shape. */
+.book__shade {
+  background-size: 100% 100%;
+  background-repeat: no-repeat;
+  mix-blend-mode: multiply;
+  mask-size: 100% 100%;
+  -webkit-mask-size: 100% 100%;
+  mask-repeat: no-repeat;
+  -webkit-mask-repeat: no-repeat;
+}
+
+/* Hover / focus: the book lifts. Openable ones lift more and brighten. */
+.book:hover .book__sprite,
+.book:focus-visible .book__sprite {
+  transform: translateY(-6px) scale(1.06);
+  filter: drop-shadow(0 10px 12px rgba(0, 0, 0, 0.45));
+}
+.book[data-open]:hover .book__sprite,
+.book[data-open]:focus-visible .book__sprite {
+  transform: translateY(-8px) scale(1.08) rotate(-1deg);
+}
+.book:focus-visible {
+  outline: none;
+}
+
+/* In-progress quills breathe faintly, so an unfinished book reads as alive
+   but idle rather than clickable. */
+.book[data-progress] .book__sprite {
+  animation: quill-breathe 3.6s ease-in-out infinite;
+}
+@keyframes quill-breathe {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-2px); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .book__sprite,
+  .book[data-progress] .book__sprite {
+    animation: none;
+    transition: none;
+  }
+}

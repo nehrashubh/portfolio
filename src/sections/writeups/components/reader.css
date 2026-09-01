@@ -1,0 +1,299 @@
+.reader {
+  position: fixed;
+  inset: 0;
+  z-index: 40;
+  display: grid;
+  place-items: center;
+  padding: clamp(1rem, 4vw, 3rem);
+}
+
+.reader__scrim {
+  position: absolute;
+  inset: 0;
+  background: rgba(26, 10, 6, 0.62);
+  backdrop-filter: blur(3px);
+  animation: reader-scrim-in 300ms var(--ease) both;
+}
+.reader[data-closing] .reader__scrim {
+  animation: reader-scrim-out 240ms cubic-bezier(0.4, 0, 0.7, 0.2) both;
+}
+
+.reader__panel {
+  position: relative;
+  z-index: 1;
+  width: min(1040px, 100%);
+  max-height: 88vh;
+  overflow-y: auto;
+  padding: clamp(1.5rem, 4vw, 2.75rem);
+  border-radius: 6px;
+  color: #f3ece4;
+  background: linear-gradient(180deg, #241a16, #1c1310);
+  box-shadow:
+    0 24px 60px rgba(0, 0, 0, 0.5),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.05);
+  border-top: 3px solid var(--accent);
+  transform-origin: center 30%;
+  animation: reader-panel-in 320ms var(--ease) both;
+}
+.reader[data-closing] .reader__panel {
+  animation: reader-panel-out 240ms cubic-bezier(0.4, 0, 0.7, 0.2) both;
+}
+
+.reader__close {
+  position: absolute;
+  top: 0.75rem;
+  right: 0.9rem;
+  appearance: none;
+  border: 0;
+  background: none;
+  color: rgba(243, 236, 228, 0.6);
+  font-size: 1.9rem;
+  line-height: 1;
+  cursor: pointer;
+  transition: color 140ms;
+}
+.reader__close:hover {
+  color: #f3ece4;
+}
+
+.reader__head {
+  display: flex;
+  gap: 1.25rem;
+  align-items: center;
+  margin-bottom: 1.75rem;
+  padding-bottom: 1.5rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+.reader__spine {
+  flex: none;
+}
+
+.reader__eyebrow {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: rgba(243, 236, 228, 0.55);
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+  flex-wrap: wrap;
+}
+.reader__cat {
+  font-weight: 600;
+}
+.reader__dot {
+  opacity: 0.5;
+}
+
+.reader__title {
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: clamp(1.7rem, 4vw, 2.6rem);
+  line-height: 1.05;
+  margin: 0.35rem 0 0.6rem;
+}
+
+.reader__tags {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  color: rgba(243, 236, 228, 0.5);
+  display: flex;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+  align-items: center;
+}
+.reader__tag {
+  color: rgba(243, 236, 228, 0.62);
+}
+
+/* --- markdown body --- */
+.reader__body {
+  font-size: 1.02rem;
+  line-height: 1.7;
+}
+/* Keep prose to a comfortable measure on the wide panel; let code use the full width. */
+.md h3,
+.md p,
+.md ul,
+.md__label,
+.md__result {
+  max-width: 76ch;
+}
+.md h3 {
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin: 2rem 0 0.75rem;
+  filter: none;
+}
+.md p {
+  margin: 0.6rem 0;
+}
+.md ul {
+  margin: 0.6rem 0;
+  padding-left: 1.2rem;
+}
+.md li {
+  margin: 0.35rem 0;
+}
+.md code {
+  font-family: var(--font-mono);
+  font-size: 0.86em;
+  background: rgba(0, 0, 0, 0.32);
+  padding: 0.1em 0.38em;
+  border-radius: 3px;
+  color: #e9c9a0;
+}
+.codeblock {
+  margin: 0.95rem 0;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-left: 3px solid var(--accent);
+  border-radius: 5px;
+  overflow: hidden;
+  background: #120b09;
+}
+
+/* Header bar: language on the left, copy on the right — a flex row, so the
+   button can never sit on top of the code, and "copied" can't cover the lang. */
+.codeblock__bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding: 0.32rem 0.4rem 0.32rem 0.85rem;
+  background: rgba(255, 255, 255, 0.035);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+.codeblock__lang {
+  font-family: var(--font-mono);
+  font-size: 0.62rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: rgba(243, 236, 228, 0.4);
+}
+.codeblock__copy {
+  flex: none;
+  min-width: 5.4rem;
+  text-align: center;
+  appearance: none;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: rgba(255, 255, 255, 0.05);
+  color: rgba(243, 236, 228, 0.72);
+  font-family: var(--font-mono);
+  font-size: 0.66rem;
+  letter-spacing: 0.06em;
+  padding: 0.24rem 0.5rem;
+  border-radius: 3px;
+  cursor: pointer;
+  transition: background 140ms, color 140ms, border-color 140ms;
+}
+.codeblock__copy:hover,
+.codeblock__copy:focus-visible {
+  background: rgba(255, 255, 255, 0.11);
+  color: #f3ece4;
+  outline: none;
+}
+.codeblock__copy[data-copied] {
+  color: #a9c98a;
+  border-color: rgba(169, 201, 138, 0.4);
+}
+
+.md pre {
+  border: 0;
+  border-radius: 0;
+  background: none;
+  padding: 0.9rem 1rem;
+  overflow-x: auto;
+  margin: 0;
+}
+.md pre code {
+  background: none;
+  padding: 0;
+  color: #d6e0c9;
+  font-size: 0.82rem;
+  line-height: 1.6;
+}
+.md__label {
+  font-family: var(--font-mono);
+  font-size: 0.74rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: rgba(243, 236, 228, 0.7);
+  margin: 1rem 0 0.25rem !important;
+}
+.md__result {
+  font-family: var(--font-mono);
+  font-size: 0.85rem;
+  color: #9fb98a;
+}
+
+/* glossary + cross-reference links inside the body */
+.md .gloss {
+  appearance: none;
+  border: 0;
+  background: none;
+  padding: 0;
+  font: inherit;
+  color: #e6b8f0;
+  border-bottom: 1px dotted rgba(230, 184, 240, 0.6);
+  cursor: help;
+}
+.md .gloss:hover,
+.md .gloss:focus-visible {
+  color: #f3d3fa;
+  outline: none;
+}
+.md .xref {
+  appearance: none;
+  border: 0;
+  background: none;
+  padding: 0;
+  font: inherit;
+  color: #e9c9a0;
+  border-bottom: 1px solid rgba(233, 201, 160, 0.5);
+  cursor: pointer;
+}
+.md a {
+  color: #e9c9a0;
+}
+
+@keyframes reader-scrim-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+@keyframes reader-scrim-out {
+  from { opacity: 1; }
+  to { opacity: 0; }
+}
+@keyframes reader-panel-in {
+  from {
+    opacity: 0;
+    transform: translateY(10px) scale(0.985);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+@keyframes reader-panel-out {
+  from {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+  to {
+    opacity: 0;
+    transform: translateY(10px) scale(0.982);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .reader__scrim,
+  .reader[data-closing] .reader__scrim,
+  .reader__panel,
+  .reader[data-closing] .reader__panel {
+    animation: none;
+  }
+}

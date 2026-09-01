@@ -1,0 +1,229 @@
+{
+  "generated": "2026-09-01T21:45:35.535Z",
+  "counts": {
+    "writeups": 5,
+    "openable": 4,
+    "inProgress": 1,
+    "glossaryTerms": 4
+  },
+  "categories": [
+    {
+      "slug": "recon",
+      "label": "Recon",
+      "color": "#4071A3",
+      "order": 1,
+      "count": 0
+    },
+    {
+      "slug": "exploitation",
+      "label": "Exploitation",
+      "color": "#CE4A2C",
+      "order": 2,
+      "count": 3
+    },
+    {
+      "slug": "privesc",
+      "label": "Privilege Escalation",
+      "color": "#A0559F",
+      "order": 3,
+      "count": 2
+    },
+    {
+      "slug": "protocol",
+      "label": "Protocols",
+      "color": "#3B683B",
+      "order": 4,
+      "count": 0
+    },
+    {
+      "slug": "misc",
+      "label": "Misc",
+      "color": "#E1E6E8",
+      "order": 5,
+      "count": 0
+    }
+  ],
+  "writeups": [
+    {
+      "slug": "nibbles",
+      "title": "Nibbles",
+      "path": "writeups/nibbles.md",
+      "date": "2026-09-01",
+      "source": "htb",
+      "category": "privilege escalation",
+      "categorySlug": "privesc",
+      "categoryLabel": "Privilege Escalation",
+      "color": "#A0559F",
+      "difficulty": "easy",
+      "status": "in-progress",
+      "tags": [
+        "web"
+      ],
+      "sprite": "writable_book",
+      "openable": false,
+      "wordCount": 0,
+      "sections": [],
+      "links": [],
+      "excerpt": null
+    },
+    {
+      "slug": "massagold",
+      "title": "Massagold",
+      "path": "writeups/massagold.md",
+      "date": "2026-07-28",
+      "source": "ctf",
+      "category": "web exploitation",
+      "categorySlug": "exploitation",
+      "categoryLabel": "Exploitation",
+      "color": "#CE4A2C",
+      "difficulty": "easy",
+      "status": "complete",
+      "tags": [
+        "web"
+      ],
+      "sprite": "written_book",
+      "openable": true,
+      "wordCount": 226,
+      "sections": [
+        "Target",
+        "Recon",
+        "Vulnerability",
+        "Exploitation",
+        "Lessons Learned"
+      ],
+      "links": [],
+      "excerpt": "Scenario files: Express + EJS backend, SQLite, Playwright-driven admin bot that logs in and visits whatever message triggers it."
+    },
+    {
+      "slug": "gatery",
+      "title": "Gatery",
+      "path": "writeups/gatery.md",
+      "date": "2026-07-25",
+      "source": "ctf",
+      "category": "web exploitation",
+      "categorySlug": "exploitation",
+      "categoryLabel": "Exploitation",
+      "color": "#CE4A2C",
+      "difficulty": "very easy",
+      "status": "complete",
+      "tags": [
+        "web"
+      ],
+      "sprite": "written_book",
+      "openable": true,
+      "wordCount": 142,
+      "sections": [
+        "Target",
+        "Recon",
+        "Vulnerability",
+        "Exploitation",
+        "Lessons Learned"
+      ],
+      "links": [],
+      "excerpt": "Source: Elysia (Bun/TS) backend + React frontend, nginx in front"
+    },
+    {
+      "slug": "privilege-escalation-practice",
+      "title": "Privilege Escalation (practice)",
+      "path": "writeups/privilege-escalation-practice.md",
+      "date": "2026-06-24",
+      "source": "practice",
+      "category": "privilege escalation",
+      "categorySlug": "privesc",
+      "categoryLabel": "Privilege Escalation",
+      "color": "#A0559F",
+      "difficulty": "easy",
+      "status": "complete",
+      "tags": [
+        "bash"
+      ],
+      "sprite": "written_book",
+      "openable": true,
+      "wordCount": 126,
+      "sections": [
+        "Target",
+        "Recon",
+        "Vulnerability",
+        "Exploitation",
+        "Privilege Escalation",
+        "Lessons Learned"
+      ],
+      "links": [
+        {
+          "type": "glossary",
+          "slug": "ssh",
+          "label": "SSH"
+        }
+      ],
+      "excerpt": "SSH access to user1 with a given password on 154.57.164.70:31681."
+    },
+    {
+      "slug": "wordpress-exploitation-practice",
+      "title": "Wordpress exploitation (practice)",
+      "path": "writeups/wordpress-exploitation-practice.md",
+      "date": "2026-06-24",
+      "source": "practice",
+      "category": "web exploitation",
+      "categorySlug": "exploitation",
+      "categoryLabel": "Exploitation",
+      "color": "#CE4A2C",
+      "difficulty": "easy",
+      "status": "complete",
+      "tags": [
+        "wordpress",
+        "metasploit",
+        "web"
+      ],
+      "sprite": "written_book",
+      "openable": true,
+      "wordCount": 135,
+      "sections": [
+        "Target",
+        "Recon",
+        "Vulnerability",
+        "Exploitation",
+        "Lessons Learned"
+      ],
+      "links": [
+        {
+          "type": "glossary",
+          "slug": "whatweb",
+          "label": "whatweb"
+        },
+        {
+          "type": "glossary",
+          "slug": "gobuster",
+          "label": "Gobuster"
+        },
+        {
+          "type": "glossary",
+          "slug": "msfconsole",
+          "label": "msfconsole"
+        }
+      ],
+      "excerpt": "machine: http://154.57.164.70:30090"
+    }
+  ],
+  "glossary": {
+    "gobuster": {
+      "term": "Gobuster",
+      "definition": "used for finding hidden folders and files on a remote server.",
+      "category": "recon"
+    },
+    "msfconsole": {
+      "term": "msfconsole",
+      "definition": "Launches the metasploit framework",
+      "category": "exploitation"
+    },
+    "ssh": {
+      "term": "SSH",
+      "definition": "Used to remotely connect to a user or server given the ip and port.",
+      "category": "protocol"
+    },
+    "whatweb": {
+      "term": "whatweb",
+      "definition": "identifies web technologies running on remote servers.",
+      "category": "recon"
+    }
+  }
+}

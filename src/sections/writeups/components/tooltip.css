@@ -1,0 +1,49 @@
+/* Minecraft item tooltip. The purple double border is the vanilla look:
+   a near-black fill with a magenta-violet edge and a darker outer ring. */
+.mc-tooltip {
+  position: fixed;
+  z-index: 60;
+  pointer-events: none;
+  max-width: 320px;
+  padding: 8px 11px;
+  font-family: var(--font-mono);
+  font-size: 13px;
+  line-height: 1.5;
+  color: #f4f2ff;
+  background: rgba(16, 0, 16, 0.96);
+  border: 2px solid #100010;
+  border-radius: 2px;
+  /* inner magenta ring + outer darkening, the classic tooltip frame */
+  box-shadow:
+    inset 0 0 0 2px #26023d,
+    inset 0 0 0 3px #3b0a63,
+    0 8px 24px rgba(0, 0, 0, 0.5);
+  image-rendering: pixelated;
+}
+
+.mc-tooltip__title {
+  font-weight: 700;
+  letter-spacing: 0.01em;
+  margin-bottom: 3px;
+}
+/* Enchantment-style lines: light purple italic, like real enchant text. */
+.mc-tooltip__ench {
+  color: #a98bdc;
+  font-style: italic;
+}
+/* Lore lines: gray, the way item lore reads. */
+.mc-tooltip__lore {
+  color: #8a8a99;
+  margin-top: 6px;
+}
+.mc-tooltip__lore--soft {
+  color: #6f6f80;
+  font-style: italic;
+}
+.mc-tooltip__tags {
+  color: #6f6f80;
+}
+.mc-tooltip__def {
+  color: #cfc9e6;
+  font-style: normal;
+}
