@@ -47,3 +47,39 @@ export function chooseLabelSide(
   const fitsLeft = screenX - labelWidth >= 0
   return overflowsRight && fitsLeft ? 'left' : 'right'
 }
+
+/** Inset from every frame edge, in CSS pixels. */
+const EDGE_PAD = 16
+/** How far the body reaches above its anchor: the leader plus the tallest body. */
+const BODY_REACH = 230
+
+export type ClampedAnchor = { x: number; y: number; clamped: boolean }
+
+/**
+ * Keeps a label's body inside the frame even when its marker is not.
+ *
+ * On a portrait phone the 60° vertical field of view leaves only ~32° across,
+ * so a marker held 25° off-centre — in frame on any landscape screen — sits
+ * outside it. The label still has to be read, so its anchor is pulled back
+ * to the nearest point that shows the whole body. `clamped` tells the caller
+ * the leader no longer points at anything, so it can dim it.
+ */
+export function clampAnchor(
+  x: number,
+  y: number,
+  side: LabelSide,
+  labelWidth: number,
+  viewportWidth: number,
+  viewportHeight: number,
+): ClampedAnchor {
+  // Body geometry from overlay.css: right-side bodies start 16px left of the
+  // anchor; left-side bodies end at the anchor.
+  const minX = side === 'right' ? EDGE_PAD + 16 : EDGE_PAD + labelWidth
+  const maxX = side === 'right' ? viewportWidth - EDGE_PAD - labelWidth + 16 : viewportWidth - EDGE_PAD
+  const minY = BODY_REACH
+  const maxY = viewportHeight - EDGE_PAD
+
+  const cx = Math.min(Math.max(x, minX), Math.max(minX, maxX))
+  const cy = Math.min(Math.max(y, minY), Math.max(minY, maxY))
+  return { x: cx, y: cy, clamped: cx !== x || cy !== y }
+}

@@ -10,7 +10,7 @@ import { ShipCloudsScene } from './ShipCloudsScene'
 import { PathLine, type PathLineHandle } from './PathLine'
 import { WaypointTarget, type WaypointTargetHandle } from './WaypointTarget'
 import { WaypointLabel, type WaypointLabelHandle, LABEL_WIDTH_PX } from './WaypointLabel'
-import { projectToScreen, chooseLabelSide } from './labelPlacement'
+import { projectToScreen, chooseLabelSide, clampAnchor } from './labelPlacement'
 import { useScrollFlight } from './useScrollFlight'
 import { smoothToward } from './scrollFlight'
 import { useDpr } from '../../shared/useDpr'
@@ -88,8 +88,12 @@ function CameraRig({
         label.setVisibility(0)
         return
       }
+      // On a portrait phone the marker itself can sit outside the frame;
+      // the label is pulled back in so it can still be read.
+      const side = chooseLabelSide(point.x, labelWidth, width)
+      const anchor = clampAnchor(point.x, point.y, side, labelWidth, width, height)
       label.setWidth(labelWidth)
-      label.setPlacement(point.x, point.y, chooseLabelSide(point.x, labelWidth, width))
+      label.setPlacement(anchor.x, anchor.y, side, anchor.clamped)
       label.setVisibility(opacity)
     })
 

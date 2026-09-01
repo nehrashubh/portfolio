@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest'
 import { PerspectiveCamera, Vector3 } from 'three'
-import { projectToScreen, chooseLabelSide } from './labelPlacement'
+import { projectToScreen, chooseLabelSide, clampAnchor } from './labelPlacement'
 
 function cameraAtOrigin() {
   const camera = new PerspectiveCamera(60, 16 / 9, 0.1, 100)
@@ -56,5 +56,33 @@ describe('chooseLabelSide', () => {
   it('flips left exactly at the overflow boundary', () => {
     expect(chooseLabelSide(760, 240, 1000)).toBe('right')
     expect(chooseLabelSide(761, 240, 1000)).toBe('left')
+  })
+})
+
+describe('clampAnchor', () => {
+  const W = 390
+  const H = 800
+  const LABEL = 234
+
+  it('leaves an anchor alone when the whole label already fits', () => {
+    expect(clampAnchor(120, 400, 'right', LABEL, W, H)).toEqual({ x: 120, y: 400, clamped: false })
+  })
+
+  it('pulls a right-side label back so its body ends inside the frame', () => {
+    const r = clampAnchor(460, 400, 'right', LABEL, W, H)
+    // body spans x - 16 … x - 16 + LABEL, so the far edge lands at W - 16
+    expect(r.x + LABEL - 16).toBeLessThanOrEqual(W - 16)
+    expect(r.clamped).toBe(true)
+  })
+
+  it('pulls a left-side label forward so its body starts inside the frame', () => {
+    const r = clampAnchor(40, 400, 'left', LABEL, W, H)
+    expect(r.x - LABEL).toBeGreaterThanOrEqual(16)
+    expect(r.clamped).toBe(true)
+  })
+
+  it('keeps the body below the chrome band and above the bottom edge', () => {
+    expect(clampAnchor(200, 30, 'right', LABEL, W, H).y).toBeGreaterThanOrEqual(230)
+    expect(clampAnchor(200, 900, 'right', LABEL, W, H).y).toBeLessThanOrEqual(H - 16)
   })
 })

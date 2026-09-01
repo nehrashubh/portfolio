@@ -8,7 +8,8 @@ export const LABEL_WIDTH_PX = 240
 
 export type WaypointLabelHandle = {
   setVisibility: (opacity: number) => void
-  setPlacement: (x: number, y: number, side: LabelSide) => void
+  /** `offFrame` means the anchor was clamped and the leader points at nothing. */
+  setPlacement: (x: number, y: number, side: LabelSide, offFrame?: boolean) => void
   /** Body width in CSS pixels; narrower than LABEL_WIDTH_PX on small frames. */
   setWidth: (px: number) => void
 }
@@ -34,13 +35,15 @@ export const WaypointLabel = forwardRef<WaypointLabelHandle, WaypointLabelProps>
         if (!el) return
         el.style.opacity = String(opacity)
       },
-      setPlacement(x: number, y: number, side: LabelSide) {
+      setPlacement(x: number, y: number, side: LabelSide, offFrame = false) {
         const el = elementRef.current
         if (!el) return
         // translate3d, not left/top: it stays on the compositor and avoids a
         // layout pass every frame for every label.
         el.style.transform = `translate3d(${x}px, ${y}px, 0)`
         el.dataset.side = side
+        if (offFrame) el.dataset.offFrame = ''
+        else delete el.dataset.offFrame
       },
       setWidth(px: number) {
         const el = elementRef.current

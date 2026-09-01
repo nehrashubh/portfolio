@@ -80,6 +80,12 @@
   background: rgba(232, 184, 119, 0.8);
 }
 
+/* The marker is outside the frame and the label was pulled back in; a
+   leader pointing at nothing is dimmed rather than drawn with conviction. */
+.waypoint-label[data-off-frame] .waypoint-label__leader {
+  opacity: 0.3;
+}
+
 .waypoint-label__body {
   position: absolute;
   bottom: 56px;
