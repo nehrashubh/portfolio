@@ -1,4 +1,4 @@
-import { describe, it, expect } from 'vitest'
+import { describe, it, expect, afterEach } from 'vitest'
 import { render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { Ground } from './Ground'
@@ -108,5 +108,55 @@ describe('Ground heading letters', () => {
     expect(
       screen.getByRole('heading', { level: 2, name: /^experience$/i }),
     ).toBeInTheDocument()
+  })
+})
+
+describe('Ground routing', () => {
+  afterEach(() => {
+    window.history.replaceState(null, '', window.location.pathname)
+  })
+
+  it('opens the section named in the URL fragment on mount', () => {
+    window.location.hash = '#writeups/massagold'
+    render(<Ground reducedMotion />)
+    // The section is a dialog and so is the reader it opened on that slug.
+    expect(screen.getByRole('dialog', { name: 'Writeups' })).toBeInTheDocument()
+    expect(screen.getByRole('dialog', { name: 'Massagold' })).toBeInTheDocument()
+  })
+
+  it('writes the fragment when a card is clicked', async () => {
+    const user = userEvent.setup()
+    render(<Ground reducedMotion />)
+    await user.click(screen.getByRole('button', { name: /projects/i }))
+    expect(window.location.hash).toBe('#projects')
+  })
+
+  it('clears the fragment on close without adding history', async () => {
+    const user = userEvent.setup()
+    render(<Ground reducedMotion />)
+    await user.click(screen.getByRole('button', { name: /skills/i }))
+    await user.click(screen.getByRole('button', { name: /close skills/i }))
+    await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument())
+    expect(window.location.hash).toBe('')
+  })
+
+  it('follows a fragment change to another section while one is open', async () => {
+    const user = userEvent.setup()
+    render(<Ground reducedMotion />)
+    await user.click(screen.getByRole('button', { name: /skills/i }))
+    window.location.hash = '#work/dbworkout'
+    window.dispatchEvent(new HashChangeEvent('hashchange'))
+    await waitFor(() =>
+      expect(screen.getByRole('dialog')).toHaveAccessibleName('Work & Education'),
+    )
+  })
+
+  it('closes when the fragment is emptied, as the back button does', async () => {
+    const user = userEvent.setup()
+    render(<Ground reducedMotion />)
+    await user.click(screen.getByRole('button', { name: /skills/i }))
+    window.history.replaceState(null, '', window.location.pathname)
+    window.dispatchEvent(new HashChangeEvent('hashchange'))
+    await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument())
   })
 })

@@ -7,7 +7,7 @@ import { NARROW_LAYOUT, NARROW_QUERY, WIDE_LAYOUT } from './stageLayout'
 import { ENTRANCE, ENTRANCE_DURATION_MS } from './entrance'
 import './skills.css'
 
-export default function SkillsSection({ reducedMotion }: SectionProps) {
+export default function SkillsSection({ reducedMotion, item }: SectionProps) {
   const sceneRef = useRef<ChessSceneHandle>(null)
   const [selectedName, setSelectedName] = useState<string | null>(null)
   const [ready, setReady] = useState(false)
@@ -26,6 +26,11 @@ export default function SkillsSection({ reducedMotion }: SectionProps) {
     )
     return () => clearTimeout(timer)
   }, [ready, entranceDone])
+
+  // `#skills/<piece>` selects that piece once the board is up.
+  useEffect(() => {
+    if (ready && item) sceneRef.current?.selectPiece(item)
+  }, [ready, item])
 
   const entrance: EntrancePhase =
     reducedMotion || entranceDone ? 'done' : ready ? 'playing' : 'waiting'

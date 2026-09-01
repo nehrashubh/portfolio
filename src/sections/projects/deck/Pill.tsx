@@ -65,7 +65,7 @@ export default function Pill({
             <li key={chip}>{chip}</li>
           ))}
         </ul>
-        <ArrowLink url={project.url} label="View project" />
+        <ArrowLink url={project.url} label={project.linkLabel ?? 'View project'} />
       </div>
     </div>
   );

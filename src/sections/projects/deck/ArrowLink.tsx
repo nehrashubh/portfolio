@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { externalHref } from './externalHref';
+import { linkHref } from './externalHref';
 
 /**
  * Bare text and an arrow, no button chrome.
@@ -17,7 +17,7 @@ import { externalHref } from './externalHref';
  */
 export default function ArrowLink({ url, label }: { url: string; label: string }) {
   const [hot, setHot] = useState<boolean | null>(null);
-  const href = externalHref(url);
+  const link = linkHref(url);
 
   const inner = (
     <>
@@ -33,14 +33,13 @@ export default function ArrowLink({ url, label }: { url: string; label: string }
 
   const className = `arrow-link${hot === true ? ' is-hot' : hot === false ? ' is-cold' : ''}`;
 
-  if (!href) return <span className={className}>{inner}</span>;
+  if (!link) return null;
 
   return (
     <a
       className={className}
-      href={href}
-      target="_blank"
-      rel="noopener noreferrer"
+      href={link.href}
+      {...(link.external ? { target: '_blank', rel: 'noopener noreferrer' } : {})}
       onPointerEnter={() => setHot(true)}
       onPointerLeave={() => setHot(false)}
       onFocus={() => setHot(true)}

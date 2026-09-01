@@ -14,15 +14,22 @@ describe('PROJECTS', () => {
     }
   });
 
-  it('uses absolute http(s) urls, since the View button opens them in a new tab', () => {
+  it('links out with http(s), within the site with a hash, or not at all', () => {
     for (const project of PROJECTS) {
-      expect(project.url).toMatch(/^https?:\/\//);
+      expect(project.url).toMatch(/^(https?:\/\/|#[a-z]+(\/[a-z0-9_-]+)?$|$)/);
     }
   });
 
+  it('has a unique slug per project for deep links', () => {
+    const slugs = PROJECTS.map((p) => p.slug);
+    expect(new Set(slugs).size).toBe(slugs.length);
+    for (const slug of slugs) expect(slug).toMatch(/^[a-z0-9-]+$/);
+  });
+
   it('keeps descriptions short enough for the card to render ~3 lines', () => {
+    // ~68 characters per line at 40cqw; three lines with room to spare.
     for (const project of PROJECTS) {
-      expect(project.description.length).toBeLessThanOrEqual(140);
+      expect(project.description.length).toBeLessThanOrEqual(160);
     }
   });
 });

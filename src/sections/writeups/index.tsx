@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import type { SectionProps } from '../SectionProps'
 import { index } from './data/writeups'
 import type { Writeup } from './types'
@@ -9,7 +9,7 @@ import './writeups.css'
 
 const SOURCE_LABEL: Record<string, string> = { htb: 'Hack The Box', ctf: 'CTF', practice: 'Practice' }
 
-export default function WriteupsSection(_props: SectionProps) {
+export default function WriteupsSection({ item }: SectionProps) {
   const [open, setOpen] = useState<Writeup | null>(null)
   const [hover, setHover] = useState<{ w: Writeup; rect: DOMRect } | null>(null)
 
@@ -18,6 +18,13 @@ export default function WriteupsSection(_props: SectionProps) {
     const w = bySlug[slug]
     if (w?.openable) setOpen(w)
   }
+
+  // `#writeups/<slug>` lands straight in the reader.
+  useEffect(() => {
+    if (!item) return
+    const w = bySlug[item]
+    setOpen(w?.openable ? w : null)
+  }, [item, bySlug])
 
   return (
     <div className="writeups">

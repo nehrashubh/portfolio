@@ -15,6 +15,8 @@ import './overlay.css'
 
 interface Props {
   section: Section | null
+  /** The thing inside the section the URL asked for, if any. */
+  item?: string
   /** Ask to close. The overlay then plays its exit and calls onClosed. */
   onClose: () => void
   /** True once the exit is running; the overlay stays mounted until it ends. */
@@ -38,6 +40,7 @@ function fontPx(el: Element): number {
 
 export function SectionOverlay({
   section,
+  item,
   onClose,
   closing = false,
   onClosed,
@@ -198,7 +201,7 @@ export function SectionOverlay({
           }
         >
           <Suspense fallback={<p className="overlay__placeholder">Opening…</p>}>
-            <SectionBody reducedMotion={reducedMotion} />
+            <SectionBody reducedMotion={reducedMotion} item={item} />
           </Suspense>
         </ErrorBoundary>
       </div>

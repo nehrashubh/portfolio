@@ -11,10 +11,17 @@ describe('ArrowLink', () => {
     expect(link.getAttribute('rel')).toContain('noreferrer');
   });
 
-  it('renders without an href rather than a dangerous one', () => {
+  it('renders nothing rather than a dangerous href', () => {
     render(<ArrowLink url="javascript:alert(1)" label="View project" />);
     expect(screen.queryByRole('link')).not.toBeInTheDocument();
-    expect(screen.getByText(/view project/i)).toBeInTheDocument();
+    expect(screen.queryByText(/view project/i)).not.toBeInTheDocument();
+  });
+
+  it('keeps a site fragment in this tab', () => {
+    render(<ArrowLink url="#writeups/massagold" label="Read the writeups" />);
+    const link = screen.getByRole('link', { name: 'Read the writeups' });
+    expect(link).toHaveAttribute('href', '#writeups/massagold');
+    expect(link).not.toHaveAttribute('target');
   });
 
   it('marks its arrows decorative so the label is announced once', () => {

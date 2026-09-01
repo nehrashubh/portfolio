@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useProgress } from '@react-three/drei';
 import type { SectionProps } from '../SectionProps';
 import { useCarousel } from './carousel/useCarousel';
@@ -9,7 +9,7 @@ import Scene from './scene/Scene';
 import { useIsNarrowViewport } from './scene/useIsNarrowViewport';
 import './projects.css';
 
-export default function ProjectsSection(_props: SectionProps) {
+export default function ProjectsSection({ item }: SectionProps) {
   const hostRef = useRef<HTMLDivElement>(null);
   const narrow = useIsNarrowViewport();
   const [openIndex, setOpenIndex] = useState<number | null>(null);
@@ -20,6 +20,17 @@ export default function ProjectsSection(_props: SectionProps) {
   const carousel = useCarousel(PROJECTS.length, openIndex === null, hostRef);
   const webgl = hasWebGL();
   const { active: loading } = useProgress();
+
+  // `#projects/<slug>` lands on that card, already open. The deck is set
+  // straight to the index rather than sprung there: there is nothing on
+  // screen yet for a travel to be seen from.
+  useEffect(() => {
+    if (!item) return;
+    const index = PROJECTS.findIndex((p) => p.slug === item);
+    if (index < 0) return;
+    carousel.stateRef.current = { position: index, velocity: 0, target: null };
+    setOpenIndex(index);
+  }, [item, carousel.stateRef]);
 
   return (
     <div ref={hostRef} className="scene-host" role="region" aria-label="Projects">

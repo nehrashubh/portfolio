@@ -69,7 +69,7 @@ describe('opening and closing a project', () => {
     expect(card.getByText(PROJECTS[0].description)).toBeVisible();
     expect(card.getByText(PROJECTS[0].role)).toBeVisible();
     for (const chip of PROJECTS[0].stack) expect(card.getByText(chip)).toBeVisible();
-    expect(card.getByRole('link', { name: /view project/i })).toHaveAttribute(
+    expect(card.getByRole('link', { name: PROJECTS[0].linkLabel ?? /view project/i })).toHaveAttribute(
       'href',
       PROJECTS[0].url,
     );

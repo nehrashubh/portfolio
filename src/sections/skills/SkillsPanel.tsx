@@ -154,14 +154,31 @@ function SkillDetail({
         <h3 className="detail__label">Selected work</h3>
         {entry.links.length > 0 ? (
           <ul className="links">
-            {entry.links.map((link) => (
-              <li key={link.href}>
-                <a className="link" href={link.href} target="_blank" rel="noreferrer noopener">
+            {entry.links.map((link) => {
+              const inner = (
+                <>
                   <span className="link__kind">{link.kind}</span>
                   <span className="link__label">{link.label}</span>
-                </a>
-              </li>
-            ))}
+                </>
+              )
+              // A hash travels within the site, so it stays in this tab;
+              // anything external opens in a new one; a cert is just a line.
+              return (
+                <li key={link.label}>
+                  {!link.href ? (
+                    <span className="link link--static">{inner}</span>
+                  ) : link.href.startsWith('#') ? (
+                    <a className="link" href={link.href}>
+                      {inner}
+                    </a>
+                  ) : (
+                    <a className="link" href={link.href} target="_blank" rel="noreferrer noopener">
+                      {inner}
+                    </a>
+                  )}
+                </li>
+              )
+            })}
           </ul>
         ) : (
           <p className="detail__empty">Nothing linked here yet.</p>

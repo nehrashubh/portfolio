@@ -115,9 +115,21 @@ describe('SkillsPanel detail', () => {
   })
 
   it('says so plainly when no work is linked yet', () => {
-    renderPanel({ selectedName: target.pieceName })
-    expect(target.links).toHaveLength(0)
+    const unlinked = FISCHER_POSITION.find((entry) => entry.links.length === 0)!
+    renderPanel({ selectedName: unlinked.pieceName })
     expect(screen.getByText('Nothing linked here yet.')).toBeTruthy()
+  })
+
+  it('keeps a site link in this tab and sends an external one to a new tab', () => {
+    const linked = FISCHER_POSITION.find((entry) =>
+      entry.links.some((l) => l.href?.startsWith('#')) &&
+      entry.links.some((l) => l.href?.startsWith('http')),
+    )!
+    renderPanel({ selectedName: linked.pieceName })
+    const internal = linked.links.find((l) => l.href?.startsWith('#'))!
+    const external = linked.links.find((l) => l.href?.startsWith('http'))!
+    expect(screen.getByText(internal.label).closest('a')).not.toHaveAttribute('target')
+    expect(screen.getByText(external.label).closest('a')).toHaveAttribute('target', '_blank')
   })
 
   it('returns to the index via the back control', () => {

@@ -95,6 +95,8 @@ export const COPY = {
     'Cybersecurity minor',
     'Virginia Tech',
     'Class of 2028',
+    'CompTIA A+',
+    'ISC2 CC',
     'Blacksburg, VA',
   ],
 } as const
@@ -114,15 +116,15 @@ export interface Link {
   href: string
 }
 
-/** All hrefs are placeholders until Shubhankar supplies the real ones. */
+/** From the résumé. The résumé itself is served from public/. */
 export const LINKS: readonly Link[] = [
-  { label: 'Email', href: 'mailto:nehrashubh6@gmail.com' },
-  { label: 'GitHub', href: '#' },
-  { label: 'LinkedIn', href: '#' },
-  { label: 'Résumé', href: '#' },
+  { label: 'Email', href: 'mailto:shubhankarnehra@vt.edu' },
+  { label: 'GitHub', href: 'https://github.com/nehrashubh' },
+  { label: 'LinkedIn', href: 'https://www.linkedin.com/in/nehrashubh' },
+  { label: 'Résumé', href: '/shubhankarnehra_resume.pdf' },
 ] as const
 
-/** Both strings are unverified guesses — see the spec, section 3. */
+/** "Say hello." is the author's. The internship line follows from a 2028 graduation. */
 export const FOOTER = {
   heading: 'Say hello.',
   note: 'Blacksburg, VA · open to summer 2027 internships',
