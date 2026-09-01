@@ -1,5 +1,5 @@
 import { describe, it, expect, vi } from 'vitest'
-import { render, screen } from '@testing-library/react'
+import { render, screen, fireEvent } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { SectionCard } from './SectionCard'
 import { SECTIONS } from '../theme'
@@ -47,5 +47,17 @@ describe('SectionCard', () => {
       <SectionCard section={skills} onOpen={() => {}} sending />,
     )
     expect(container.querySelector('.card')).toHaveClass('card--sending')
+  })
+})
+
+describe('SectionCard prefetch', () => {
+  it('prefetches on hover, focus and pointerdown', () => {
+    const onPrefetch = vi.fn()
+    render(<SectionCard section={skills} onOpen={() => {}} onPrefetch={onPrefetch} />)
+    const button = screen.getByRole('button')
+    fireEvent.pointerEnter(button)
+    fireEvent.focus(button)
+    fireEvent.pointerDown(button)
+    expect(onPrefetch).toHaveBeenCalledTimes(3)
   })
 })

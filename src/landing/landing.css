@@ -185,3 +185,11 @@
     padding-bottom: 0;
   }
 }
+
+/* While a section owns the viewport the landing is fully covered. Hiding it
+   stops the compositor tracking thirty petals under an opaque overlay, and
+   the descent loop skips its work (Landing.tsx reads the same attribute). */
+html[data-section-open] .descent__viewport,
+html[data-section-open] .descent__panels {
+  visibility: hidden;
+}

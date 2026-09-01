@@ -69,6 +69,12 @@ export function Landing() {
     window.addEventListener('resize', measure)
 
     const tick = (t: number) => {
+      // A section owns the viewport; the landing is hidden under it and has
+      // nothing to show for the work. Keep the loop alive, skip the frame.
+      if (document.documentElement.hasAttribute('data-section-open')) {
+        raf = requestAnimationFrame(tick)
+        return
+      }
       const p = progressAt(window.scrollY - trackTop, scrollable)
 
       // The branch swings on the same gust the petals read, anchored at the

@@ -1,4 +1,5 @@
 import {
+  Suspense,
   useEffect,
   useLayoutEffect,
   useRef,
@@ -8,6 +9,8 @@ import {
 import { createPortal } from 'react-dom'
 import { MOTION, type Section } from '../theme'
 import { flipScale, flipTransform } from '../lib/flip'
+import { ErrorBoundary } from '../shared/ErrorBoundary'
+import { SECTION_REGISTRY } from './registry'
 import './overlay.css'
 
 interface Props {
@@ -23,6 +26,12 @@ interface Props {
   originRef?: RefObject<HTMLElement | null>
 }
 
+/**
+ * Height of the band the title and cross occupy, published to the section as
+ * --overlay-chrome so it can pad its own top and keep clear of them.
+ */
+const CHROME = 'calc(3.4vh + 70px)'
+
 function fontPx(el: Element): number {
   return parseFloat(getComputedStyle(el).fontSize) || 1
 }
@@ -36,6 +45,7 @@ export function SectionOverlay({
   originRef,
 }: Props) {
   const titleRef = useRef<HTMLParagraphElement>(null)
+  const closeRef = useRef<HTMLButtonElement>(null)
 
   // Entrance: the title travels out of the card it came from. Measured before
   // paint so there is no frame where it sits at its destination.
@@ -95,21 +105,59 @@ export function SectionOverlay({
     return () => window.clearTimeout(timer)
   }, [closing, section, reducedMotion, onClosed, originRef])
 
+  // Keys, scroll lock and focus.
+  //
+  // Escape is heard on window. A section's own dialog (the writeup reader,
+  // an open project card) listens on document and preventDefaults the Escape
+  // it consumed — and document fires before window — so an inner dialog
+  // always wins and one keypress never closes two things.
   useEffect(() => {
     if (!section) return
     const onKey = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') onClose()
+      if (e.key === 'Escape' && !e.defaultPrevented) onClose()
     }
-    document.addEventListener('keydown', onKey)
-    const prev = document.body.style.overflow
+    window.addEventListener('keydown', onKey)
+
+    // Both roots: html alone is not enough on iOS, body alone is not enough
+    // when html is the scroller.
+    const root = document.documentElement
+    const prevHtml = root.style.overflow
+    const prevBody = document.body.style.overflow
+    root.style.overflow = 'hidden'
     document.body.style.overflow = 'hidden'
+
+    // Focus lands on the cross, and goes back to the card the section came
+    // from when it closes, so a keyboard user returns to where they left.
+    const origin = originRef?.current?.closest('button') ?? null
+    closeRef.current?.focus({ preventScroll: true })
+
     return () => {
-      document.removeEventListener('keydown', onKey)
-      document.body.style.overflow = prev
+      window.removeEventListener('keydown', onKey)
+      root.style.overflow = prevHtml
+      document.body.style.overflow = prevBody
+      origin?.focus({ preventScroll: true })
     }
-  }, [section, onClose])
+  }, [section, onClose, originRef])
+
+  // Once the cascade has fully covered the landing, tell it to stand down:
+  // the descent loop and thirty petals have nothing to show for a viewport
+  // the section owns. Cleared the moment closing starts, since the exit
+  // reveals the cards underneath.
+  useEffect(() => {
+    if (!section || closing) return
+    const t = window.setTimeout(
+      () => document.documentElement.setAttribute('data-section-open', ''),
+      reducedMotion ? 0 : MOTION.veilGradeMs,
+    )
+    return () => {
+      window.clearTimeout(t)
+      document.documentElement.removeAttribute('data-section-open')
+    }
+  }, [section, closing, reducedMotion])
 
   if (!section) return null
+
+  const SectionBody = SECTION_REGISTRY[section.key].Component
 
   /**
    * Portalled to <body> deliberately. A modal belongs at the document root,
@@ -133,6 +181,7 @@ export function SectionOverlay({
           '--grade-ms': `${MOTION.veilGradeMs}ms`,
           '--cross-ms': `${MOTION.crossMs}ms`,
           '--ease': MOTION.ease,
+          '--overlay-chrome': CHROME,
         } as CSSProperties
       }
     >
@@ -141,11 +190,17 @@ export function SectionOverlay({
 
       {/* The section owns the whole viewport; the chrome floats over it. */}
       <div className="overlay__mount">
-        <p className="overlay__placeholder">
-          {section.title} — 3D scene and content mount here
-          <br />
-          designed separately · loaded on open
-        </p>
+        <ErrorBoundary
+          fallback={
+            <p className="overlay__placeholder">
+              {section.title} could not be opened. Reload the page to try again.
+            </p>
+          }
+        >
+          <Suspense fallback={<p className="overlay__placeholder">Opening…</p>}>
+            <SectionBody reducedMotion={reducedMotion} />
+          </Suspense>
+        </ErrorBoundary>
       </div>
 
       <p className="overlay__title" ref={titleRef}>
@@ -153,6 +208,7 @@ export function SectionOverlay({
       </p>
 
       <button
+        ref={closeRef}
         type="button"
         className="overlay__close"
         aria-label={`Close ${section.title}`}

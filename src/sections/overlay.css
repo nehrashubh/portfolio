@@ -87,14 +87,19 @@
   position: absolute;
   inset: 0;
   z-index: 2;
-  display: grid;
-  place-content: center;
-  justify-items: center;
-  gap: 1.6vh;
-  text-align: center;
-  padding: 4vh 2vw;
   opacity: 1;
   animation: backdrop-in 0.6s ease both 0.3s;
+}
+
+/* The Suspense and error lines are the one thing still centred in the slot;
+   a mounted section fills it edge to edge. */
+.overlay__mount > .overlay__placeholder {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-content: center;
+  text-align: center;
+  padding: 4vh 2vw;
 }
 
 .overlay--closing .overlay__mount {

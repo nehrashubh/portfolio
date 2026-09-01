@@ -1,5 +1,5 @@
 import { describe, it, expect, vi } from 'vitest'
-import { render, screen } from '@testing-library/react'
+import { render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { SectionOverlay } from './SectionOverlay'
 import { SECTIONS } from '../theme'
@@ -82,5 +82,63 @@ describe('SectionOverlay', () => {
       <SectionOverlay section={projects} onClose={() => {}} reducedMotion={false} />,
     )
     expect(screen.getByRole('dialog')).toHaveAttribute('aria-modal', 'true')
+  })
+})
+
+describe('SectionOverlay section mount', () => {
+  const skills = SECTIONS[0]
+
+  it('mounts the section lazily inside the slot', async () => {
+    render(<SectionOverlay section={skills} onClose={() => {}} reducedMotion />)
+    expect(await screen.findByText('Skills — section stub')).toBeInTheDocument()
+    expect(document.querySelector('.overlay__mount')).toContainElement(
+      screen.getByText('Skills — section stub'),
+    )
+  })
+
+  it('ignores Escape that an inner dialog already consumed', async () => {
+    const onClose = vi.fn()
+    render(<SectionOverlay section={skills} onClose={onClose} reducedMotion />)
+    await screen.findByText('Skills — section stub')
+    const consumed = new KeyboardEvent('keydown', { key: 'Escape', bubbles: true, cancelable: true })
+    consumed.preventDefault()
+    window.dispatchEvent(consumed)
+    expect(onClose).not.toHaveBeenCalled()
+    window.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true }))
+    expect(onClose).toHaveBeenCalledTimes(1)
+  })
+
+  it('moves focus to the close button on open', async () => {
+    render(<SectionOverlay section={skills} onClose={() => {}} reducedMotion />)
+    await screen.findByText('Skills — section stub')
+    expect(screen.getByRole('button', { name: /close skills/i })).toHaveFocus()
+  })
+
+  it('publishes the chrome height for sections to pad by', () => {
+    render(<SectionOverlay section={skills} onClose={() => {}} reducedMotion />)
+    const overlay = screen.getByRole('dialog')
+    expect(overlay.style.getPropertyValue('--overlay-chrome')).not.toBe('')
+  })
+
+  it('locks page scroll while open and restores it after', () => {
+    const { unmount } = render(
+      <SectionOverlay section={skills} onClose={() => {}} reducedMotion />,
+    )
+    expect(document.documentElement.style.overflow).toBe('hidden')
+    expect(document.body.style.overflow).toBe('hidden')
+    unmount()
+    expect(document.documentElement.style.overflow).toBe('')
+    expect(document.body.style.overflow).toBe('')
+  })
+
+  it('stands the landing down once open, and wakes it the moment closing starts', async () => {
+    const { rerender } = render(
+      <SectionOverlay section={skills} onClose={() => {}} reducedMotion />,
+    )
+    await waitFor(() =>
+      expect(document.documentElement).toHaveAttribute('data-section-open'),
+    )
+    rerender(<SectionOverlay section={skills} onClose={() => {}} reducedMotion closing />)
+    expect(document.documentElement).not.toHaveAttribute('data-section-open')
   })
 })

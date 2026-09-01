@@ -2,6 +2,7 @@ import { useCallback, useRef, useState, type Ref } from 'react'
 import { SECTIONS, type HourKey } from '../theme'
 import { SectionCard } from '../sections/SectionCard'
 import { SectionOverlay } from '../sections/SectionOverlay'
+import { prefetchSection } from '../sections/registry'
 import './ground.css'
 
 interface Props {
@@ -66,6 +67,7 @@ export function Ground({ reducedMotion, headingRef }: Props) {
             key={s.key}
             section={s}
             sending={openKey === s.key}
+            onPrefetch={() => prefetchSection(s.key)}
             onOpen={() => {
               setClosing(false)
               setOpenKey(s.key)
