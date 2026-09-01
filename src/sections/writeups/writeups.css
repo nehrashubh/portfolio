@@ -20,3 +20,14 @@
   margin: 0 auto;
   padding: var(--overlay-chrome) clamp(1.25rem, 4vw, 3.5rem) 6rem;
 }
+
+/* The reader is a modal over the section, and the section lives under the
+   overlay's title and cross. Keep the panel below that band rather than
+   letting the title print across its top edge. */
+.writeups .reader {
+  padding-top: max(var(--overlay-chrome), 3rem);
+}
+
+.writeups .reader__panel {
+  max-height: calc(100vh - var(--overlay-chrome) - 3rem);
+}

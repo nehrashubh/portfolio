@@ -1,0 +1,364 @@
+.deck-host {
+  position: absolute;
+  inset: 0;
+  /* Every deck dimension is in cqw against this box, so the composition scales
+     with the viewport instead of the pixel. `size` not `inline-size`, because the
+     card's open height is expressed in cqh. */
+  container-type: size;
+  display: grid;
+  place-items: center;
+}
+
+/* Carries the per-frame transform written by Deck. Never give this a transition:
+   the spring is the animation, and a transition would chase a target that has
+   already moved. */
+.pill-slot {
+  position: absolute;
+  will-change: transform, opacity;
+}
+
+/* Carries the morph. Positioned, so the hit overlay and the close cross have
+   something to anchor to. */
+.pill {
+  position: relative;
+  width: 34cqw;
+  height: 11.8cqw;
+  padding: 4.35cqw 3.4cqw;
+  border-radius: 999px;
+  background: radial-gradient(
+    130% 180% at 16% 0%,
+    rgba(240, 192, 160, 0.14),
+    rgba(60, 42, 32, 0.42) 58%,
+    rgba(38, 26, 20, 0.5)
+  );
+  outline: 1px solid transparent;
+  outline-offset: 0.5cqw;
+  transition:
+    width 900ms cubic-bezier(0.22, 1, 0.36, 1),
+    height 900ms cubic-bezier(0.22, 1, 0.36, 1),
+    padding 900ms cubic-bezier(0.22, 1, 0.36, 1),
+    border-radius 900ms cubic-bezier(0.22, 1, 0.36, 1),
+    background 900ms ease,
+    box-shadow 900ms ease,
+    outline-color 300ms ease,
+    outline-offset 300ms ease;
+}
+
+/* Hover, and only on the focused pill: a cream hairline held off the edge. An
+   offset outline, not a border — that is what makes it read as a halo. */
+.pill-slot.is-hot .pill {
+  outline-color: rgba(246, 238, 224, 0.85);
+  outline-offset: 0.85cqw;
+}
+
+/* :not(.is-open) matters. This selector is more specific than `.pill.is-open`,
+   so without it the focused *pill's* glow overrides the open *card's* drop
+   shadow and the card floats with no weight under it. */
+.pill-slot.is-focused .pill:not(.is-open) {
+  box-shadow:
+    inset 0 0 0 1px rgba(240, 192, 160, 0.42),
+    0 0 3.8cqw rgba(176, 96, 16, 0.3);
+}
+
+/* Covers the whole pill, so the target matches the shape the hover ring draws.
+   Empty and transparent — the visible head row sits beneath it in normal flow
+   and lends this its accessible name. */
+.pill-hit {
+  all: unset;
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  cursor: pointer;
+}
+
+/* Once open, the card's own content has to be reachable — the link, the chips,
+   the text. pointer-events rather than removing the button, so it keeps its
+   place in the tab order and its aria-expanded state. */
+.pill.is-open .pill-hit {
+  pointer-events: none;
+}
+
+/* `all: unset` takes the browser's focus ring with it, so put one back — these
+   are the only way through the deck by keyboard. */
+.pill-hit:focus-visible {
+  outline: 1px solid rgba(246, 238, 224, 0.9);
+  outline-offset: 1.2cqw;
+}
+
+.pill-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 2cqw;
+}
+
+.pill-title {
+  font-family: var(--font-display);
+  font-size: 2.7cqw;
+  line-height: 1;
+  color: #f4e7da;
+  white-space: nowrap;
+}
+
+.pill-date {
+  font-family: var(--font-mono);
+  font-size: 0.95cqw;
+  letter-spacing: 0.26em;
+  color: #d08060;
+}
+
+/* --- the link whose arrow changes sides ---------------------------------- */
+.arrow-link {
+  margin-top: 3cqw;
+  display: inline-flex;
+  align-items: center;
+  padding-bottom: 0.9cqw;
+  color: #f0c0a0;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.arrow-slot {
+  position: relative;
+  flex: none;
+  width: 0;
+  height: 1.5cqw;
+  transition: width 420ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.arrow-slot > span {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  font-size: 1.18cqw;
+  line-height: 1;
+  transition:
+    opacity 260ms ease,
+    transform 420ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.arrow-slot.is-left > span {
+  opacity: 0;
+  transform: translate(-50%, -50%) rotate(-45deg) scale(0.82);
+}
+
+.arrow-slot.is-right { width: 2.6cqw; }
+
+.arrow-slot.is-right > span {
+  opacity: 1;
+  transform: translate(-50%, -50%) rotate(0deg) scale(1);
+}
+
+.arrow-link.is-hot .arrow-slot.is-left { width: 2.6cqw; }
+.arrow-link.is-hot .arrow-slot.is-right { width: 0; }
+
+.arrow-link.is-hot .arrow-slot.is-left > span {
+  opacity: 1;
+  transform: translate(-50%, -50%) rotate(0deg) scale(1);
+}
+
+.arrow-link.is-hot .arrow-slot.is-right > span {
+  opacity: 0;
+  transform: translate(-50%, -50%) rotate(-45deg) scale(0.82);
+}
+
+/* inline-block matters: on an inline span the ::after rule renders outside the
+   box and gets clipped by any overflow on an ancestor. */
+.arrow-label {
+  position: relative;
+  display: inline-block;
+  font-size: 1.18cqw;
+  white-space: nowrap;
+}
+
+.arrow-label::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  bottom: -0.42cqw;
+  width: 100%;
+  height: 1px;
+  background: #e09a72;
+  transform-origin: right;
+}
+
+/* Collapses to the right, then redraws from the left, so the rule looks dragged
+   along behind the arrow. */
+@keyframes rule-sweep-out {
+  0%   { transform: scaleX(1); transform-origin: right; }
+  46%  { transform: scaleX(0); transform-origin: right; }
+  47%  { transform: scaleX(0); transform-origin: left; }
+  100% { transform: scaleX(1); transform-origin: left; }
+}
+
+@keyframes rule-sweep-back {
+  0%   { transform: scaleX(1); transform-origin: left; }
+  46%  { transform: scaleX(0); transform-origin: left; }
+  47%  { transform: scaleX(0); transform-origin: right; }
+  100% { transform: scaleX(1); transform-origin: right; }
+}
+
+.arrow-link.is-hot .arrow-label::after {
+  animation: rule-sweep-out 560ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.arrow-link.is-cold .arrow-label::after {
+  animation: rule-sweep-back 560ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* --- the close cross ------------------------------------------------------ */
+.close-cross {
+  all: unset;
+  position: absolute;
+  top: 2.2cqw;
+  right: 2.4cqw;
+  width: 2.1cqw;
+  height: 2.1cqw;
+  opacity: 0;
+  pointer-events: none;
+  cursor: pointer;
+  transition:
+    opacity 400ms ease 380ms,
+    transform 1100ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.close-cross::before,
+.close-cross::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 0;
+  width: 100%;
+  height: 1px;
+  background: #e0b090;
+  opacity: 0.8;
+}
+
+.close-cross::before { transform: rotate(45deg); }
+.close-cross::after { transform: rotate(-45deg); }
+
+/* Ninety degrees, slowly: it turns and lands as the same cross. */
+.close-cross:hover,
+.close-cross:focus-visible { transform: rotate(90deg); }
+
+.pill.is-open .close-cross { opacity: 1; pointer-events: auto; }
+
+/* --- the card the pill becomes -------------------------------------------- */
+.pill-body {
+  opacity: 0;
+  max-height: 0;
+  overflow: hidden;
+  transition:
+    opacity 420ms ease 120ms,
+    max-height 900ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.pill-role {
+  margin-top: 1cqw;
+  font-size: 1.02cqw;
+  letter-spacing: 0.04em;
+  color: #c08d6e;
+}
+
+.pill-blurb {
+  margin-top: 2.4cqw;
+  font-size: 1.18cqw;
+  line-height: 1.75;
+  color: #cbb1a1;
+  max-width: 40cqw;
+}
+
+.pill-chips {
+  margin-top: 2.6cqw;
+  display: flex;
+  gap: 0.7cqw;
+  flex-wrap: wrap;
+  list-style: none;
+}
+
+.pill-chips li {
+  font-family: var(--font-mono);
+  font-size: 0.86cqw;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  padding: 0.45cqw 1.1cqw;
+  border-radius: 999px;
+  color: #d9bca6;
+  box-shadow: inset 0 0 0 1px rgba(240, 192, 160, 0.2);
+}
+
+/* The card overtakes the hands rather than staying in the corridor.
+   Height is sized for the longest placeholder — a three-line blurb over four
+   stack chips — rather than the shortest, so the box never has to reflow. */
+.pill.is-open {
+  width: 58cqw;
+  height: 50cqh;
+  padding: 3.4cqw 3.6cqw;
+  border-radius: 1.9cqw;
+  outline-color: transparent;
+  background: radial-gradient(
+    130% 150% at 14% 0%,
+    rgba(240, 192, 160, 0.15),
+    rgba(56, 39, 30, 0.78) 54%,
+    rgba(34, 23, 18, 0.88)
+  );
+  box-shadow:
+    inset 0 0 0 1px rgba(240, 192, 160, 0.3),
+    0 2.4cqw 6cqw rgba(0, 0, 0, 0.5),
+    0 0 8cqw rgba(176, 96, 16, 0.16);
+}
+
+.pill.is-open .pill-body { opacity: 1; max-height: 60cqh; }
+/* Keeps the year clear of the cross once there is a corner for it to sit in. */
+.pill.is-open .pill-head { padding-right: 3.6cqw; }
+.pill.is-open .pill-hit { cursor: default; }
+
+/* --- reduced motion ------------------------------------------------------- */
+/* Functional motion stays — the deck still moves, because that is the product.
+   Decorative motion goes, and the morph becomes a short fade. */
+.deck-host.is-reduced .pill { transition: opacity 180ms ease; }
+.deck-host.is-reduced .pill-body { transition: opacity 180ms ease; }
+.deck-host.is-reduced .arrow-slot,
+.deck-host.is-reduced .arrow-slot > span,
+.deck-host.is-reduced .close-cross { transition: none; }
+.deck-host.is-reduced .arrow-label::after { animation: none; }
+.deck-host.is-reduced .close-cross:hover,
+.deck-host.is-reduced .close-cross:focus-visible { transform: none; }
+
+/* --- narrow viewports ----------------------------------------------------- */
+/* The hands cannot flank a phone — the corridor between them would be narrower
+   than one pill — so HandsModel puts them behind the deck and the deck takes the
+   full width. deckLayout flattens the axis to match; there are no fingers left
+   to clear. */
+@media (max-width: 900px) {
+  .pill {
+    width: 76cqw;
+    height: 26cqw;
+    padding: 9cqw 6cqw;
+  }
+
+  .pill-title { font-size: 5.4cqw; white-space: normal; }
+  .pill-date { font-size: 2.2cqw; }
+
+  .pill.is-open {
+    width: 88cqw;
+    height: 44cqh;
+    padding: 7cqw 6cqw;
+    border-radius: 4cqw;
+  }
+
+  .pill-role { font-size: 2.4cqw; margin-top: 2cqw; }
+  .pill-blurb { font-size: 2.9cqw; max-width: none; margin-top: 5cqw; }
+  .pill-chips { margin-top: 5cqw; gap: 1.6cqw; }
+  .pill-chips li { font-size: 2.1cqw; padding: 1.1cqw 2.4cqw; }
+
+  .arrow-link { margin-top: 6cqw; padding-bottom: 2cqw; }
+  .arrow-label, .arrow-slot > span { font-size: 2.9cqw; }
+  .arrow-slot { height: 3.6cqw; }
+  .arrow-slot.is-right,
+  .arrow-link.is-hot .arrow-slot.is-left { width: 6cqw; }
+  .arrow-label::after { bottom: -1cqw; }
+
+  .close-cross { width: 5cqw; height: 5cqw; top: 5cqw; right: 5cqw; }
+  .pill.is-open .pill-head { padding-right: 8cqw; }
+}

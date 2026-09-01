@@ -1,0 +1,26 @@
+.scene-host {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  /* Built from the brown the artist outlined the hands with. This is CSS behind
+     a transparent canvas, so it doubles as the loading state and there is never
+     a flash while the glb lands. */
+  background: radial-gradient(130% 100% at 50% 6%, #2b211b 0%, #201814 60%, #150f0c 100%);
+  touch-action: none;
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+}
+
+.scene-loading {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  margin: 0;
+  pointer-events: none;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: rgba(240, 192, 160, 0.6);
+}
