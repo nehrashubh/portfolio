@@ -1,5 +1,5 @@
 import { useEffect, useRef } from 'react'
-import { progressAt, columnOffsetVh } from '../lib/descent'
+import { progressAt, columnOffsetVh, damp } from '../lib/descent'
 import { gust } from '../lib/wind'
 import { useReducedMotion } from '../shared/useReducedMotion'
 import { Hero } from './Hero'
@@ -9,36 +9,52 @@ import { Footer } from './Footer'
 import { PetalField } from './PetalField'
 import './landing.css'
 
-/** How far the scene travels across the track. The panels travel 340vh, so
+/** How far the scene travels across the track. The panels travel 440vh, so
  *  the gap between the two is the parallax that gives the descent depth. */
-const COLUMN_TRAVEL_VH = 170
+const COLUMN_TRAVEL_VH = 220
+
+/** Total travel of the content panels, in vh: their stacked height less the
+ *  one viewport that is always on screen. 110 + 140 + 190 + 100 - 100. */
+const PANEL_TRAVEL_VH = 440
+
+/** How hard the scene resists the scroll. This is the lambda of an
+ *  exponential decay, so 1/DAMPING is roughly the time in seconds to cover
+ *  63% of the remaining distance. Lower is heavier. */
+const DAMPING = 1.0
+
+/** Ceiling on how fast the scene may travel, in progress units per second.
+ *  This is what makes a flick of the wheel do almost nothing: the scroll is
+ *  accepted in full, but the scene will not chase it faster than this. */
+const MAX_SPEED = 0.3
 
 /** Share of the heading's window spent handing off from letter to letter.
- *  Zero: the whole staircase drops as one, so the full word is readable
- *  right up until it moves. */
-const STAGGER = 0
+ *  The first letter starts highest and falls first; each one after it sets
+ *  off a little later, so the word settles as a wave from left to right. */
+const STAGGER = 0.5
 
 /** Rise per step of the staircase. Nine steps, so this multiplies up fast —
  *  0.92em put the first letter clean off the top of the screen and only the
  *  last few were ever visible. 0.62 is the most that still fits. */
 const LINE_EM = 0.62
 
+/** A soft landing: fast out of the gate, long decelerating tail, no bounce. */
+const easeOutQuint = (t: number) => 1 - Math.pow(1 - t, 5)
+
 /*
- * There is deliberately no smoothing here.
+ * Everything on screen is driven by ONE damped value.
  *
- * A damped follow was tried — every frame chasing a lagged copy of the
- * scroll position instead of reading it straight — and it made two things
- * worse at once: ordinary scrolling felt delayed (anything driven by the
- * lagged value visibly trailed the real scroll position), and a fast settle
- * could move less than a pixel some frames, which a rounded transform
- * collapsed into the same integer for a couple dozen consecutive frames
- * before jumping — a stutter with no dropped frames behind it at all.
+ * Native scroll still owns the scrollbar, the keyboard and the accessibility
+ * tree — the track is a real scrollable element. What is rendered, though, is
+ * a damped follow of that scroll position, and both the scene and the content
+ * panels read the same damped number. Smoothing one and not the other was
+ * tried and read as drift.
  *
- * The content panels are normal in-flow content, so they ride native scroll
- * directly — zero lag, and whatever smoothing the OS already applies to the
- * wheel. Only the background scene (the sky/ground column, the branch, the
- * hero copy's fade, the heading's fall) is computed from scroll position
- * each frame, straight, with no easing applied.
+ * The panels' transform is written with fractional pixels on purpose. An
+ * earlier version rounded it, and a slow settle then moved less than a pixel
+ * per frame — which rounding collapsed into the same integer for a couple of
+ * dozen frames before jumping: a stutter with no dropped frames behind it.
+ * Only the scene column is rounded, where a half-pixel boundary between two
+ * plates would draw a hairline.
  */
 
 export function Landing() {
@@ -47,12 +63,15 @@ export function Landing() {
   const columnRef = useRef<HTMLDivElement>(null)
   const heroRef = useRef<HTMLDivElement>(null)
   const headingRef = useRef<HTMLHeadingElement>(null)
+  const panelsRef = useRef<HTMLDivElement>(null)
   const branchRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
     if (reducedMotion) return
 
     let raf = 0
+    let shown = 0 // the damped progress everything reads
+    let last = performance.now()
 
     // offsetTop and offsetHeight force layout, so they are measured here and
     // on resize rather than every frame — reading them inside the loop is
@@ -69,13 +88,26 @@ export function Landing() {
     window.addEventListener('resize', measure)
 
     const tick = (t: number) => {
-      // A section owns the viewport; the landing is hidden under it and has
-      // nothing to show for the work. Keep the loop alive, skip the frame.
+      const dt = Math.min(0.05, (t - last) / 1000) // cap after a background tab
+      last = t
+
+      // A section owns the viewport; the landing is covered and has nothing
+      // to show for the work. Keep the loop alive, skip the frame.
       if (document.documentElement.hasAttribute('data-section-open')) {
         raf = requestAnimationFrame(tick)
         return
       }
-      const p = progressAt(window.scrollY - trackTop, scrollable)
+
+      const target = progressAt(window.scrollY - trackTop, scrollable)
+      shown = damp(shown, target, DAMPING, dt, MAX_SPEED)
+      const p = shown
+      const vh = window.innerHeight
+
+      const panels = panelsRef.current
+      if (panels) {
+        const y = -p * (PANEL_TRAVEL_VH / 100) * vh
+        panels.style.transform = `translate3d(0, ${y.toFixed(2)}px, 0)`
+      }
 
       // The branch swings on the same gust the petals read, anchored at the
       // corner it enters from so the tip travels and the base barely moves.
@@ -93,7 +125,7 @@ export function Landing() {
         // it — which draws a faint one-pixel line wherever two layers meet,
         // however exactly their colours are matched.
         const y = columnOffsetVh(p, COLUMN_TRAVEL_VH)
-        const px = Math.round((y / 100) * window.innerHeight)
+        const px = Math.round((y / 100) * vh)
         col.style.transform = `translate3d(0, ${px}px, 0)`
       }
 
@@ -110,33 +142,27 @@ export function Landing() {
 
       // The staircase falls to level as the heading rises into the frame.
       // Driven by the heading's own on-screen position rather than a scroll
-      // fraction: a fixed fraction of the track was tuned against one screen
-      // height and drifted on any other — on a tall viewport the cards panel
-      // is a much smaller fraction of the scroll, so all four cards were
-      // already on screen while the fraction-based window hadn't opened yet.
-      // Reading getBoundingClientRect each frame costs one layout read,
-      // which the rest of the loop already forces via window.scrollY's
-      // neighbours — it does not add a second one.
+      // fraction, so it holds on any viewport height. The rect reflects the
+      // panels' damped transform, so the fall is as smooth as the descent.
       const heading = headingRef.current
       if (heading) {
-        const vh = window.innerHeight
         const rect = heading.getBoundingClientRect()
-        // 0 while the heading is still low enough to be entering from below
-        // the frame, 1 once it has risen into the upper third — leaving room
-        // under it, on any screen, for the cards to already be in view too.
+        // 0 while the heading is still entering from below the frame, 1 once
+        // it has risen into the upper third — leaving room under it, on any
+        // screen, for the cards to already be in view too.
         const enterAt = vh * 0.95
-        const settleAt = vh * 0.32
+        const settleAt = vh * 0.3
         const k = Math.min(1, Math.max(0, (enterAt - rect.top) / (enterAt - settleAt)))
         const letters = heading.querySelectorAll<HTMLElement>('.ground__letter')
-        const last = letters.length - 1
+        const lastIndex = letters.length - 1
         for (let i = 0; i < letters.length; i++) {
-          const start = (i / last) * STAGGER
+          const start = (i / lastIndex) * STAGGER
           const lt = Math.min(1, Math.max(0, (k - start) / (1 - STAGGER)))
-          const eased = 1 - Math.pow(1 - lt, 3)
-          const rise = last - i // lines above its resting place
+          const eased = easeOutQuint(lt)
+          const rise = lastIndex - i // lines above its resting place
           letters[i].style.transform =
             `translateY(${(-rise * (1 - eased) * LINE_EM).toFixed(3)}em)`
-          letters[i].style.opacity = (1 - (rise / last) * (1 - eased) * 0.72).toFixed(3)
+          letters[i].style.opacity = (1 - (rise / lastIndex) * (1 - eased) * 0.72).toFixed(3)
         }
       }
 
@@ -151,21 +177,19 @@ export function Landing() {
   }, [reducedMotion])
 
   return (
-    <>
-      <div className="descent" ref={trackRef}>
-        {/* The scene: one continuous place you travel down. */}
-        <div className="descent__viewport">
-          <div className="descent__column" ref={columnRef}>
-            <div className="descent__layer descent__layer--sky" />
-            <div className="descent__branch" ref={branchRef} aria-hidden="true" />
-            <div className="descent__layer descent__layer--ground" />
-          </div>
-          {/* One weather system for the whole descent, not one per panel. */}
-          <PetalField count={30} reducedMotion={reducedMotion} />
+    <div className="descent" ref={trackRef}>
+      {/* The scene: one continuous place you travel down. */}
+      <div className="descent__viewport">
+        <div className="descent__column" ref={columnRef}>
+          <div className="descent__layer descent__layer--sky" />
+          <div className="descent__branch" ref={branchRef} aria-hidden="true" />
+          <div className="descent__layer descent__layer--ground" />
         </div>
+        {/* One weather system for the whole descent, not one per panel. */}
+        <PetalField count={30} reducedMotion={reducedMotion} />
 
-        {/* Content rides over the scene, scrolling at the page's own rate. */}
-        <div className="descent__panels">
+        {/* The content, riding the same damped progress as the scene. */}
+        <div className="descent__panels" ref={panelsRef}>
           <section className="descent__panel descent__panel--hero">
             <Hero progressRef={heroRef} />
           </section>
@@ -175,12 +199,14 @@ export function Landing() {
           <section className="descent__panel descent__panel--cards">
             <Ground reducedMotion={reducedMotion} headingRef={headingRef} />
           </section>
+          {/* Inside the damped stack too. Left in normal flow it rode raw
+              scroll, so it arrived while the damped panels were still a lag
+              behind and appeared before the cards had settled. */}
+          <div className="descent__panel descent__panel--footer">
+            <Footer />
+          </div>
         </div>
       </div>
-
-      {/* Below the track, in normal flow — the meadow scrolls away as the
-          sticky viewport un-sticks, and the footer follows right behind it. */}
-      <Footer />
-    </>
+    </div>
   )
 }

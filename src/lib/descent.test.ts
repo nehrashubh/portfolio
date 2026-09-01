@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { progressAt, columnOffsetVh } from './descent'
+import { progressAt, columnOffsetVh, ease, damp } from './descent'
 
 const TRACK = 3000
 const TRAVEL = 160
@@ -61,5 +61,82 @@ describe('columnOffsetVh', () => {
     const PANEL_TRAVEL = 200
     expect(TRAVEL).toBeLessThan(PANEL_TRAVEL)
     expect(Math.abs(columnOffsetVh(1, TRAVEL))).toBeLessThan(PANEL_TRAVEL)
+  })
+})
+
+describe('ease', () => {
+  it('moves toward the target without overshooting it', () => {
+    let v = 0
+    for (let i = 0; i < 200; i++) {
+      v = ease(v, 100, 0.1)
+      expect(v).toBeLessThanOrEqual(100)
+      expect(v).toBeGreaterThanOrEqual(0)
+    }
+  })
+
+  it('converges exactly, so a still page stops producing new values', () => {
+    let v = 0
+    for (let i = 0; i < 500; i++) v = ease(v, 100, 0.1)
+    expect(v).toBe(100)
+    expect(ease(v, 100, 0.1)).toBe(100)
+  })
+
+  it('works downward as well as upward', () => {
+    let v = 100
+    for (let i = 0; i < 500; i++) v = ease(v, -40, 0.1)
+    expect(v).toBe(-40)
+  })
+
+  it('smooths a step change instead of jumping to it', () => {
+    // One frame of a 100px wheel jump should move only a fraction of the way.
+    expect(ease(0, 100, 0.12)).toBeCloseTo(12, 6)
+  })
+})
+
+describe('damp', () => {
+  it('is frame-rate independent — one big step equals two small ones', () => {
+    const once = damp(0, 1, 4, 0.032)
+    let twice = damp(0, 1, 4, 0.016)
+    twice = damp(twice, 1, 4, 0.016)
+    expect(twice).toBeCloseTo(once, 10)
+  })
+
+  it('never overshoots the target', () => {
+    let v = 0
+    for (let i = 0; i < 500; i++) {
+      v = damp(v, 1, 6, 0.016)
+      expect(v).toBeLessThanOrEqual(1)
+    }
+  })
+
+  it('converges exactly, so a still page stops producing new values', () => {
+    let v = 0
+    for (let i = 0; i < 2000; i++) v = damp(v, 1, 6, 0.016)
+    expect(v).toBe(1)
+    expect(damp(v, 1, 6, 0.016)).toBe(1)
+  })
+
+  it('works downward as well as upward', () => {
+    let v = 1
+    for (let i = 0; i < 2000; i++) v = damp(v, -0.4, 6, 0.016)
+    expect(v).toBe(-0.4)
+  })
+
+  it('refuses to move faster than maxSpeed, however far the target is', () => {
+    // Target a mile away; one frame may still only move maxSpeed * dt.
+    const dt = 0.016
+    const moved = damp(0, 1000, 6, dt, 0.5)
+    expect(moved).toBeCloseTo(0.5 * dt, 10)
+  })
+
+  it('leaves a slow approach untouched by the clamp', () => {
+    // Well inside the speed limit, so damping alone decides.
+    const dt = 0.016
+    expect(damp(0, 0.001, 6, dt, 10)).toBeCloseTo(damp(0, 0.001, 6, dt), 12)
+  })
+
+  it('returns the current value for a zero or negative frame time', () => {
+    expect(damp(0.3, 1, 6, 0)).toBe(0.3)
+    expect(damp(0.3, 1, 6, -0.016)).toBe(0.3)
   })
 })

@@ -57,19 +57,18 @@ describe('Landing', () => {
     }
   })
 
-  it('rides three content panels over the scene', () => {
+  it('rides four content panels over the scene, footer included', () => {
     const { container } = render(<Landing />)
-    expect(container.querySelectorAll('.descent__panel')).toHaveLength(3)
+    expect(container.querySelectorAll('.descent__panel')).toHaveLength(4)
   })
 
-  it('keeps the footer in normal flow after the track, not inside it', () => {
-    // Inside it, the footer would need to ride the same JS-driven progress
-    // as the scene instead of native scroll, for no benefit — nothing here
-    // is damped, so there is no lag for it to fall out of sync with.
+  it('keeps the footer inside the damped stack, not in normal flow after it', () => {
+    // Outside it, the footer rides raw scroll and arrives while the damped
+    // panels are still a lag behind — it appeared before the cards settled.
     const { container } = render(<Landing />)
-    const descent = container.querySelector('.descent')!
-    expect(descent.contains(screen.getByRole('contentinfo'))).toBe(false)
-    expect(container.contains(screen.getByRole('contentinfo'))).toBe(true)
+    const panels = container.querySelector('.descent__panels')!
+    expect(panels.querySelector('.descent__panel--footer')).toBeInTheDocument()
+    expect(panels.contains(screen.getByRole('contentinfo'))).toBe(true)
   })
 
   it('runs one weather system for the whole descent, not one per panel', () => {

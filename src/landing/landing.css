@@ -25,21 +25,14 @@
    between them at all, and the plate's last colour is what the mountain
    fades up into — measured, they meet at 204,231,245 against 204,230,244.
 
-   The column travels 170vh while the panels travel 300vh. The scene moving
-   slower than the text is the whole of the parallax.
-
-   The footer is NOT part of this track. It is a plain element straight
-   after it, in normal flow, sized to its own content. It used to be pulled
-   in as a panel so it could ride the same damped progress as everything
-   else and not arrive early — but that was curing a problem the damping
-   itself caused. With no damping, native scroll keeps everything in sync
-   for free, and the footer can go back to just being the next thing on the
-   page once the meadow scrolls past. */
+   The column travels 280vh while the panels travel 370vh. The scene moving
+   slower than the text is the whole of the parallax.                       */
 
 .descent {
   position: relative;
-  /* 110 + 140 + 150. */
-  height: 400vh;
+  /* 110 + 140 + 190 + 100. The footer is a full viewport, so nothing shows
+     underneath it at the end of the descent. */
+  height: 540vh;
 }
 
 .descent__viewport {
@@ -121,17 +114,18 @@
   pointer-events: none;
 }
 
-/* A sibling of the sticky viewport, not a child of it — it needs to scroll
-   normally with the rest of the page, not be clipped by the viewport's own
-   overflow:hidden. position:absolute here only lifts it out of document
-   flow (.descent already reserves the height for it via its own explicit
-   height); it is never transformed, so it rides native scroll at 1×. */
+/* Content lives INSIDE the sticky viewport and is translated by the same
+   damped progress that moves the scene. It used to sit in normal flow and
+   scroll at the raw rate while only the scene was smoothed — the two then
+   disagreed by exactly the damping lag, and that disagreement was the
+   wobble. One value now drives both, so they cannot desync. */
 .descent__panels {
   position: absolute;
   top: 0;
   left: 0;
   right: 0;
   z-index: 2;
+  will-change: transform;
 }
 
 .descent__panel {
@@ -150,14 +144,28 @@
   height: 140dvh;
 }
 
-/* Bottom-aligned, so the cards sit low in the meadow rather than floating in
-   the middle of it, and close enough to the panel's own foot that the
-   footer follows right behind them instead of after a long empty run. */
+/* The footer is a panel like any other, so it rides the same damped
+   progress and cannot arrive early. */
+.descent__panel--footer {
+  /* A full viewport. At 70vh the 30vh above it was transparent panel and the
+     meadow showed through above the footer at the very bottom of the page. */
+  height: 100vh;
+  height: 100dvh;
+  display: block;
+  padding: 0;
+  /* Both axes. Box Alignment now applies justify-items to block children
+     too, so the grid rule's `center` was shrink-wrapping the footer into a
+     column in the middle of the meadow. */
+  place-items: stretch;
+}
+
+/* Bottom-aligned, so the last card sits close to the foot of the meadow
+   rather than floating in the middle of it. */
 .descent__panel--cards {
-  height: 150vh;
-  height: 150dvh;
+  height: 190vh;
+  height: 190dvh;
   align-items: end;
-  padding-bottom: 6vh;
+  padding-bottom: 16vh;
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -188,12 +196,16 @@
     align-items: center;
     padding-bottom: 0;
   }
+
+  .descent__panel--footer {
+    height: auto;
+  }
 }
 
-/* While a section owns the viewport the landing is fully covered. Hiding it
-   stops the compositor tracking thirty petals under an opaque overlay, and
-   the descent loop skips its work (Landing.tsx reads the same attribute). */
-html[data-section-open] .descent__viewport,
-html[data-section-open] .descent__panels {
-  visibility: hidden;
+/* While a section owns the viewport the landing is fully covered. The
+   descent loop skips its work (Landing.tsx reads the same attribute) and the
+   petals pause. Nothing is hidden: visibility:hidden discarded the plates'
+   rasterised layers, and the meadow came back white for a beat on close. */
+html[data-section-open] .petal {
+  animation-play-state: paused;
 }
