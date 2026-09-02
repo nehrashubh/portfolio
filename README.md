@@ -129,6 +129,12 @@ Still to confirm: the footer's "open to summer 2027 internships" line, and a
 public repository for this site once it has one (the "This site" card links
 to the GitHub profile until then).
 
+**The published résumé has the phone number removed on purpose.** The PDF in
+`public/` is a redacted copy: the number is gone from the file's bytes, not
+covered over, and the header line was re-centred with its link underlines and
+click targets shifted to match. Re-exporting the résumé from its source will
+put the number back, so redact it again before publishing.
+
 ## URLs
 
 The open section is the URL fragment, so every section and every thing in
