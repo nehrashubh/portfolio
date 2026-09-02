@@ -141,6 +141,26 @@ Short links: `/resume`, `/cv`, `/github`, `/linkedin`.
 Link previews come from the meta tags in `index.html` and `public/og.jpg`,
 which `npm run og` renders from the hero itself. The favicon is one petal.
 
+## The airship scene
+
+Two things make the low-poly cloud asset read as weather rather than cut
+paper, both in code, neither touching the model:
+
+- `src/sections/journey/cloudShell.ts` welds the shell's split vertices and
+  recomputes normals, so shading rolls across the mass instead of catching
+  each facet. The material stays **opaque** on purpose — fading it by view
+  angle softens the silhouette but sorts after everything opaque, and the
+  dashed route line vanishes behind it.
+- Scene fog in the clouds' own dusk violet dissolves the remaining hard
+  silhouette into distance. `FOG_NEAR` sits past the camera's orbit radius
+  so the ship itself is never hazed.
+
+Each stop is a glass card beside its ring, with a brass edge on the side
+facing the marker instead of a leader line. Below 700px there is no room
+beside a marker, so the card docks to the foot of the frame above the year
+rail. The rail sits above the transparent scroll layer — below it, its
+buttons are unclickable.
+
 ## Plates
 
 `tools/cut_branch.py` keys the blossom branch off its green screen (source in
