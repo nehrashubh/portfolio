@@ -1,10 +1,4 @@
-import {
-  CATEGORIES,
-  FISCHER_POSITION,
-  pieceLetter,
-  pieceSide,
-  type FischerPositionEntry,
-} from './fischerPosition'
+import { CATEGORIES, FISCHER_POSITION, type FischerPositionEntry } from './fischerPosition'
 import { ENTRANCE, revealDelayMs } from './entrance'
 import { useContentSwap } from './useContentSwap'
 import { useReducedMotion } from '../../shared/useReducedMotion'
@@ -95,7 +89,7 @@ function SkillIndex({ onSelectSkill }: { onSelectSkill: (pieceName: string) => v
                     className="column__item"
                     style={{ animationDelay: `${revealDelayMs(entry.pieceName)}ms` }}
                   >
-                    <SkillChip entry={entry} onSelect={() => onSelectSkill(entry.pieceName)} />
+                    <SkillName entry={entry} onSelect={() => onSelectSkill(entry.pieceName)} />
                   </li>
                 ))}
               </ul>
@@ -103,21 +97,23 @@ function SkillIndex({ onSelectSkill }: { onSelectSkill: (pieceName: string) => v
           )
         })}
       </div>
-      <p className="index__legend">
-        Badges give the piece in algebraic notation — filled for white, outlined for black.
-        Hover the set to find any of them.
-      </p>
     </div>
   )
 }
 
-function SkillChip({ entry, onSelect }: { entry: FischerPositionEntry; onSelect: () => void }) {
+/** A name on the sheet. The board, not a badge, says which piece it is. */
+function SkillName({
+  entry,
+  onSelect,
+  inline = false,
+}: {
+  entry: FischerPositionEntry
+  onSelect: () => void
+  inline?: boolean
+}) {
   return (
-    <button type="button" className="chip" onClick={onSelect}>
-      <span className={`badge badge--${pieceSide(entry.pieceName)}`} aria-hidden="true">
-        {pieceLetter(entry.pieceName)}
-      </span>
-      <span className="chip__name">{entry.shortName}</span>
+    <button type="button" className={`skill${inline ? ' skill--inline' : ''}`} onClick={onSelect}>
+      {entry.shortName}
     </button>
   )
 }
@@ -143,8 +139,7 @@ function SkillDetail({
       </button>
 
       <p className="eyebrow">
-        {category?.label} · {pieceLetter(entry.pieceName)}
-        {entry.square}
+        {category?.label} · {entry.square}
       </p>
       <h2 className="detail__title">{entry.skillName}</h2>
       <p className="detail__desc">{entry.description}</p>
@@ -191,7 +186,7 @@ function SkillDetail({
           <ul className="related">
             {related.map((other) => (
               <li key={other.pieceName}>
-                <SkillChip entry={other} onSelect={() => onSelectSkill(other.pieceName)} />
+                <SkillName inline entry={other} onSelect={() => onSelectSkill(other.pieceName)} />
               </li>
             ))}
           </ul>

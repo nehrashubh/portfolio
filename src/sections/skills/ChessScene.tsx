@@ -44,6 +44,9 @@ export type ChessSceneHandle = {
 
 export type ChessSceneProps = {
   layout?: StageLayout
+  /** Width in CSS px, at the right edge, that the DOM panel covers. The
+   *  pieces are framed in what remains; the board runs on underneath. */
+  reserveRight?: number
   onPieceSelect?: (name: string | null) => void
   /** Fires once the model is decoded and a frame has been drawn, which is the
    *  moment the opening sequence begins on the board. The panel listens so its
@@ -118,9 +121,12 @@ function getGeometryAndMaterial(node: THREE.Object3D): { geometry: THREE.BufferG
  * Solves camera distance and the selected-piece rest point from the live canvas
  * size, so both follow the viewport instead of being hand-tuned world constants.
  */
-function useSceneFraming(layout: StageLayout) {
+function useSceneFraming(layout: StageLayout, reserveRight: number) {
   const { width, height } = useThree((state) => state.size)
-  const aspect = width / Math.max(height, 1)
+  // The frame the pieces are fitted to is the canvas minus the covered strip.
+  // NDC ±1 in that frame is the strip's left edge, so a flight anchor of 1
+  // lands beside the panel rather than under it.
+  const aspect = Math.max(1, width - reserveRight) / Math.max(height, 1)
 
   return useMemo(() => {
     const distance = fitDistance(FRAMED_POINTS, CAMERA_DIRECTION, FOV_RADIANS, aspect, layout.fitMargin)
@@ -184,8 +190,9 @@ function HoverAnchor({
   return null
 }
 
-function FramedCamera({ distance }: { distance: number }) {
+function FramedCamera({ distance, reserveRight }: { distance: number; reserveRight: number }) {
   const cameraRef = useRef<THREE.PerspectiveCamera>(null)
+  const { width, height } = useThree((state) => state.size)
   const unit = useMemo(() => cameraBasis(CAMERA_DIRECTION).z, [])
 
   useLayoutEffect(() => {
@@ -193,12 +200,21 @@ function FramedCamera({ distance }: { distance: number }) {
     if (!camera) return
     camera.position.set(unit[0] * distance, unit[1] * distance, unit[2] * distance)
     camera.lookAt(0, 0, 0)
+    // The full frame is the uncovered width; the canvas shows that frame plus
+    // the strip under the panel to its right. Scale stays uniform because the
+    // aspect is the frame's, not the canvas's — which is why the camera is
+    // `manual`: r3f would otherwise reset the aspect to the canvas on resize.
+    const usable = Math.max(1, width - reserveRight)
+    camera.aspect = usable / Math.max(height, 1)
+    camera.setViewOffset(usable, height, 0, 0, width, height)
     camera.updateProjectionMatrix()
-  }, [distance, unit])
+  }, [distance, unit, width, height, reserveRight])
 
   // near/far hug a scene that is barely two units deep, which keeps depth
   // precision (and so the shadow map) usable at this scale.
-  return <PerspectiveCamera ref={cameraRef} makeDefault fov={FOV_DEGREES} near={0.05} far={10} />
+  return (
+    <PerspectiveCamera ref={cameraRef} makeDefault manual fov={FOV_DEGREES} near={0.05} far={10} />
+  )
 }
 
 function ChessBoard({
@@ -276,6 +292,7 @@ function ChessBoard({
 
 function Stage({
   layout,
+  reserveRight,
   selectedName,
   hoveredName,
   reducedMotion,
@@ -286,6 +303,7 @@ function Stage({
   onAnchorChange,
 }: {
   layout: StageLayout
+  reserveRight: number
   selectedName: string | null
   hoveredName: string | null
   reducedMotion: boolean
@@ -295,12 +313,12 @@ function Stage({
   onSelect: (name: string) => void
   onAnchorChange: (point: ScreenPoint | null) => void
 }) {
-  const { distance, target } = useSceneFraming(layout)
+  const { distance, target } = useSceneFraming(layout, reserveRight)
   const [homePositions, setHomePositions] = useState<Map<string, Vec3>>(() => new Map())
 
   return (
     <>
-      <FramedCamera distance={distance} />
+      <FramedCamera distance={distance} reserveRight={reserveRight} />
       <ambientLight intensity={0.35} />
       <directionalLight
         position={[0.6, 1, 0.8]}
@@ -357,7 +375,7 @@ function Stage({
 }
 
 export const ChessScene = forwardRef<ChessSceneHandle, ChessSceneProps>(function ChessScene(
-  { layout = WIDE_LAYOUT, onPieceSelect, onReady },
+  { layout = WIDE_LAYOUT, reserveRight = 0, onPieceSelect, onReady },
   ref,
 ) {
   const [selectedName, setSelectedName] = useState<string | null>(null)
@@ -438,6 +456,7 @@ export const ChessScene = forwardRef<ChessSceneHandle, ChessSceneProps>(function
       >
         <Stage
           layout={layout}
+          reserveRight={reserveRight}
           selectedName={selectedName}
           hoveredName={hoveredName}
           reducedMotion={reducedMotion}

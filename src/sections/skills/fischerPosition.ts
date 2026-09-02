@@ -44,7 +44,7 @@ export const FISCHER_POSITION: FischerPositionEntry[] = [
     links: [
       { label: 'Massagold — stored XSS past a CSP', href: '#writeups/massagold', kind: 'writeup' },
       { label: 'Gatery — session hijacking', href: '#writeups/gatery', kind: 'writeup' },
-      { label: 'Cyber Apocalypse 2026, top 9%', href: '#projects/cyber-apocalypse-2026', kind: 'project' },
+      { label: 'Cyber Apocalypse 2026, top 9%', href: '#projects/cyber-apocalypse', kind: 'project' },
     ],
     related: ['piece_bishop_black_01', 'piece_knight_white_01'],
     category: 'security',
@@ -71,7 +71,7 @@ export const FISCHER_POSITION: FischerPositionEntry[] = [
     description: 'Ghidra and GDB, on CTF binaries and on code nobody documented.',
     whyPiece: 'The other bishop: the same reach, aimed at the squares the first one can never touch.',
     links: [
-      { label: 'Cyber Apocalypse 2026 — reversing track', href: '#projects/cyber-apocalypse-2026', kind: 'project' },
+      { label: 'Cyber Apocalypse 2026 — reversing track', href: '#projects/cyber-apocalypse', kind: 'project' },
     ],
     related: ['piece_bishop_black_01', 'piece_king_white'],
     category: 'security',

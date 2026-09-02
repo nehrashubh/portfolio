@@ -28,13 +28,11 @@ export const SECTIONS: readonly Section[] = [
     hour: 'morning',
     tintFrom: 'rgba(247,232,196,.9)',
     tintTo: 'rgba(238,214,158,.55)',
-    // Deep morning amber rather than pale cream. Every section's veil is now
-    // dark enough to carry light ink, so opening any card is the same
-    // gesture: the title travels from navy to near-white. With a pale veil
-    // Skills needed dark ink, and the title barely changed colour at all
-    // while the other three changed dramatically.
-    veil: 'rgba(146,101,34,.91)',
-    ink: '#fdf3e2',
+    // Honey-gold: the meadow under early sun. Light enough to be a colour
+    // rather than a shadow, so it carries dark ink — the one section whose
+    // title darkens rather than lightens on the way in.
+    veil: 'rgba(229, 184, 86, 0.9)',
+    ink: '#3b2b12',
   },
   {
     key: 'projects',
@@ -72,10 +70,10 @@ export const SECTIONS: readonly Section[] = [
 ] as const
 
 /*
- * Every veil above is dark enough to carry light ink at 4.5:1 or better, so
- * two things hold at once: opening any card is the same gesture — the title
- * always travels from navy to near-white — and the section's own small text
- * stays legible on it. An earlier pale Skills veil satisfied neither.
+ * Three veils are dark enough to carry light ink; Skills is gold and carries
+ * dark ink instead. Its title travels from navy to a deep brown rather than
+ * to near-white — a smaller move, but mustard was the price of the larger
+ * one and it was not worth paying.
  */
 
 /** The landing's own veil — every section grades out of and back into this. */

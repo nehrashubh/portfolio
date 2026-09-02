@@ -1,7 +1,7 @@
 import { describe, it, expect, vi, afterEach } from 'vitest'
 import { render, screen, fireEvent, act } from '@testing-library/react'
 import { SkillsPanel } from './SkillsPanel'
-import { CATEGORIES, FISCHER_POSITION, pieceLetter } from './fischerPosition'
+import { CATEGORIES, FISCHER_POSITION } from './fischerPosition'
 
 const noop = () => {}
 
@@ -37,11 +37,11 @@ describe('SkillsPanel index', () => {
     }
   })
 
-  it('labels each chip with the piece letter that locates it on the board', () => {
+  it('names each skill plainly, with no piece badge beside it', () => {
     renderPanel()
     for (const entry of FISCHER_POSITION) {
-      const chip = screen.getByText(entry.shortName).closest('button')!
-      expect(chip.textContent).toContain(pieceLetter(entry.pieceName))
+      const button = screen.getByRole('button', { name: entry.shortName })
+      expect(button.textContent).toBe(entry.shortName)
     }
   })
 
@@ -94,7 +94,7 @@ describe('SkillsPanel detail', () => {
     expect(screen.getByText(target.description)).toBeTruthy()
     expect(screen.getByText(target.whyPiece)).toBeTruthy()
     expect(
-      screen.getByText(`${category.label} · ${pieceLetter(target.pieceName)}${target.square}`),
+      screen.getByText(`${category.label} · ${target.square}`),
     ).toBeTruthy()
   })
 
