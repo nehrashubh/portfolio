@@ -32,7 +32,7 @@ export const SECTIONS: readonly Section[] = [
     // rather than a shadow, so it carries dark ink — the one section whose
     // title darkens rather than lightens on the way in.
     veil: 'rgba(229, 184, 86, 0.9)',
-    ink: '#3b2b12',
+    ink: '#5a3d12',
   },
   {
     key: 'projects',
