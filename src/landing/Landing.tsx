@@ -13,9 +13,6 @@ import './landing.css'
  *  the gap between the two is the parallax that gives the descent depth. */
 const COLUMN_TRAVEL_VH = 220
 
-/** Total travel of the content panels, in vh: their stacked height less the
- *  one viewport that is always on screen. 110 + 140 + 190 + 100 - 100. */
-const PANEL_TRAVEL_VH = 440
 
 /** How hard the scene resists the scroll. This is the lambda of an
  *  exponential decay, so 1/DAMPING is roughly the time in seconds to cover
@@ -30,15 +27,23 @@ const MAX_SPEED = 0.3
 /** Share of the heading's window spent handing off from letter to letter.
  *  The first letter starts highest and falls first; each one after it sets
  *  off a little later, so the word settles as a wave from left to right. */
-const STAGGER = 0.5
+const STAGGER = 0.6
+
+/** The fall has weight of its own. The scroll only sets where the letters
+ *  are headed; they get there on this time constant, so a flick of the wheel
+ *  cannot drop the whole word in a quarter of a second. 1/FALL_DAMPING is
+ *  roughly the seconds to cover 63% of the remaining distance. */
+const FALL_DAMPING = 2.2
 
 /** Rise per step of the staircase. Nine steps, so this multiplies up fast —
  *  0.92em put the first letter clean off the top of the screen and only the
  *  last few were ever visible. 0.62 is the most that still fits. */
 const LINE_EM = 0.62
 
-/** A soft landing: fast out of the gate, long decelerating tail, no bounce. */
-const easeOutQuint = (t: number) => 1 - Math.pow(1 - t, 5)
+/** Gravity, then a landing: the letter gathers speed and settles without a
+ *  bounce. The time damping above adds the long tail. */
+const easeInOutCubic = (t: number) =>
+  t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2
 
 /*
  * Everything on screen is driven by ONE damped value.
@@ -71,6 +76,7 @@ export function Landing() {
 
     let raf = 0
     let shown = 0 // the damped progress everything reads
+    let fall = 0 // the heading's damped fall, 0 scattered → 1 level
     let last = performance.now()
 
     // offsetTop and offsetHeight force layout, so they are measured here and
@@ -80,7 +86,12 @@ export function Landing() {
     let scrollable = 0
     const measure = () => {
       const track = trackRef.current
-      if (!track) return
+      const panels = panelsRef.current
+      if (!track || !panels) return
+      // The track is exactly as tall as the stacked panels, so the panels'
+      // total travel equals the scrollable distance and the footer — however
+      // tall its content — ends flush with the bottom of the viewport.
+      track.style.height = `${panels.offsetHeight}px`
       trackTop = track.offsetTop
       scrollable = track.offsetHeight - window.innerHeight
     }
@@ -105,7 +116,7 @@ export function Landing() {
 
       const panels = panelsRef.current
       if (panels) {
-        const y = -p * (PANEL_TRAVEL_VH / 100) * vh
+        const y = -p * scrollable
         panels.style.transform = `translate3d(0, ${y.toFixed(2)}px, 0)`
       }
 
@@ -147,18 +158,20 @@ export function Landing() {
       const heading = headingRef.current
       if (heading) {
         const rect = heading.getBoundingClientRect()
-        // 0 while the heading is still entering from below the frame, 1 once
-        // it has risen into the upper third — leaving room under it, on any
-        // screen, for the cards to already be in view too.
-        const enterAt = vh * 0.95
-        const settleAt = vh * 0.3
-        const k = Math.min(1, Math.max(0, (enterAt - rect.top) / (enterAt - settleAt)))
+        // Where the fall is headed: 0 while the heading is still entering
+        // from below the frame, 1 once it has risen into the upper quarter.
+        // The letters chase that target on their own damping, so the word
+        // falls at its own pace whatever the wheel does.
+        const enterAt = vh * 1.0
+        const settleAt = vh * 0.22
+        const target = Math.min(1, Math.max(0, (enterAt - rect.top) / (enterAt - settleAt)))
+        fall = damp(fall, target, FALL_DAMPING, dt)
         const letters = heading.querySelectorAll<HTMLElement>('.ground__letter')
         const lastIndex = letters.length - 1
         for (let i = 0; i < letters.length; i++) {
           const start = (i / lastIndex) * STAGGER
-          const lt = Math.min(1, Math.max(0, (k - start) / (1 - STAGGER)))
-          const eased = easeOutQuint(lt)
+          const lt = Math.min(1, Math.max(0, (fall - start) / (1 - STAGGER)))
+          const eased = easeInOutCubic(lt)
           const rise = lastIndex - i // lines above its resting place
           letters[i].style.transform =
             `translateY(${(-rise * (1 - eased) * LINE_EM).toFixed(3)}em)`

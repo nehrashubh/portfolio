@@ -143,10 +143,11 @@ describe('SectionOverlay section mount', () => {
       <SectionOverlay section={skills} onClose={() => {}} reducedMotion />,
     )
     expect(document.documentElement.style.overflow).toBe('hidden')
-    expect(document.body.style.overflow).toBe('hidden')
+    // Never body: that would make body a scroll container and un-stick the
+    // landing's scene behind the section.
+    expect(document.body.style.overflow).toBe('')
     unmount()
     expect(document.documentElement.style.overflow).toBe('')
-    expect(document.body.style.overflow).toBe('')
   })
 
   it('stands the landing down once open, and wakes it the moment closing starts', async () => {

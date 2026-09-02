@@ -121,13 +121,15 @@ export function SectionOverlay({
     }
     window.addEventListener('keydown', onKey)
 
-    // Both roots: html alone is not enough on iOS, body alone is not enough
-    // when html is the scroller.
+    // The root only — never body. With html's overflow no longer visible,
+    // overflow:hidden on body turns body into its own scroll container, and
+    // the landing's sticky scene (panels and all) re-anchors to the top of
+    // the document, thousands of pixels above the viewport. The page behind
+    // the section then showed nothing but the body colour: a white flash on
+    // open, and a white screen for the whole of the close.
     const root = document.documentElement
     const prevHtml = root.style.overflow
-    const prevBody = document.body.style.overflow
     root.style.overflow = 'hidden'
-    document.body.style.overflow = 'hidden'
 
     // Focus lands on the cross, and goes back to the card the section came
     // from when it closes, so a keyboard user returns to where they left.
@@ -137,7 +139,6 @@ export function SectionOverlay({
     return () => {
       window.removeEventListener('keydown', onKey)
       root.style.overflow = prevHtml
-      document.body.style.overflow = prevBody
       origin?.focus({ preventScroll: true })
     }
   }, [section, onClose, originRef])

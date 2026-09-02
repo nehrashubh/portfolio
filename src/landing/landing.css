@@ -30,14 +30,25 @@
 
 .descent {
   position: relative;
-  /* 110 + 140 + 190 + 100. The footer is a full viewport, so nothing shows
-     underneath it at the end of the descent. */
-  height: 540vh;
+  /* Set from the panels' own height by Landing.tsx, so the scroll length is
+     exactly the content's and the footer can be as tall as it needs. This
+     is the fallback until that runs. */
+  height: 430vh;
+  height: 430dvh;
 }
 
+/* Fixed, not sticky. The track is the whole page, so a viewport stuck to its
+   top is pinned for the entire scroll and the two are equivalent — except
+   under a section, where the page's overflow is locked. overflow:hidden on
+   the root un-sticks a sticky element in both Chromium and Firefox (its
+   top jumped to minus the scroll offset), and the landing vanished behind
+   every section: a white flash on open, a white screen through the close.
+   A fixed element does not care. */
 .descent__viewport {
-  position: sticky;
+  position: fixed;
   top: 0;
+  left: 0;
+  right: 0;
   height: 100vh;
   height: 100dvh;
   overflow: hidden;
@@ -145,38 +156,27 @@
 }
 
 /* The footer is a panel like any other, so it rides the same damped
-   progress and cannot arrive early. */
+   progress and cannot arrive early — but it is only as tall as its own
+   content, so it sits straight under the last card rather than a viewport
+   below it. */
 .descent__panel--footer {
-  /* A full viewport. At 70vh the 30vh above it was transparent panel and the
-     meadow showed through above the footer at the very bottom of the page. */
-  height: 100vh;
-  height: 100dvh;
   display: block;
   padding: 0;
-  /* Both axes. Box Alignment now applies justify-items to block children
-     too, so the grid rule's `center` was shrink-wrapping the footer into a
-     column in the middle of the meadow. */
   place-items: stretch;
 }
 
 /* Bottom-aligned, so the last card sits close to the foot of the meadow
    rather than floating in the middle of it. */
 .descent__panel--cards {
-  height: 190vh;
-  height: 190dvh;
+  height: 150vh;
+  height: 150dvh;
   align-items: end;
-  padding-bottom: 16vh;
+  padding-bottom: 6vh;
 }
 
 @media (prefers-reduced-motion: reduce) {
   .descent {
     height: auto;
-  }
-
-  .descent__viewport {
-    position: fixed;
-    inset: 0;
-    height: 100vh;
   }
 
   .descent__column,
@@ -197,9 +197,6 @@
     padding-bottom: 0;
   }
 
-  .descent__panel--footer {
-    height: auto;
-  }
 }
 
 /* While a section owns the viewport the landing is fully covered. The

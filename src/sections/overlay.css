@@ -41,20 +41,16 @@
   backdrop-filter: blur(18px) saturate(1.05);
   background: var(--veil);
   opacity: 1;
-  animation:
-    backdrop-in 0.45s ease both,
-    veil-grade var(--grade-ms) ease both;
+  /* The veil arrives in its own hour, over the grade's full length. It used
+     to start as the landing's near-white veil and grade into the hour, which
+     read as a white flash on every open — and, run backwards, as a white
+     flash on every close. Time passing is carried by the fade itself now. */
+  animation: backdrop-in var(--grade-ms) ease both;
 }
 
 @keyframes backdrop-in {
   from {
     opacity: 0;
-  }
-}
-
-@keyframes veil-grade {
-  from {
-    background: var(--veil-landing);
   }
 }
 
@@ -65,20 +61,12 @@
 }
 
 .overlay--closing .overlay__veil {
-  animation:
-    backdrop-out var(--close-ms) ease both,
-    veil-return var(--close-ms) ease both;
+  animation: backdrop-out var(--close-ms) ease both;
 }
 
 @keyframes backdrop-out {
   to {
     opacity: 0;
-  }
-}
-
-@keyframes veil-return {
-  to {
-    background: var(--veil-landing);
   }
 }
 
