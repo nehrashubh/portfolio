@@ -26,13 +26,12 @@ export const SECTIONS: readonly Section[] = [
     title: 'Skills',
     descriptor: 'Tooling, languages, and what I actually reach for.',
     hour: 'morning',
-    tintFrom: 'rgba(247,232,196,.9)',
-    tintTo: 'rgba(238,214,158,.55)',
-    // Honey-gold: the meadow under early sun. Light enough to be a colour
-    // rather than a shadow, so it carries dark ink — the one section whose
-    // title darkens rather than lightens on the way in.
-    veil: 'rgba(229, 184, 86, 0.9)',
-    ink: '#5a3d12',
+    tintFrom: 'rgba(200,226,190,.9)',
+    tintTo: 'rgba(150,192,142,.55)',
+    // Morning is the meadow itself: a deep, fresh green, dark enough to carry
+    // the same light ink as every other hour.
+    veil: 'rgba(52, 92, 58, 0.9)',
+    ink: '#eef5e8',
   },
   {
     key: 'projects',
@@ -40,10 +39,13 @@ export const SECTIONS: readonly Section[] = [
     title: 'Projects',
     descriptor: "Things I've built, and a few I've taken apart.",
     hour: 'late afternoon',
-    tintFrom: 'rgba(196,140,88,.9)',
-    tintTo: 'rgba(140,88,55,.6)',
-    veil: 'rgba(96,60,38,.88)',
-    ink: '#f7e6d5',
+    tintFrom: 'rgba(124,172,176,.9)',
+    tintTo: 'rgba(74,124,132,.6)',
+    // Late afternoon in shade: a deep teal. Brown on brown on brown never
+    // read as clean, and teal is the complement of the hands' painted skin,
+    // so the drawing comes forward instead of sinking into the ground.
+    veil: 'rgba(40, 76, 84, 0.9)',
+    ink: '#eaf2f1',
   },
   {
     key: 'writeups',
@@ -70,10 +72,9 @@ export const SECTIONS: readonly Section[] = [
 ] as const
 
 /*
- * Three veils are dark enough to carry light ink; Skills is gold and carries
- * dark ink instead. Its title travels from navy to a deep brown rather than
- * to near-white — a smaller move, but mustard was the price of the larger
- * one and it was not worth paying.
+ * Every veil is dark enough to carry light ink, so opening any card is the
+ * same gesture: the title always travels from navy to near-white, and each
+ * section's own small text stays legible on its ground.
  */
 
 /** The landing's own veil — every section grades out of and back into this. */
@@ -90,15 +91,6 @@ export const COPY = {
     'offensive security — red teaming is where I want to end up. I build ' +
     'things and I break them — usually in that order.',
   bio: 'wannabe pentester. foodie. dog and cat person. jack of all trades.',
-  facts: [
-    'Computer Science',
-    'Cybersecurity minor',
-    'Virginia Tech',
-    'Class of 2028',
-    'CompTIA A+',
-    'ISC2 CC',
-    'Blacksburg, VA',
-  ],
 } as const
 
 export const MOTION = {

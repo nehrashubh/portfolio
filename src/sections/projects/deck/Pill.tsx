@@ -47,12 +47,14 @@ export default function Pill({
         aria-expanded={open}
         aria-labelledby={`${id}-title ${id}-date`}
       />
+      {/* Date above the title, both centred: a long title has the whole pill
+          to itself and the date sits in the same place on every pill. */}
       <span className="pill-head">
-        <span className="pill-title" id={`${id}-title`}>
-          {project.title}
-        </span>
         <span className="pill-date" id={`${id}-date`}>
           {project.date}
+        </span>
+        <span className="pill-title" id={`${id}-title`}>
+          {project.title}
         </span>
       </span>
       {/* inert as well as aria-hidden: aria-hidden keeps a closed pill's blurb

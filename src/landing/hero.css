@@ -55,33 +55,58 @@
   text-shadow: 0 1px 14px rgba(12, 44, 86, 0.4);
 }
 
-/* The corner: résumé and GitHub, where every section keeps its cross. They
-   scroll away with the hero — the footer carries them again at the end. */
+/* The corner: résumé and GitHub as two buttons, where every section keeps
+   its cross. Solid enough to read over the blossom, which is exactly where
+   they sit. They scroll away with the hero; the footer carries them again. */
 .hero__links {
   position: absolute;
   top: 3.4vh;
   right: 3.6vw;
   display: flex;
-  gap: 26px;
+  gap: 10px;
   z-index: 3;
 }
 
 .hero__links a {
+  display: inline-block;
+  padding: 11px 18px;
   font-family: var(--font-mono);
   font-size: 11px;
   letter-spacing: 0.2em;
   text-transform: uppercase;
-  color: rgba(255, 255, 255, 0.86);
   text-decoration: none;
-  text-shadow: 0 1px 14px rgba(12, 44, 86, 0.4);
-  border-bottom: 1px solid transparent;
-  transition: border-color 0.3s ease;
+  line-height: 1;
+  border: 1px solid rgba(255, 255, 255, 0.9);
+  color: #fff;
+  background: rgba(20, 60, 110, 0.28);
+  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
+  transition:
+    background 0.3s ease,
+    color 0.3s ease,
+    transform 0.3s var(--ease);
+}
+
+/* The one a recruiter is looking for is the filled one. */
+.hero__links a:first-child {
+  background: rgba(255, 255, 255, 0.94);
+  color: var(--ink-dark);
 }
 
 .hero__links a:hover,
 .hero__links a:focus-visible {
-  border-bottom-color: currentColor;
+  transform: translateY(-1px);
   outline: none;
+}
+
+.hero__links a:first-child:hover,
+.hero__links a:first-child:focus-visible {
+  background: #fff;
+}
+
+.hero__links a:not(:first-child):hover,
+.hero__links a:not(:first-child):focus-visible {
+  background: rgba(255, 255, 255, 0.22);
 }
 
 /* A quiet instruction, gone the moment it has been obeyed. */
@@ -160,7 +185,13 @@
   }
 
   .hero__links {
-    gap: 18px;
+    gap: 8px;
     right: 5vw;
+  }
+
+  .hero__links a {
+    padding: 10px 13px;
+    font-size: 10px;
+    letter-spacing: 0.16em;
   }
 }

@@ -6,8 +6,12 @@ interface Props {
   progressRef?: React.RefObject<HTMLDivElement | null>
 }
 
-/** The two links a recruiter reaches for before scrolling anything. */
-const CORNER = LINKS.filter((l) => l.label === 'Résumé' || l.label === 'GitHub')
+/** The two a recruiter reaches for before scrolling anything. Résumé first,
+ *  so it takes the filled button. */
+const CORNER = [
+  LINKS.find((l) => l.label === 'Résumé')!,
+  LINKS.find((l) => l.label === 'GitHub')!,
+]
 
 export function Hero({ progressRef }: Props) {
   return (

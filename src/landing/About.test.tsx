@@ -14,27 +14,15 @@ describe('About', () => {
     expect(screen.getByText(COPY.bio)).toBeInTheDocument()
   })
 
-  it('lists every fact', () => {
+  it('carries no facts line — the hero states them now', () => {
     const { container } = render(<About />)
-    const facts = container.querySelector('.about__facts')!
-    for (const fact of COPY.facts) {
-      expect(facts.textContent).toContain(fact)
-    }
+    expect(container.querySelector('.about__facts')).toBeNull()
+    expect(container.textContent).not.toContain('Blacksburg')
   })
 
-  it('keeps the facts in their own element, out of the prose', () => {
+  it('holds the bio on a single line', () => {
     const { container } = render(<About />)
-    const facts = container.querySelector('.about__facts')!
-    const prose = container.querySelector('.about__text')!
-    expect(facts).not.toBe(prose)
-    expect(prose.textContent).not.toContain('Blacksburg')
-  })
-
-  it('holds the facts and the bio each on a single line', () => {
-    const { container } = render(<About />)
-    for (const sel of ['.about__facts', '.about__bio']) {
-      expect(container.querySelector(sel)!.textContent).not.toContain('\n')
-    }
+    expect(container.querySelector('.about__bio')!.textContent).not.toContain('\n')
   })
 
   it('drops "cybersecurity enthusiast" from the bio', () => {

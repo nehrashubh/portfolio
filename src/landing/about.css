@@ -24,35 +24,16 @@
   max-width: 46ch;
 }
 
-/* One line each, sitting just under the description. Both shrink with the
-   viewport rather than wrapping — a wrapped credentials line reads as a
-   paragraph, and a recruiter scans it as one. */
-.about__facts,
+/* One line, sitting just under the description. It shrinks with the
+   viewport rather than wrapping. */
 .about__bio {
   white-space: nowrap;
   font-family: var(--font-mono);
   margin: 0;
-}
-
-.about__bio {
   font-size: clamp(6.5px, 1vw, 12px);
   line-height: 1.8;
   color: rgba(45, 72, 108, 0.78);
   margin-top: clamp(18px, 2.6vh, 30px);
-}
-
-.about__rule {
-  width: 34px;
-  height: 1px;
-  background: rgba(24, 48, 78, 0.42);
-  margin: clamp(14px, 2vh, 22px) 0;
-}
-
-.about__facts {
-  font-size: clamp(6.5px, 1.03vw, 12px);
-  letter-spacing: 0.2em;
-  text-transform: uppercase;
-  color: var(--ink-fact);
 }
 
 @media (max-width: 520px) {
@@ -60,8 +41,6 @@
     font-size: 16px;
   }
 
-  /* The facts and bio stop shrinking to fit one line and wrap instead. */
-  .about__facts,
   .about__bio {
     white-space: normal;
     font-size: 10px;

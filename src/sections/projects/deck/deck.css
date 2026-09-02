@@ -22,14 +22,14 @@
 .pill {
   position: relative;
   width: 34cqw;
-  height: 13.2cqw;
-  padding: 5cqw 3.8cqw;
+  height: 14.4cqw;
+  padding: 4cqw 3.8cqw;
   border-radius: 999px;
   background: radial-gradient(
     130% 180% at 16% 0%,
-    rgba(240, 192, 160, 0.14),
-    rgba(60, 42, 32, 0.42) 58%,
-    rgba(38, 26, 20, 0.5)
+    rgba(240, 192, 160, 0.12),
+    rgba(22, 52, 60, 0.5) 58%,
+    rgba(12, 34, 40, 0.58)
   );
   outline: 1px solid transparent;
   outline-offset: 0.5cqw;
@@ -57,7 +57,7 @@
 .pill-slot.is-focused .pill:not(.is-open) {
   box-shadow:
     inset 0 0 0 1px rgba(240, 192, 160, 0.42),
-    0 0 3.8cqw rgba(176, 96, 16, 0.3);
+    0 0 3.8cqw rgba(240, 160, 110, 0.22);
 }
 
 /* Covers the whole pill, so the target matches the shape the hover ring draws.
@@ -87,14 +87,14 @@
 
 .pill-head {
   display: flex;
-  align-items: baseline;
-  justify-content: space-between;
-  gap: 2cqw;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.1cqw;
+  text-align: center;
 }
 
 .pill-title {
-  flex: 1 1 auto;
-  min-width: 0;
+  max-width: 100%;
   font-family: var(--font-display);
   font-size: 2.8cqw;
   line-height: 1;
@@ -102,13 +102,13 @@
   white-space: nowrap;
 }
 
-/* The date never yields: a title too long for the pill is the title's
-   problem (projects.test.ts caps it), not the date's. */
+/* Centred above the title, so it sits in the same place on every pill and a
+   long title has the whole width to itself. */
 .pill-date {
-  flex: none;
   font-family: var(--font-mono);
   font-size: 1cqw;
-  letter-spacing: 0.26em;
+  letter-spacing: 0.3em;
+  text-indent: 0.3em; /* offsets the trailing letter-space, so it centres */
   color: #d08060;
 }
 
@@ -262,14 +262,15 @@
   margin-top: 1.8cqw;
   font-size: 1.05cqw;
   letter-spacing: 0.04em;
-  color: #c08d6e;
+  text-align: center;
+  color: #d9b8a4;
 }
 
 .pill-blurb {
   margin-top: 3.2cqw;
   font-size: 1.2cqw;
   line-height: 1.85;
-  color: #cbb1a1;
+  color: #d8cec4;
   max-width: 40cqw;
 }
 
@@ -297,25 +298,25 @@
    stack chips — rather than the shortest, so the box never has to reflow. */
 .pill.is-open {
   width: 58cqw;
-  height: 58cqh;
+  /* In cqw, like everything inside it, so the height follows the content on
+     any aspect ratio. In cqh it overflowed on wide, short screens. */
+  height: 41cqw;
   padding: 4cqw 4.2cqw;
   border-radius: 1.9cqw;
   outline-color: transparent;
   background: radial-gradient(
     130% 150% at 14% 0%,
-    rgba(240, 192, 160, 0.15),
-    rgba(56, 39, 30, 0.78) 54%,
-    rgba(34, 23, 18, 0.88)
+    rgba(240, 192, 160, 0.12),
+    rgba(18, 44, 50, 0.84) 54%,
+    rgba(10, 28, 32, 0.92)
   );
   box-shadow:
     inset 0 0 0 1px rgba(240, 192, 160, 0.3),
     0 2.4cqw 6cqw rgba(0, 0, 0, 0.5),
-    0 0 8cqw rgba(176, 96, 16, 0.16);
+    0 0 8cqw rgba(240, 160, 110, 0.12);
 }
 
-.pill.is-open .pill-body { opacity: 1; max-height: 70cqh; }
-/* Keeps the year clear of the cross once there is a corner for it to sit in. */
-.pill.is-open .pill-head { padding-right: 3.6cqw; }
+.pill.is-open .pill-body { opacity: 1; max-height: 44cqw; }
 .pill.is-open .pill-hit { cursor: default; }
 
 /* --- reduced motion ------------------------------------------------------- */
@@ -338,8 +339,8 @@
 @media (max-width: 900px) {
   .pill {
     width: 76cqw;
-    height: 28cqw;
-    padding: 10cqw 6cqw;
+    height: 30cqw;
+    padding: 8cqw 6cqw;
   }
 
   .pill-title { font-size: 5.4cqw; white-space: normal; }
@@ -347,10 +348,12 @@
 
   .pill.is-open {
     width: 88cqw;
-    height: 54cqh;
+    height: 96cqw;
     padding: 8cqw 6.5cqw;
     border-radius: 4cqw;
   }
+
+  .pill.is-open .pill-body { max-height: 96cqw; }
 
   .pill-role { font-size: 2.4cqw; margin-top: 2.8cqw; }
   .pill-blurb { font-size: 2.9cqw; max-width: none; margin-top: 6cqw; }
@@ -365,5 +368,4 @@
   .arrow-label::after { bottom: -1cqw; }
 
   .close-cross { width: 5cqw; height: 5cqw; top: 5cqw; right: 5cqw; }
-  .pill.is-open .pill-head { padding-right: 8cqw; }
 }

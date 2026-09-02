@@ -2,15 +2,15 @@
   position: absolute;
   inset: 0;
   overflow: hidden;
-  /* The brown the artist outlined the hands with, lifted two steps and left
-     partly open so the late-afternoon veil — and the blurred meadow behind
-     it — shows through. Same place, later hour, rather than a sealed box.
+  /* Teal shade over the late-afternoon veil, left partly open so the blurred
+     meadow behind it shows through. The complement of the hands' painted
+     skin: the drawing comes forward instead of sinking into a brown room.
      CSS behind a transparent canvas, so it is also the loading state. */
   background: radial-gradient(
     130% 100% at 50% 6%,
-    rgba(92, 72, 58, 0.55) 0%,
-    rgba(66, 50, 40, 0.66) 60%,
-    rgba(46, 34, 27, 0.78) 100%
+    rgba(44, 84, 92, 0.42) 0%,
+    rgba(26, 58, 66, 0.6) 60%,
+    rgba(14, 38, 44, 0.78) 100%
   );
   touch-action: none;
   font-family: var(--font-sans);
@@ -37,5 +37,5 @@
   font-size: 11px;
   letter-spacing: 0.22em;
   text-transform: uppercase;
-  color: rgba(240, 192, 160, 0.6);
+  color: rgba(234, 242, 241, 0.6);
 }

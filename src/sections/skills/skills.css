@@ -4,11 +4,11 @@
    cards on the landing. The board's edge runs on behind the glass.        */
 
 .skills-section {
-  --bone: #efe6d6;
-  --sage: #a8ab98;
+  --bone: #eef5e8;
+  --sage: #a9b8a3;
   --brass: #d9b36e;
-  --hairline: rgba(255, 236, 200, 0.13);
-  --glass: rgba(26, 20, 12, 0.66);
+  --hairline: rgba(238, 245, 232, 0.14);
+  --glass: rgba(12, 24, 16, 0.66);
   --display: var(--font-display);
   --sans: var(--font-sans);
   --mono: var(--font-mono);
@@ -68,7 +68,7 @@
   font-size: 11px;
   letter-spacing: 0.14em;
   text-transform: uppercase;
-  color: rgba(59, 43, 18, 0.72);
+  color: rgba(238, 245, 232, 0.72);
 }
 
 /* Sits over the hovered piece. Positioned from a one-off projection rather
@@ -108,7 +108,7 @@
   background: var(--glass);
   -webkit-backdrop-filter: blur(18px) saturate(1.1);
   backdrop-filter: blur(18px) saturate(1.1);
-  border: 1px solid rgba(255, 236, 200, 0.16);
+  border: 1px solid rgba(238, 245, 232, 0.16);
   color: var(--bone);
 }
 
