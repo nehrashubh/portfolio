@@ -18,8 +18,8 @@ export const PROJECTS: readonly Project[] = [
     linkLabel: 'On the journey',
   },
   {
-    slug: 'cyber-apocalypse-2026',
-    title: 'Cyber Apocalypse 2026',
+    slug: 'cyber-apocalypse',
+    title: 'Cyber Apocalypse',
     date: '2026',
     role: 'Team, HackTheBox CTF',
     stack: ['Web', 'Reversing', 'HackTheBox'],

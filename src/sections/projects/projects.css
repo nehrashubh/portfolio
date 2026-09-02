@@ -17,6 +17,14 @@
   -webkit-font-smoothing: antialiased;
 }
 
+/* The deck is laid out in cqw to the pixel; the UA's list padding and
+   paragraph margins have no place in it. */
+.scene-host p,
+.scene-host ul {
+  margin: 0;
+  padding: 0;
+}
+
 .scene-loading {
   position: absolute;
   inset: 0;

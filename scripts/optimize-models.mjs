@@ -18,9 +18,12 @@ const JOBS = [
   {
     src: '../project-display/public/damaged_hands.glb',
     out: 'public/models/hands.glb',
-    // The atlases are UV-padded; 14-bit texcoords keep quantisation error
-    // well under a texel so island edges never sample their gutter.
-    draco: { method: 'edgebreaker', quantizeTexcoord: 14 },
+    // The dark shading on the leaves is a translucent mesh lying EXACTLY on
+    // the leaf surface. At draco's default 14-bit positions that overlay
+    // landed a hair behind the surface on one hand and vanished, leaving
+    // the leaves bright green. 24 bits keeps coplanar geometry coplanar.
+    // 14-bit texcoords keep the UV-padded atlases off their gutters.
+    draco: { method: 'edgebreaker', quantizePosition: 24, quantizeTexcoord: 14 },
   },
   {
     src: '../journey-scene/public/ship_in_clouds.glb',

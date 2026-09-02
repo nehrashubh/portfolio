@@ -43,6 +43,10 @@ describe('PROJECTS card fields', () => {
     }
   });
 
+  it('keeps titles short enough to share the pill with the date', () => {
+    for (const project of PROJECTS) expect(project.title.length).toBeLessThanOrEqual(18);
+  });
+
   it('keeps stack chips short enough to sit on one line of the card', () => {
     for (const project of PROJECTS) {
       expect(project.stack.length).toBeLessThanOrEqual(4);
