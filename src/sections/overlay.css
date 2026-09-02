@@ -108,7 +108,11 @@
   margin: 0;
 }
 
+/* Decoration. Without this it sits above the section (z-index 3 over 2) and
+   swallows every tap in the top-left corner of the frame — on a phone that is
+   a sizeable slice of whatever the section is showing there. */
 .overlay__title {
+  pointer-events: none;
   position: absolute;
   top: var(--title-top);
   left: 3.6vw;

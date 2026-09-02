@@ -40,8 +40,15 @@ const REST_EPSILON = 1e-3;
 
 /** Velocity that coasts almost exactly one card before snapping. */
 export const NUDGE_VELOCITY = 6.6;
-/** Pixels of pointer drag per card. */
+/** Pixels of pointer drag per card, with a mouse. */
 export const DRAG_PX_PER_SLOT = 320;
+
+/**
+ * The same, for a finger. A phone is around 700px tall, so 320px per card
+ * meant a swipe across half the screen advanced a single project and the
+ * deck felt stuck.
+ */
+export const DRAG_PX_PER_SLOT_TOUCH = 150;
 
 const WHEEL_PX_TO_VELOCITY = NUDGE_VELOCITY / 100;
 const LINE_HEIGHT_PX = 16;

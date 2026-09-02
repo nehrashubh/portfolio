@@ -1,5 +1,9 @@
+import { useRef } from 'react'
 import type { Writeup } from '../types'
 import './book.css'
+
+/** How long a finger must rest on a book before it shows its card. */
+const HOLD_MS = 350
 
 interface Props {
   writeup: Writeup
@@ -18,6 +22,39 @@ export default function Book({ writeup, size = 72, onOpen, onHover }: Props) {
   const overlay = `/books/${base}_overlay.png`
   const canOpen = writeup.openable
 
+  const holdTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
+  // True once a hold has actually shown the card, so the tap that ends it
+  // peeks rather than opens.
+  const peeked = useRef(false)
+  // A touch synthesises mouseenter a moment later; without this a plain tap
+  // would raise the hover card on a phone as well as opening the reader.
+  const touching = useRef(false)
+
+  const cancelHold = () => {
+    if (holdTimer.current) {
+      clearTimeout(holdTimer.current)
+      holdTimer.current = null
+    }
+  }
+
+  const startHold = (rect: DOMRect) => {
+    peeked.current = false
+    cancelHold()
+    holdTimer.current = setTimeout(() => {
+      peeked.current = true
+      onHover?.(writeup, rect)
+    }, HOLD_MS)
+  }
+
+  const endHold = () => {
+    cancelHold()
+    // The peek lasts as long as the finger does.
+    if (peeked.current) onHover?.(null, null)
+    setTimeout(() => {
+      touching.current = false
+    }, 500)
+  }
+
   return (
     <button
       type="button"
@@ -28,10 +65,32 @@ export default function Book({ writeup, size = 72, onOpen, onHover }: Props) {
       aria-label={`${writeup.title} — ${writeup.categoryLabel}, ${writeup.difficulty}, ${writeup.status}${
         canOpen ? '' : ' (not yet written)'
       }`}
-      onClick={() => canOpen && onOpen?.(writeup)}
-      onMouseEnter={(e) => onHover?.(writeup, e.currentTarget.getBoundingClientRect())}
-      onMouseMove={(e) => onHover?.(writeup, e.currentTarget.getBoundingClientRect())}
-      onMouseLeave={() => onHover?.(null, null)}
+      onClick={() => {
+        // A hold is a peek, not an open.
+        if (peeked.current) {
+          peeked.current = false
+          return
+        }
+        if (canOpen) onOpen?.(writeup)
+      }}
+      onTouchStart={(e) => {
+        touching.current = true
+        startHold(e.currentTarget.getBoundingClientRect())
+      }}
+      onTouchMove={cancelHold}
+      onTouchEnd={endHold}
+      onTouchCancel={endHold}
+      onContextMenu={(e) => {
+        // Android raises its own menu on a long press; this one is ours.
+        if (touching.current) e.preventDefault()
+      }}
+      onMouseEnter={(e) =>
+        !touching.current && onHover?.(writeup, e.currentTarget.getBoundingClientRect())
+      }
+      onMouseMove={(e) =>
+        !touching.current && onHover?.(writeup, e.currentTarget.getBoundingClientRect())
+      }
+      onMouseLeave={() => !touching.current && onHover?.(null, null)}
       onFocus={(e) => onHover?.(writeup, e.currentTarget.getBoundingClientRect())}
       onBlur={() => onHover?.(null, null)}
     >

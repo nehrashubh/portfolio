@@ -33,7 +33,10 @@ export default function Reader({ writeup, glossary, onClose, onOpenWriteup }: Pr
     }
     setClosing(true)
     setGloss(null)
-    timer.current = setTimeout(onClose, EXIT_MS)
+    timer.current = setTimeout(() => {
+      timer.current = null
+      onClose()
+    }, EXIT_MS)
   }, [onClose])
 
   useEffect(() => {
@@ -45,11 +48,27 @@ export default function Reader({ writeup, glossary, onClose, onOpenWriteup }: Pr
       requestClose()
     }
     document.addEventListener('keydown', onKey)
-    return () => {
-      document.removeEventListener('keydown', onKey)
-      if (timer.current) clearTimeout(timer.current)
-    }
+    return () => document.removeEventListener('keydown', onKey)
   }, [requestClose])
+
+  // The exit timer is cancelled ONLY when the reader really goes away.
+  //
+  // It used to be cleaned up alongside the key listener, in an effect keyed on
+  // requestClose — which changes identity whenever the section re-renders, as
+  // it does every time a book is hovered. A re-render during the 240ms exit
+  // therefore cancelled the close: onClose never fired, `timer.current` stayed
+  // set so every later requestClose returned early, and the reader was stuck
+  // invisible but mounted. Opening another writeup then did nothing, and only
+  // leaving the section entirely cleared it.
+  useEffect(() => () => {
+    if (timer.current) clearTimeout(timer.current)
+  }, [])
+
+  // A different writeup means a fresh reader, never a half-closed one.
+  useEffect(() => {
+    setClosing(false)
+    setGloss(null)
+  }, [writeup])
 
   const entry = gloss ? glossary[gloss.slug] : null
   const accent = readableOnDark(writeup.color)

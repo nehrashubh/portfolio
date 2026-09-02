@@ -32,8 +32,9 @@ const WAYPOINT_TS = WAYPOINTS.map((waypoint) => waypoint.t)
 const WORLD_UP = new Vector3(0, 1, 0)
 /** A label may take this much of a narrow frame, so it never runs off an edge. */
 const LABEL_MAX_FRACTION = 0.6
-/** The scroll cue leaves once the reader has clearly started travelling. */
-const CUE_GONE_AT = 0.02
+/** The scroll cue leaves once the reader has clearly started travelling.
+ *  At 0.02 it was gone before most people had finished reading it. */
+const CUE_GONE_AT = 0.06
 
 type CameraRigProps = {
   progressRef: RefObject<number>

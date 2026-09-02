@@ -53,11 +53,20 @@ describe('layoutForSlot', () => {
     expect(focused.focused).toBe(true);
   });
 
-  it('sends the next pill up and to the right, the previous one down and left', () => {
-    expect(layoutForSlot(1, false).y).toBeLessThan(0);
-    expect(layoutForSlot(1, false).x).toBeGreaterThan(0);
-    expect(layoutForSlot(-1, false).y).toBeGreaterThan(0);
-    expect(layoutForSlot(-1, false).x).toBeLessThan(0);
+  it('waits with the next pill below, and sends the passed one above', () => {
+    // The deck travels the way a list does: advancing lifts the stack, so
+    // what is coming sits below the focus and what is done sits above it.
+    // On a touchscreen this is what makes the pills follow the finger.
+    expect(layoutForSlot(1, false).y).toBeGreaterThan(0);
+    expect(layoutForSlot(1, false).x).toBeLessThan(0);
+    expect(layoutForSlot(-1, false).y).toBeLessThan(0);
+    expect(layoutForSlot(-1, false).x).toBeGreaterThan(0);
+  });
+
+  it('keeps both ends on one diagonal, so the axis itself is unchanged', () => {
+    const next = layoutForSlot(1, false);
+    const prev = layoutForSlot(-1, false);
+    expect(next.y / next.x).toBeCloseTo(prev.y / prev.x, 6);
   });
 
   it('fades and shrinks monotonically with distance', () => {

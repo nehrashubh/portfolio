@@ -219,3 +219,25 @@
 html[data-section-open] .petal {
   animation-play-state: paused;
 }
+
+/* A phone shows the same copy in a much smaller frame, so the panels'
+   desktop heights left long empty runs between the hero, the About and the
+   cards. Shorter panels put the same three beats a comfortable scroll
+   apart instead of a viewport and a half. */
+@media (max-width: 700px) {
+  .descent__panel--hero {
+    height: 100vh;
+    height: 100dvh;
+  }
+
+  .descent__panel--about {
+    height: 105vh;
+    height: 105dvh;
+  }
+
+  .descent__panel--cards {
+    height: 118vh;
+    height: 118dvh;
+    padding-bottom: 4vh;
+  }
+}

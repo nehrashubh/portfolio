@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import type { SectionProps } from '../SectionProps'
 import { index } from './data/writeups'
 import type { Writeup } from './types'
@@ -14,10 +14,25 @@ export default function WriteupsSection({ item }: SectionProps) {
   const [hover, setHover] = useState<{ w: Writeup; rect: DOMRect } | null>(null)
 
   const bySlug = useMemo(() => Object.fromEntries(index.writeups.map((w) => [w.slug, w])), [])
-  const openWriteup = (slug: string) => {
-    const w = bySlug[slug]
-    if (w?.openable) setOpen(w)
-  }
+
+  // Stable, because the reader's exit timer is torn down with any effect that
+  // depends on it. An inline arrow here is a new function on every render of
+  // this section — and hovering a book re-renders it.
+  const closeReader = useCallback(() => setOpen(null), [])
+
+  const showReader = useCallback((w: Writeup) => {
+    // A tooltip raised by the same touch has no business surviving the open.
+    setHover(null)
+    setOpen(w)
+  }, [])
+
+  const openWriteup = useCallback(
+    (slug: string) => {
+      const w = bySlug[slug]
+      if (w?.openable) showReader(w)
+    },
+    [bySlug, showReader],
+  )
 
   // `#writeups/<slug>` lands straight in the reader.
   useEffect(() => {
@@ -34,7 +49,7 @@ export default function WriteupsSection({ item }: SectionProps) {
         <Shelf
           categories={index.categories}
           writeups={index.writeups}
-          onOpen={setOpen}
+          onOpen={showReader}
           onHover={(w, rect) => setHover(w && rect ? { w, rect } : null)}
         />
       </div>
@@ -63,7 +78,7 @@ export default function WriteupsSection({ item }: SectionProps) {
         <Reader
           writeup={open}
           glossary={index.glossary}
-          onClose={() => setOpen(null)}
+          onClose={closeReader}
           onOpenWriteup={openWriteup}
         />
       )}

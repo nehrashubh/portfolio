@@ -33,9 +33,11 @@ const DIM_STEP = 0.35;
  *
  * Lower than it looks like it needs to be: the model layers several translucent
  * meshes over each other, so the composite reads considerably stronger than any
- * single material's alpha.
+ * single material's alpha. On a phone the pills sit directly on top of the
+ * drawing rather than between the hands, so it has to fall back further still
+ * or the titles are read against knuckles.
  */
-const NARROW_OPACITY = 0.22;
+const NARROW_OPACITY = 0.13;
 
 type Half = { group: Group; bounds: Box3 };
 type Halves = { left: Half; right: Half; pairBounds: Box3; materials: Material[] };

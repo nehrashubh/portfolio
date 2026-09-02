@@ -54,7 +54,12 @@ export const AXIS_DEGREES = 65;
  */
 export const HAND_CORRIDOR = 53.6;
 
-export const STEP_Y_NARROW = 17;
+/**
+ * A phone shows the deck at 76cqw wide and 26cqw tall. At a 17 step each
+ * pill covered 43% of its neighbour, which read as a heap rather than a
+ * stack; 21 leaves about a fifth covered.
+ */
+export const STEP_Y_NARROW = 21;
 /** Almost vertical: on a phone the hands are behind the deck, not beside it. */
 export const AXIS_DEGREES_NARROW = 86;
 
@@ -90,8 +95,13 @@ export function layoutForSlot(d: number, narrow: boolean): PillLayout {
         : lerp(0.3, 0, distance - 2);
 
   return {
-    x: d * stepX,
-    y: -d * stepY,
+    // Both signs negated together, which keeps the axis on exactly the same
+    // diagonal and only reverses which way it travels. Advancing used to move
+    // the pills DOWN the screen, so on a touchscreen the deck slid against
+    // the finger: swipe up, content goes down. Now the next pill arrives from
+    // below and the stack moves up, the way a list does.
+    x: -d * stepX,
+    y: d * stepY,
     scale: 1 - SCALE_PER_SLOT * distance,
     opacity,
     // The +1 breaks ties in favour of the pill that has already passed, so a

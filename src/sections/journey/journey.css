@@ -46,7 +46,10 @@
   font-size: 10px;
   letter-spacing: 0.32em;
   text-transform: uppercase;
-  color: rgba(232, 184, 119, 0.75);
+  color: rgba(255, 240, 214, 0.9);
+  /* The cue sits wherever the cloud happens to be, which is near-white as
+     often as deep blue. Brass alone vanished on the bright half. */
+  text-shadow: 0 1px 10px rgba(0, 0, 0, 0.85);
 }
 
 .journey__loading {
@@ -55,11 +58,35 @@
   place-items: center;
 }
 
+/* The hero's cue, in the section's brass: the word, then a line drawn
+   downward, so it reads as an instruction rather than a label. */
 .journey__cue {
   left: 50%;
   bottom: 4vh;
   transform: translateX(-50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  text-indent: 0.32em;
   transition: opacity 0.6s ease;
+}
+
+.journey__cue::after {
+  content: '';
+  width: 1px;
+  height: 34px;
+  background: linear-gradient(to bottom, rgba(255, 240, 214, 0.9), transparent);
+  box-shadow: 0 0 6px rgba(0, 0, 0, 0.5);
+  transform-origin: top;
+  animation: journey-cue-fall 2.4s cubic-bezier(0.22, 1, 0.36, 1) infinite;
+}
+
+@keyframes journey-cue-fall {
+  0% { transform: scaleY(0); opacity: 0; }
+  35% { opacity: 1; }
+  70% { transform: scaleY(1); opacity: 1; }
+  100% { transform: scaleY(1); opacity: 0; }
 }
 
 .journey-scene__overlay {

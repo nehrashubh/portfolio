@@ -20,7 +20,7 @@ describe('scrollProgress', () => {
 
 describe('smoothToward', () => {
   it('closes about 63% of the gap in one time constant', () => {
-    expect(smoothToward(0, 1, 0.5, 0.5)).toBeCloseTo(1 - Math.exp(-1), 5)
+    expect(smoothToward(0, 1, 0.3, 0.3)).toBeCloseTo(1 - Math.exp(-1), 5)
   })
 
   it('does not overshoot on a huge step', () => {

@@ -10,6 +10,12 @@
   place-items: center;
   line-height: 0;
   transition: transform 160ms var(--ease);
+  /* A hold on a book is ours to handle: no iOS callout, no text selection,
+     and no delay before the tap registers. */
+  -webkit-touch-callout: none;
+  user-select: none;
+  -webkit-user-select: none;
+  touch-action: manipulation;
 }
 .book[data-open] {
   cursor: pointer;

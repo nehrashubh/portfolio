@@ -175,6 +175,20 @@ is what keeps it legible over cloud that runs from near-white to deep
 blue. Below 700px there is no room beside a marker, so the text settles at
 the foot of the frame as a caption instead.
 
+## Touch
+
+Every section is usable with a finger, and a few things exist only for one:
+
+- The project deck travels the way a list does, so the pills follow the
+  finger rather than sliding against it, and a drag covers a card in 150px
+  rather than 320.
+- A writeup's card appears on a press and hold, since there is no hover to
+  give it. The hold peeks; it does not open.
+- Skills puts the panel over the foot of the board rather than beside it,
+  and the camera reserves that edge so no piece hides underneath.
+- Work & Education docks its caption at the foot of the frame, because
+  there is no room beside a marker on a portrait screen.
+
 ## Plates
 
 `tools/cut_branch.py` keys the blossom branch off its green screen (source in

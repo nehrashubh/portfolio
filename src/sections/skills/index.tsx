@@ -16,18 +16,25 @@ export default function SkillsSection({ reducedMotion, item }: SectionProps) {
   const [selectedName, setSelectedName] = useState<string | null>(null)
   const [ready, setReady] = useState(false)
   const [entranceDone, setEntranceDone] = useState(false)
-  const [reserve, setReserve] = useState(0)
+  const [reserve, setReserve] = useState({ right: 0, bottom: 0 })
   const isNarrow = useMediaQuery(NARROW_QUERY)
 
-  // The board fills the whole section and the panel floats over its right
-  // side, so the two read as one place rather than two columns. The camera
-  // is told how much of the width the panel covers and frames the pieces in
-  // what is left; the board's edge runs on behind the glass.
+  // The board fills the whole section and the panel floats over it, so the
+  // two read as one place rather than two boxes with a rule between them.
+  // The camera is told how much the panel covers — the right on a wide
+  // screen, the foot on a narrow one — and frames the pieces in what is
+  // left, while the board itself carries on behind the glass.
   useEffect(() => {
     const panel = panelRef.current
     if (!panel) return
-    const update = () =>
-      setReserve(isNarrow ? 0 : Math.ceil(panel.getBoundingClientRect().width + GAP_PX * 2))
+    const update = () => {
+      const box = panel.getBoundingClientRect()
+      setReserve(
+        isNarrow
+          ? { right: 0, bottom: Math.ceil(box.height + GAP_PX) }
+          : { right: Math.ceil(box.width + GAP_PX * 2), bottom: 0 },
+      )
+    }
     update()
     const ro = new ResizeObserver(update)
     ro.observe(panel)
@@ -56,13 +63,17 @@ export default function SkillsSection({ reducedMotion, item }: SectionProps) {
     reducedMotion || entranceDone ? 'done' : ready ? 'playing' : 'waiting'
 
   return (
-    <div className="skills-section" style={{ '--reserve': `${reserve}px` } as React.CSSProperties}>
+    <div
+      className="skills-section"
+      style={{ '--reserve': `${reserve.right}px` } as React.CSSProperties}
+    >
       <div className="page">
         <div className="page__stage">
           <ChessScene
             ref={sceneRef}
             layout={isNarrow ? NARROW_LAYOUT : WIDE_LAYOUT}
-            reserveRight={reserve}
+            reserveRight={reserve.right}
+            reserveBottom={reserve.bottom}
             onPieceSelect={setSelectedName}
             onReady={handleReady}
           />

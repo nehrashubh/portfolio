@@ -405,51 +405,62 @@
 
 /* Board above the panel, the section scrolls as one column. Keep the
    breakpoint in step with NARROW_QUERY in stageLayout.ts. */
+/* Board above, panel over it — the same idea as the wide layout, not a
+   stack of two boxes with a rule between them. The board fills the section
+   and runs on behind the glass; the camera keeps the pieces in the part the
+   panel leaves uncovered. Keep the breakpoint in step with NARROW_QUERY. */
 @media (max-width: 900px) {
   .skills-section {
-    position: absolute;
-    top: var(--overlay-chrome);
-    left: 0;
-    right: 0;
-    bottom: 0;
-    height: auto;
-    overflow-y: auto;
-    overscroll-behavior: contain;
+    overflow: hidden;
   }
 
   .page {
-    display: grid;
-    height: auto;
-    min-height: 100%;
-    gap: var(--gap);
-    padding: var(--gap);
-    grid-template-rows: min(46dvh, 360px) auto;
+    display: block;
+    height: 100%;
+    padding: 0;
   }
 
-  .page__stage,
+  .page__stage {
+    position: absolute;
+    inset: 0;
+  }
+
   .page__panel {
-    position: static;
+    position: absolute;
+    top: auto;
+    left: var(--gap);
+    right: var(--gap);
+    bottom: var(--gap);
     width: auto;
+    /* Never more than half the frame, so the board is always the larger
+       half and the pieces stay comfortably clickable above it. */
+    max-height: min(52%, 460px);
   }
 
   .skills {
-    height: auto;
-    overflow: visible;
+    height: 100%;
   }
 
-  .swap { height: auto; }
+  .swap { height: 100%; }
 
   .index,
   .detail {
-    height: auto;
-    overflow: visible;
-    padding: 24px 20px;
+    height: 100%;
+    overflow-y: auto;
+    padding: 20px 18px;
   }
 
   .index__columns {
     grid-template-columns: minmax(0, 1fr);
-    gap: 22px;
-    overflow: visible;
+    gap: 18px;
+  }
+
+  .index__lede {
+    font-size: 17px;
+  }
+
+  .detail__title {
+    font-size: clamp(24px, 7vw, 32px);
   }
 
   /* No hover on touch, so the label would only ever flash on tap. */

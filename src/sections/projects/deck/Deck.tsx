@@ -21,6 +21,10 @@ export default function Deck({
   const { stateRef, advance, focusOn } = carousel;
   const reduced = usePrefersReducedMotion();
   const slotRefs = useRef<(HTMLDivElement | null)[]>([]);
+  const cueRef = useRef<HTMLParagraphElement>(null);
+  // Latched, not derived: once someone has scrolled the deck they know how,
+  // and the cue should not return when they wrap round to the start.
+  const travelled = useRef(false);
   const hoveredRef = useRef(-1);
   // Read inside the frame loop, which never re-runs, so props would be stale.
   const narrowRef = useRef(narrow);
@@ -41,6 +45,11 @@ export default function Deck({
       // must never step the deck, or it moves at double speed. While a card is
       // open the deck is frozen rather than merely uninteractive.
       const { position } = open ? stateRef.current : advance(dt);
+
+      if (!travelled.current && (open || Math.abs(position) > 0.25)) {
+        travelled.current = true;
+        cueRef.current?.classList.add('is-gone');
+      }
 
       for (let index = 0; index < PROJECTS.length; index++) {
         const slot = slotRefs.current[index];
@@ -101,6 +110,9 @@ export default function Deck({
         if (!(event.target as HTMLElement).closest('.pill')) onOpenChange(null);
       }}
     >
+      <p className="deck-cue" ref={cueRef} aria-hidden="true">
+        Scroll
+      </p>
       {PROJECTS.map((project, index) => (
         <div
           key={project.title}

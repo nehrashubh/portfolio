@@ -3,6 +3,7 @@ import {
   applyImpulse,
   type CarouselState,
   DRAG_PX_PER_SLOT,
+  DRAG_PX_PER_SLOT_TOUCH,
   nudge,
   step,
   targetFor,
@@ -96,7 +97,8 @@ export function useCarousel(count: number, enabled = true, hostRef?: RefObject<H
 
       // Dragging up (decreasing clientY) moves the carousel forward.
       const dy = drag.lastY - event.clientY;
-      const dSlots = dy / DRAG_PX_PER_SLOT;
+      const perSlot = event.pointerType === 'touch' ? DRAG_PX_PER_SLOT_TOUCH : DRAG_PX_PER_SLOT;
+      const dSlots = dy / perSlot;
       const now = performance.now();
       const dt = Math.max((now - drag.lastTime) / 1000, 1 / 240);
 
