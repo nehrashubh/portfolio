@@ -1,5 +1,5 @@
 import { useEffect, useRef } from 'react'
-import { progressAt, columnOffsetVh, damp } from '../lib/descent'
+import { progressAt, columnOffsetPx, damp } from '../lib/descent'
 import { gust } from '../lib/wind'
 import { useReducedMotion } from '../shared/useReducedMotion'
 import { Hero } from './Hero'
@@ -131,13 +131,12 @@ export function Landing() {
 
       const col = columnRef.current
       if (col) {
-        // Rounded to whole pixels on purpose. A fractional offset puts every
-        // layer boundary on a half pixel, and the browser antialiases across
-        // it — which draws a faint one-pixel line wherever two layers meet,
-        // however exactly their colours are matched.
-        const y = columnOffsetVh(p, COLUMN_TRAVEL_VH)
-        const px = Math.round((y / 100) * vh)
-        col.style.transform = `translate3d(0, ${px}px, 0)`
+        // Sub-pixel, like the panels. Rounding this to whole pixels is what
+        // made the scene stutter as it eased into the top or the bottom —
+        // see columnOffsetPx for the measurement and for why the hairline it
+        // used to guard against cannot happen any more.
+        const px = columnOffsetPx(p, COLUMN_TRAVEL_VH, vh)
+        col.style.transform = `translate3d(0, ${px.toFixed(2)}px, 0)`
       }
 
       // The hero copy is drawn upward out of frame as you fall past it.

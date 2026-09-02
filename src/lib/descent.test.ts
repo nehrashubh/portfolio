@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { progressAt, columnOffsetVh, ease, damp } from './descent'
+import { progressAt, columnOffsetVh, columnOffsetPx, ease, damp } from './descent'
 
 const TRACK = 3000
 const TRAVEL = 160
@@ -138,5 +138,31 @@ describe('damp', () => {
   it('returns the current value for a zero or negative frame time', () => {
     expect(damp(0.3, 1, 6, 0)).toBe(0.3)
     expect(damp(0.3, 1, 6, -0.016)).toBe(0.3)
+  })
+})
+
+describe('columnOffsetPx', () => {
+  it('scales the vh offset by the viewport', () => {
+    expect(columnOffsetPx(1, 200, 800)).toBeCloseTo(-1600, 6)
+    expect(columnOffsetPx(0, 200, 800)).toBe(0)
+  })
+
+  it('keeps sub-pixel precision, which is what stops the settle stuttering', () => {
+    // Two frames of a slow settle, a thousandth of the track apart. Rounded
+    // to whole pixels these collapse to the same value and the scene freezes;
+    // that was the stutter at the top and bottom of the page.
+    const a = columnOffsetPx(0.0010, 220, 800)
+    const b = columnOffsetPx(0.0015, 220, 800)
+    expect(a).not.toBe(b)
+    expect(Math.abs(b - a)).toBeLessThan(1)
+  })
+
+  it('never doubles back as progress advances', () => {
+    let prev = columnOffsetPx(0, 220, 800)
+    for (let p = 0.005; p <= 1; p += 0.005) {
+      const now = columnOffsetPx(p, 220, 800)
+      expect(now).toBeLessThanOrEqual(prev)
+      prev = now
+    }
   })
 })

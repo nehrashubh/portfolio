@@ -77,3 +77,22 @@ export function damp(
   // Settle exactly, so a stationary page stops writing new transforms.
   return Math.abs(target - next) < 1e-4 ? target : next
 }
+
+/**
+ * The scene column's offset in CSS pixels — deliberately fractional.
+ *
+ * This used to be rounded to whole pixels, to stop a half-pixel layer
+ * boundary being antialiased into a faint hairline. That boundary no longer
+ * exists: the ground plate overlaps the sky by 150vh and fades up through a
+ * 26vh mask, so there is nothing to seam. Verified at 3x magnification.
+ *
+ * The rounding was, meanwhile, the whole of the stutter at the top and
+ * bottom of the page. Easing into either end moves the column about 39px,
+ * and at that speed a rounded transform repeats the same integer for dozens
+ * of frames and then jumps: measured over a 4s settle, 201 of 241 frames
+ * rendered no movement at all, the longest freeze running 44 frames. At
+ * sub-pixel precision the same settle stalls on zero frames.
+ */
+export function columnOffsetPx(progress: number, travelVh: number, viewportPx: number): number {
+  return (columnOffsetVh(progress, travelVh) / 100) * viewportPx
+}
