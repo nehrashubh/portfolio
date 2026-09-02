@@ -18,14 +18,38 @@ nothing here reads from them at runtime.
 
     npm run dev              # dev server on http://localhost:5173
     npm run build            # tsc -b && vite build → dist/
-    npm test                 # vitest, ~400 tests
+    npm test                 # vitest, ~430 tests
     npm run lint             # oxlint
     npm run preview          # serve dist/ on http://localhost:4173
+    npm run preview:pages    # serve dist/ the way Cloudflare Pages will,
+                             # with public/_headers and _redirects applied
 
+    npm run deploy           # build and upload to Cloudflare Pages
+    npm run og               # re-render public/og.jpg from the live hero
     npm run optimize:models  # rebuild public/models/*.glb from the prototypes
     npm run sync:writeups    # pull writeups from the Obsidian vault into content/
     npm run shoot -- all     # screenshots of every section, desktop + iPhone
                              # (preview server must be running)
+
+## Deploying
+
+The site is static and deploys to Cloudflare Pages, where the domain already
+lives. `wrangler.toml` names the project `shubhankarnehra` and points at `dist/`.
+
+First time only:
+
+    npx wrangler login              # opens the browser, one click
+    npm run deploy                  # creates the project and uploads
+
+Then, in the Cloudflare dashboard: Workers & Pages → shubhankarnehra →
+Custom domains → add `shubhankarnehra.com` (and `www`). DNS is on Cloudflare,
+so it activates in a minute. Every later `npm run deploy` goes live at once.
+
+`public/_headers` sets caching (hashed assets immutable, everything else a
+day at the edge) and a Content-Security-Policy that the whole site runs
+under — `wasm-unsafe-eval` for the Draco decoder, `blob:` for the textures
+three.js unpacks from the models. `public/_redirects` gives `/resume`,
+`/cv`, `/github` and `/linkedin` as short links.
 
 ## How it loads
 
@@ -111,6 +135,11 @@ one is a link:
 The back button leaves a section; closing one clears the fragment without
 adding history. Skills use these to point at projects, writeups and journey
 stops. `src/sections/route.ts` parses them.
+
+Short links: `/resume`, `/cv`, `/github`, `/linkedin`.
+
+Link previews come from the meta tags in `index.html` and `public/og.jpg`,
+which `npm run og` renders from the hero itself. The favicon is one petal.
 
 ## Plates
 

@@ -30,14 +30,15 @@ export const PILL_W = 34;
 
 /**
  * Vertical step between slots. Fixed, because it decides how much of each pill
- * its neighbour covers (~37% at this pill height) — a legibility constraint, not
+ * its neighbour covers (~29% at this pill height) — a legibility constraint, not
  * a stylistic one. The axis angle is therefore expressed as the *horizontal*
- * step derived from it, and not the other way round.
+ * step derived from it, and not the other way round. The step was 7.4 against
+ * an 11.8 pill (37% covered), which read as a crowded pile.
  */
-export const STEP_Y = 7.4;
+export const STEP_Y = 9.4;
 
 /** Axis angle from horizontal. The one number to change to re-lean the deck. */
-export const AXIS_DEGREES = 60;
+export const AXIS_DEGREES = 65;
 
 /**
  * How much of the frame's width the hands actually leave between them.
@@ -46,10 +47,10 @@ export const AXIS_DEGREES = 60;
  * `HAND_OVERHANG`, and pinned to them by a test in `scene/modelFraming.test.ts`
  * — change the hand size and that test fails until this is updated.
  *
- * A deck wider than this runs its outer pills under the fingers. At 60° the deck
- * is 51.1 and clears, but the margin is thin: the floor is about **56.4°**, so
+ * A deck wider than this runs its outer pills under the fingers. At 65° the deck
+ * is 51.5 and clears, but the margin is thin: the floor is about **62.5°**, so
  * there is only a few degrees of room below the current axis. Enlarging the
- * hands again would raise that floor further.
+ * hands, the pills or the vertical step would raise that floor further.
  */
 export const HAND_CORRIDOR = 53.6;
 

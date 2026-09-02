@@ -82,6 +82,8 @@ export const LANDING_VEIL = 'rgba(245,250,254,.86)'
 export const COPY = {
   name: 'Shubhankar Nehra',
   hook: 'I find the way in — before someone worse does.',
+  /** The facts a recruiter needs in the first twenty seconds, under the hook. */
+  summary: 'Computer science at Virginia Tech, class of 2028 · offensive security',
   about:
     'I study computer science at Virginia Tech, with a focus on security. ' +
     "Right now I'm working toward my CPTS and spending most of my time in " +

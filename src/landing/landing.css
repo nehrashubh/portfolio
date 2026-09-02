@@ -146,6 +146,7 @@
 }
 
 .descent__panel--hero {
+  position: relative;
   height: 110vh;
   height: 110dvh;
 }

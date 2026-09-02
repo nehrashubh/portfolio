@@ -11,7 +11,10 @@
     "test": "vitest run",
     "optimize:models": "node scripts/optimize-models.mjs",
     "sync:writeups": "node scripts/sync-writeups.mjs",
-    "shoot": "node scripts/shoot.mjs"
+    "shoot": "node scripts/shoot.mjs",
+    "deploy": "npm run build && wrangler pages deploy dist",
+    "preview:pages": "wrangler pages dev dist --port 8788",
+    "og": "node scripts/og.mjs"
   },
   "dependencies": {
     "@react-spring/three": "^10.1.2",
@@ -41,6 +44,7 @@
     "sharp": "^0.35.3",
     "typescript": "~6.0.2",
     "vite": "^8.1.1",
-    "vitest": "^4.1.10"
+    "vitest": "^4.1.10",
+    "wrangler": "^4.128.0"
   }
 }

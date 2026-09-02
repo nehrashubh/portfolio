@@ -1,0 +1,29 @@
+# Cloudflare Pages headers. Hashed build assets are immutable; everything else
+# under public/ keeps its name across deploys, so it gets a day at the edge and
+# a revalidation after that.
+
+/*
+  X-Content-Type-Options: nosniff
+  X-Frame-Options: DENY
+  Referrer-Policy: strict-origin-when-cross-origin
+  Permissions-Policy: camera=(), microphone=(), geolocation=(), interest-cohort=()
+  Cross-Origin-Opener-Policy: same-origin
+  Content-Security-Policy: default-src 'self'; script-src 'self' 'wasm-unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self'; connect-src 'self' blob:; worker-src 'self' blob:; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'; upgrade-insecure-requests
+
+/assets/*
+  Cache-Control: public, max-age=31536000, immutable
+
+/models/*
+  Cache-Control: public, max-age=86400, stale-while-revalidate=604800
+
+/fonts/*
+  Cache-Control: public, max-age=604800, stale-while-revalidate=2592000
+
+/plates/*
+  Cache-Control: public, max-age=86400, stale-while-revalidate=604800
+
+/draco/*
+  Cache-Control: public, max-age=604800, stale-while-revalidate=2592000
+
+/books/*
+  Cache-Control: public, max-age=86400, stale-while-revalidate=604800

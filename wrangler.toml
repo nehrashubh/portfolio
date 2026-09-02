@@ -1,0 +1,6 @@
+# Cloudflare Pages. `npm run deploy` builds and uploads dist/.
+# First time: `npx wrangler login`, then add the custom domain in the dashboard
+# (Workers & Pages → shubhankarnehra → Custom domains → shubhankarnehra.com).
+name = "shubhankarnehra"
+compatibility_date = "2026-09-01"
+pages_build_output_dir = "dist"

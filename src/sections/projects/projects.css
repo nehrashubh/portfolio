@@ -18,9 +18,10 @@
 }
 
 /* The deck is laid out in cqw to the pixel; the UA's list padding and
-   paragraph margins have no place in it. */
-.scene-host p,
-.scene-host ul {
+   paragraph margins have no place in it. :where() keeps this at zero
+   specificity, so the deck's own .pill-role / .pill-blurb margins win. */
+:where(.scene-host) p,
+:where(.scene-host) ul {
   margin: 0;
   padding: 0;
 }

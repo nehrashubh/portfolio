@@ -22,8 +22,8 @@
 .pill {
   position: relative;
   width: 34cqw;
-  height: 11.8cqw;
-  padding: 4.35cqw 3.4cqw;
+  height: 13.2cqw;
+  padding: 5cqw 3.8cqw;
   border-radius: 999px;
   background: radial-gradient(
     130% 180% at 16% 0%,
@@ -96,7 +96,7 @@
   flex: 1 1 auto;
   min-width: 0;
   font-family: var(--font-display);
-  font-size: 2.7cqw;
+  font-size: 2.8cqw;
   line-height: 1;
   color: #f4e7da;
   white-space: nowrap;
@@ -107,14 +107,14 @@
 .pill-date {
   flex: none;
   font-family: var(--font-mono);
-  font-size: 0.95cqw;
+  font-size: 1cqw;
   letter-spacing: 0.26em;
   color: #d08060;
 }
 
 /* --- the link whose arrow changes sides ---------------------------------- */
 .arrow-link {
-  margin-top: 3cqw;
+  margin-top: 4.2cqw;
   display: inline-flex;
   align-items: center;
   padding-bottom: 0.9cqw;
@@ -259,24 +259,24 @@
 }
 
 .pill-role {
-  margin-top: 1cqw;
-  font-size: 1.02cqw;
+  margin-top: 1.8cqw;
+  font-size: 1.05cqw;
   letter-spacing: 0.04em;
   color: #c08d6e;
 }
 
 .pill-blurb {
-  margin-top: 2.4cqw;
-  font-size: 1.18cqw;
-  line-height: 1.75;
+  margin-top: 3.2cqw;
+  font-size: 1.2cqw;
+  line-height: 1.85;
   color: #cbb1a1;
   max-width: 40cqw;
 }
 
 .pill-chips {
-  margin-top: 2.6cqw;
+  margin-top: 3.6cqw;
   display: flex;
-  gap: 0.7cqw;
+  gap: 0.9cqw;
   flex-wrap: wrap;
   list-style: none;
 }
@@ -286,7 +286,7 @@
   font-size: 0.86cqw;
   letter-spacing: 0.1em;
   text-transform: uppercase;
-  padding: 0.45cqw 1.1cqw;
+  padding: 0.6cqw 1.3cqw;
   border-radius: 999px;
   color: #d9bca6;
   box-shadow: inset 0 0 0 1px rgba(240, 192, 160, 0.2);
@@ -297,8 +297,8 @@
    stack chips — rather than the shortest, so the box never has to reflow. */
 .pill.is-open {
   width: 58cqw;
-  height: 50cqh;
-  padding: 3.4cqw 3.6cqw;
+  height: 58cqh;
+  padding: 4cqw 4.2cqw;
   border-radius: 1.9cqw;
   outline-color: transparent;
   background: radial-gradient(
@@ -313,7 +313,7 @@
     0 0 8cqw rgba(176, 96, 16, 0.16);
 }
 
-.pill.is-open .pill-body { opacity: 1; max-height: 60cqh; }
+.pill.is-open .pill-body { opacity: 1; max-height: 70cqh; }
 /* Keeps the year clear of the cross once there is a corner for it to sit in. */
 .pill.is-open .pill-head { padding-right: 3.6cqw; }
 .pill.is-open .pill-hit { cursor: default; }
@@ -338,8 +338,8 @@
 @media (max-width: 900px) {
   .pill {
     width: 76cqw;
-    height: 26cqw;
-    padding: 9cqw 6cqw;
+    height: 28cqw;
+    padding: 10cqw 6cqw;
   }
 
   .pill-title { font-size: 5.4cqw; white-space: normal; }
@@ -347,17 +347,17 @@
 
   .pill.is-open {
     width: 88cqw;
-    height: 44cqh;
-    padding: 7cqw 6cqw;
+    height: 54cqh;
+    padding: 8cqw 6.5cqw;
     border-radius: 4cqw;
   }
 
-  .pill-role { font-size: 2.4cqw; margin-top: 2cqw; }
-  .pill-blurb { font-size: 2.9cqw; max-width: none; margin-top: 5cqw; }
-  .pill-chips { margin-top: 5cqw; gap: 1.6cqw; }
+  .pill-role { font-size: 2.4cqw; margin-top: 2.8cqw; }
+  .pill-blurb { font-size: 2.9cqw; max-width: none; margin-top: 6cqw; }
+  .pill-chips { margin-top: 6cqw; gap: 1.8cqw; }
   .pill-chips li { font-size: 2.1cqw; padding: 1.1cqw 2.4cqw; }
 
-  .arrow-link { margin-top: 6cqw; padding-bottom: 2cqw; }
+  .arrow-link { margin-top: 7cqw; padding-bottom: 2cqw; }
   .arrow-label, .arrow-slot > span { font-size: 2.9cqw; }
   .arrow-slot { height: 3.6cqw; }
   .arrow-slot.is-right,

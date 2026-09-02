@@ -26,20 +26,20 @@ describe('stepXFor', () => {
 describe('the deck fits between the hands', () => {
   it('clears the corridor at the chosen angle', () => {
     const span = deckSpan(PILL_W, stepXFor(AXIS_DEGREES, STEP_Y));
-    expect(span).toBeCloseTo(51.1, 1);
+    expect(span).toBeCloseTo(51.5, 1);
     expect(span).toBeLessThan(HAND_CORRIDOR);
   });
 
-  it('does not clear it below about 56 degrees, which is the floor', () => {
-    expect(deckSpan(PILL_W, stepXFor(55, STEP_Y))).toBeGreaterThan(HAND_CORRIDOR);
+  it('does not clear it below about 62 degrees, which is the floor', () => {
+    expect(deckSpan(PILL_W, stepXFor(61, STEP_Y))).toBeGreaterThan(HAND_CORRIDOR);
   });
 
   it('leaves only a few degrees of room under the chosen angle', () => {
     // Worth stating as a test rather than a comment: the margin is thin enough
     // that a modest change to the axis, the pill width or the hand size closes
-    // it. 57 clears, 56 does not.
-    expect(deckSpan(PILL_W, stepXFor(57, STEP_Y))).toBeLessThan(HAND_CORRIDOR);
-    expect(deckSpan(PILL_W, stepXFor(56, STEP_Y))).toBeGreaterThan(HAND_CORRIDOR);
+    // it. 63 clears, 62 does not.
+    expect(deckSpan(PILL_W, stepXFor(63, STEP_Y))).toBeLessThan(HAND_CORRIDOR);
+    expect(deckSpan(PILL_W, stepXFor(62, STEP_Y))).toBeGreaterThan(HAND_CORRIDOR);
   });
 });
 
