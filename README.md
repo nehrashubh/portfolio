@@ -155,11 +155,12 @@ paper, both in code, neither touching the model:
   silhouette into distance. `FOG_NEAR` sits past the camera's orbit radius
   so the ship itself is never hazed.
 
-Each stop is a glass card beside its ring, with a brass edge on the side
-facing the marker instead of a leader line. Below 700px there is no room
-beside a marker, so the card docks to the foot of the frame above the year
-rail. The rail sits above the transparent scroll layer — below it, its
-buttons are unclickable.
+Each stop's text sits in the sky beside its ring: no leader line and no
+panel. A soft radial scrim behind it — inscribed in its box so it reaches
+full transparency on every side and can never be clipped into an edge —
+is what keeps it legible over cloud that runs from near-white to deep
+blue. Below 700px there is no room beside a marker, so the text settles at
+the foot of the frame as a caption instead.
 
 ## Plates
 

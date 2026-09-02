@@ -206,26 +206,6 @@ export function JourneyScene({ stopId }: { stopId?: string }) {
         <p className="journey__cue" ref={cueRef} aria-hidden="true">
           Scroll
         </p>
-        {/* The route as a line of years. The bright one is where you are;
-            any of them is a place to go. */}
-        <nav className="journey__rail" aria-label="Stops on the route">
-          {WAYPOINTS.map((waypoint, index) => (
-            <button
-              key={waypoint.id}
-              type="button"
-              className="journey__stop"
-              data-active={index === activeIndex || undefined}
-              aria-current={index === activeIndex ? 'step' : undefined}
-              onClick={() => {
-                const el = containerRef.current
-                if (el) el.scrollTop = waypoint.t * (el.scrollHeight - el.clientHeight)
-              }}
-            >
-              <span className="journey__stop-year">{waypoint.year}</span>
-              <span className="journey__stop-title">{waypoint.title}</span>
-            </button>
-          ))}
-        </nav>
       </div>
       <div
         ref={containerRef}
