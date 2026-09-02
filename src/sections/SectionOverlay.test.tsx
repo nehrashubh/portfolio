@@ -3,6 +3,7 @@ import { render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { lazy } from 'react'
 import { SectionOverlay } from './SectionOverlay'
+import { SECTION_REGISTRY } from './registry'
 import { SECTIONS } from '../theme'
 
 // The real sections mount WebGL canvases, which jsdom cannot run. The overlay
@@ -16,9 +17,11 @@ vi.mock('./registry', async () => {
       })
     return { load, Component: lazy(load) }
   }
+  const registry = Object.fromEntries(SECTIONS.map((s) => [s.key, stub(s.title)]))
   return {
-    SECTION_REGISTRY: Object.fromEntries(SECTIONS.map((s) => [s.key, stub(s.title)])),
+    SECTION_REGISTRY: registry,
     prefetchSection: vi.fn(),
+
   }
 })
 
@@ -159,5 +162,25 @@ describe('SectionOverlay section mount', () => {
     )
     rerender(<SectionOverlay section={skills} onClose={() => {}} reducedMotion closing />)
     expect(document.documentElement).not.toHaveAttribute('data-section-open')
+  })
+})
+
+describe('SectionOverlay failure', () => {
+  it('names the section, shows the reason, and offers a reload', async () => {
+    const spy = vi.spyOn(console, 'error').mockImplementation(() => {})
+    // A chunk that will not arrive, which is what this fallback exists for.
+    vi.spyOn(SECTION_REGISTRY.projects, 'Component', 'get').mockReturnValue(
+      lazy(() => Promise.reject(new Error('Failed to fetch dynamically imported module'))) as never,
+    )
+
+    render(<SectionOverlay section={projects} onClose={() => {}} reducedMotion />)
+
+    expect(await screen.findByText(/Projects could not be opened/)).toBeInTheDocument()
+    expect(
+      screen.getByText(/Failed to fetch dynamically imported module/),
+    ).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: /reload the page/i })).toBeInTheDocument()
+    spy.mockRestore()
+    vi.restoreAllMocks()
   })
 })

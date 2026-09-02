@@ -116,12 +116,14 @@ describe('Ground routing', () => {
     window.history.replaceState(null, '', window.location.pathname)
   })
 
-  it('opens the section named in the URL fragment on mount', () => {
+  it('opens the section named in the URL fragment on mount', async () => {
     window.location.hash = '#writeups/massagold'
     render(<Ground reducedMotion />)
     // The section is a dialog and so is the reader it opened on that slug.
+    // Awaited: each mount now builds its own lazy component, so the chunk is
+    // resolved per mount rather than once for the whole file.
     expect(screen.getByRole('dialog', { name: 'Writeups' })).toBeInTheDocument()
-    expect(screen.getByRole('dialog', { name: 'Massagold' })).toBeInTheDocument()
+    expect(await screen.findByRole('dialog', { name: 'Massagold' })).toBeInTheDocument()
   })
 
   it('writes the fragment when a card is clicked', async () => {

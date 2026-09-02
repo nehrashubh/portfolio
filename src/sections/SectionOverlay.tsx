@@ -195,11 +195,27 @@ export function SectionOverlay({
       {/* The section owns the whole viewport; the chrome floats over it. */}
       <div className="overlay__mount">
         <ErrorBoundary
-          fallback={
-            <p className="overlay__placeholder">
-              {section.title} could not be opened. Reload the page to try again.
-            </p>
-          }
+          fallback={(error) => (
+            <div className="overlay__failed">
+              <p className="overlay__placeholder">{section.title} could not be opened</p>
+              {/* The reason, not a shrug. Whatever went wrong, the person
+                  looking at this is the only one who can report it. */}
+              <p className="overlay__failed-why">
+                {error instanceof Error ? error.message : String(error)}
+              </p>
+              {/* Reload only. An in-page retry was tried and removed: a
+                  failed chunk is cached by the browser's module map and a
+                  failed model by drei's loader cache, so the button looked
+                  like a way out while changing nothing. A reload clears
+                  both, and index.html is served must-revalidate so it is
+                  never the stale copy that failed. */}
+              <div className="overlay__failed-actions">
+                <button type="button" onClick={() => window.location.reload()}>
+                  Reload the page
+                </button>
+              </div>
+            </div>
+          )}
         >
           <Suspense fallback={<p className="overlay__placeholder">Opening…</p>}>
             <SectionBody reducedMotion={reducedMotion} item={item} />

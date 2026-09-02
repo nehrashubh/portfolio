@@ -197,3 +197,53 @@
   outline: 1px solid currentColor;
   outline-offset: 6px;
 }
+
+/* A section that failed to open. It states what went wrong and offers both
+   ways back: a retry, which remounts and re-requests the chunk, and a
+   reload, which is the only cure for a chunk that is genuinely gone. */
+.overlay__failed {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-content: center;
+  justify-items: center;
+  gap: 14px;
+  padding: 4vh 6vw;
+  text-align: center;
+}
+
+.overlay__failed-why {
+  margin: 0;
+  max-width: 60ch;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  line-height: 1.7;
+  opacity: 0.62;
+  word-break: break-word;
+}
+
+.overlay__failed-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 8px;
+}
+
+.overlay__failed-actions button {
+  padding: 10px 18px;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: inherit;
+  background: transparent;
+  border: 1px solid currentColor;
+  cursor: pointer;
+  transition: background 0.3s ease;
+}
+
+.overlay__failed-actions button:hover,
+.overlay__failed-actions button:focus-visible {
+  background: rgba(255, 255, 255, 0.14);
+  outline: none;
+}
