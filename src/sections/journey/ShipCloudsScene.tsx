@@ -4,6 +4,7 @@ import { useGLTF } from '@react-three/drei'
 import { useThree } from '@react-three/fiber'
 import { Mesh, MeshStandardMaterial } from 'three'
 import { MODEL_OFFSET, MODEL_SCALE } from './sceneBounds'
+import { smoothCloudShell } from './cloudShell'
 
 // Draco geometry + WebP textures at the atlases' full 1024px resolution
 // (scripts/optimize-models.mjs). An earlier pass resized the atlases to
@@ -33,6 +34,9 @@ export function ShipCloudsScene() {
     scene.traverse((object) => {
       if (!(object instanceof Mesh)) return
       const material = object.material as MeshStandardMaterial
+      // The opaque low-poly shell: weld its split vertices and reshade it
+      // smooth, so the mass rolls instead of showing every facet.
+      if (material.name === 'Poly') smoothCloudShell(object)
       if (material.map) material.map.anisotropy = maxAnisotropy
       if (material.emissiveMap) material.emissiveMap.anisotropy = maxAnisotropy
 

@@ -68,8 +68,8 @@
   pointer-events: none;
 }
 
-/* Anchored to a projected marker position. The element sits at the marker and
-   the body is offset from it, so `transform` carries only the marker's own
+/* Anchored to a projected marker position. The element sits at the marker;
+   the card is offset from it, so `transform` carries only the marker's own
    screen position. */
 .waypoint-label {
   position: absolute;
@@ -81,126 +81,222 @@
   font-family: var(--font-sans);
 }
 
-.waypoint-label__leader {
+/* A pane of dark glass beside the ring, centred on it, with a brass edge on
+   the side that faces the marker. No leader: the edge points. */
+.waypoint-label__card {
   position: absolute;
-  left: 0;
-  bottom: 0;
-  width: 1px;
-  height: 56px;
-  background: rgba(232, 184, 119, 0.8);
+  top: 0;
+  width: var(--label-w, 250px);
+  transform: translateY(-50%);
+  padding: 16px 20px 18px;
+  background: rgba(10, 16, 30, 0.58);
+  -webkit-backdrop-filter: blur(16px) saturate(1.1);
+  backdrop-filter: blur(16px) saturate(1.1);
+  border: 1px solid rgba(232, 184, 119, 0.22);
+  box-shadow: 0 14px 40px rgba(0, 0, 0, 0.28);
 }
 
-/* The marker is outside the frame and the label was pulled back in; a
-   leader pointing at nothing is dimmed rather than drawn with conviction. */
-.waypoint-label[data-off-frame] .waypoint-label__leader {
-  opacity: 0.3;
-}
-
-.waypoint-label__body {
-  position: absolute;
-  bottom: 56px;
-  width: var(--label-w, 240px);
-  padding: 12px 16px 16px;
-  /* Contain the scrim's negative z-index so it paints behind this text but not
-     behind the canvas. */
-  isolation: isolate;
-}
-
-/* The scrim. A marker travels through the scene, so a label lands on
-   near-white cloud as often as deep blue and light type vanishes on the bright
-   half. This is invisible over dark cloud and quietly darkens bright cloud.
-
-   It lives on an oversized pseudo-element rather than as a background on the
-   body itself. Painting it on the body meant the gradient was still partly
-   opaque where the box ended, so it got cut off square and the "no panel"
-   scrim read as a dark rectangle — the exact thing it exists to avoid. Given
-   its own box, inset well beyond the text, it always reaches full transparency
-   before any edge, whatever the text measures. */
-.waypoint-label__body::before {
-  content: '';
-  position: absolute;
-  inset: -40px -48px -40px -44px;
-  z-index: -1;
-  pointer-events: none;
-  /* 50% radii centred at 50% is the point: the ellipse is exactly INSCRIBED in
-     this box, so it reaches full transparency on every side rather than being
-     clipped flat by an edge. An off-centre gradient with larger radii spilled
-     past the left and top, which is what drew the straight edges. */
-  background: radial-gradient(
-    50% 50% at 50% 50%,
-    rgba(6, 8, 16, 0.82) 0%,
-    rgba(6, 8, 16, 0.6) 38%,
-    rgba(6, 8, 16, 0.26) 66%,
-    rgba(6, 8, 16, 0) 100%
-  );
-}
-
-.waypoint-label[data-side='right'] .waypoint-label__body {
-  left: -16px;
+.waypoint-label[data-side='right'] .waypoint-label__card {
+  left: 22px;
+  border-left: 2px solid rgba(232, 184, 119, 0.85);
   text-align: left;
 }
 
-.waypoint-label[data-side='left'] .waypoint-label__body {
-  left: calc(-1 * var(--label-w, 240px));
-  text-align: right;
+.waypoint-label[data-side='left'] .waypoint-label__card {
+  right: 22px;
+  border-right: 2px solid rgba(232, 184, 119, 0.85);
+  text-align: left;
 }
 
-.waypoint-label[data-side='left'] .waypoint-label__body::before {
-  inset: -40px -44px -40px -48px;
+/* The marker is outside the frame and the card was pulled back in; the
+   pointing edge dims, since it no longer points at anything. */
+.waypoint-label[data-off-frame][data-side='right'] .waypoint-label__card {
+  border-left-color: rgba(232, 184, 119, 0.3);
+}
+
+.waypoint-label[data-off-frame][data-side='left'] .waypoint-label__card {
+  border-right-color: rgba(232, 184, 119, 0.3);
 }
 
 .waypoint-label__year {
-  margin: 0 0 4px;
+  margin: 0 0 6px;
   font-family: var(--font-mono);
-  font-size: 0.85rem;
-  font-weight: 400;
-  letter-spacing: 0.18em;
+  font-size: 0.78rem;
+  letter-spacing: 0.22em;
   color: #e8b877;
-  text-shadow: 0 1px 12px rgba(0, 0, 0, 0.8);
 }
 
 .waypoint-label__title {
-  margin: 0 0 7px;
-  font-family: var(--font-display);
-  font-size: 1.35rem;
-  line-height: 1.12;
-  font-weight: 400;
-  letter-spacing: 0;
-  color: #fff6e8;
-  text-shadow: 0 2px 16px rgba(0, 0, 0, 0.75);
-}
-
-.waypoint-label__rule {
-  display: block;
-  width: 24px;
-  height: 1.5px;
   margin: 0 0 8px;
-  background: rgba(232, 184, 119, 0.8);
-}
-
-.waypoint-label[data-side='left'] .waypoint-label__rule {
-  margin-left: auto;
+  font-family: var(--font-display);
+  font-size: 1.4rem;
+  line-height: 1.1;
+  font-weight: 400;
+  color: #fff6e8;
 }
 
 .waypoint-label__role {
-  margin: 0 0 6px;
+  margin: 0 0 8px;
   font-family: var(--font-mono);
-  font-size: 0.66rem;
-  font-weight: 400;
+  font-size: 0.64rem;
   letter-spacing: 0.14em;
   text-transform: uppercase;
   color: #e8b877;
-  text-shadow: 0 1px 12px rgba(0, 0, 0, 0.85);
 }
 
 .waypoint-label__description {
   margin: 0;
-  font-size: 0.8rem;
+  font-size: 0.82rem;
   line-height: 1.55;
   color: rgba(255, 246, 232, 0.86);
-  text-shadow: 0 1px 12px rgba(0, 0, 0, 0.85);
 }
 
+/* The route as a line of years along the foot of the frame.
+   Above the scroller (z-index 2), or its own transparent overlay swallows
+   every click — the stage sets no z-index, so these compete directly. The
+   nav itself lets the wheel through; only the stops themselves take a
+   pointer, so scrolling still works in the gaps between them. */
+.journey__rail {
+  position: absolute;
+  left: 50%;
+  bottom: 3.6vh;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 0;
+  padding: 0;
+  z-index: 3;
+  pointer-events: none;
+}
+
+.journey__rail .journey__stop {
+  pointer-events: auto;
+}
+
+.journey__stop {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 18px 0;
+  border: 0;
+  background: none;
+  color: rgba(255, 246, 232, 0.5);
+  cursor: pointer;
+  transition: color 0.3s ease;
+}
+
+/* The line the stops sit on, and the tick that marks each one. */
+.journey__stop::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: rgba(232, 184, 119, 0.35);
+}
+
+.journey__stop::after {
+  content: '';
+  position: absolute;
+  top: -3px;
+  left: 50%;
+  width: 7px;
+  height: 7px;
+  margin-left: -3.5px;
+  border-radius: 50%;
+  border: 1px solid rgba(232, 184, 119, 0.8);
+  background: #05050a;
+  transition: background 0.3s ease, transform 0.3s var(--ease);
+}
+
+.journey__stop-year {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.22em;
+}
+
+.journey__stop-title {
+  font-family: var(--font-sans);
+  font-size: 11px;
+  letter-spacing: 0.02em;
+  white-space: nowrap;
+  opacity: 0;
+  transform: translateY(-4px);
+  transition: opacity 0.3s ease, transform 0.3s var(--ease);
+}
+
+.journey__stop:hover,
+.journey__stop:focus-visible,
+.journey__stop[data-active] {
+  color: #fff6e8;
+  outline: none;
+}
+
+.journey__stop[data-active]::after {
+  background: #e8b877;
+  transform: scale(1.35);
+}
+
+.journey__stop:hover .journey__stop-title,
+.journey__stop:focus-visible .journey__stop-title,
+.journey__stop[data-active] .journey__stop-title {
+  opacity: 1;
+  transform: none;
+}
+
+/* ── Narrow ───────────────────────────────────────────────────────────────
+   A portrait phone has no room beside a marker: a card there lands on the
+   ship and neither can be read. So it stops chasing the marker and docks to
+   the foot of the frame, full width, above the rail. The scene stays the
+   picture; the card is the caption under it. */
+@media (max-width: 700px) {
+  .waypoint-label {
+    position: absolute;
+    top: auto;
+    left: 12px;
+    right: 12px;
+    bottom: calc(3.6vh + 58px);
+    width: auto;
+    /* Both auto: the base rule is a zero-sized point at the marker, and a
+       docked card inside a zero-height box spills out below its anchor
+       instead of stacking above it. */
+    height: auto;
+    /* The per-frame transform carries the marker's screen position; here the
+       card is docked, so it must be ignored. */
+    transform: none !important;
+  }
+
+  .waypoint-label__card,
+  .waypoint-label[data-side='left'] .waypoint-label__card,
+  .waypoint-label[data-side='right'] .waypoint-label__card {
+    position: static;
+    width: auto;
+    transform: none;
+    left: auto;
+    right: auto;
+    border-right: 1px solid rgba(232, 184, 119, 0.22);
+    border-left: 2px solid rgba(232, 184, 119, 0.85);
+  }
+
+  .waypoint-label__title {
+    font-size: 1.25rem;
+  }
+
+  .journey__stop {
+    padding: 10px 8px 0;
+  }
+
+  .journey__stop-title {
+    display: none;
+  }
+
+  /* The cue would print across the rail. */
+  .journey__cue {
+    bottom: calc(3.6vh + 96px);
+  }
+}
 
 /* Reduced motion: the same five stops as a plain list on the twilight veil. */
 .journey-static {

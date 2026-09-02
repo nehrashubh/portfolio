@@ -3,14 +3,14 @@ import { forwardRef, useImperativeHandle, useRef } from 'react'
 import type { Waypoint } from './waypoints'
 import type { LabelSide } from './labelPlacement'
 
-/** Body width in CSS pixels. Callers pass this to `chooseLabelSide`. */
-export const LABEL_WIDTH_PX = 240
+/** Card width in CSS pixels. Callers pass this to `chooseLabelSide`. */
+export const LABEL_WIDTH_PX = 250
 
 export type WaypointLabelHandle = {
   setVisibility: (opacity: number) => void
-  /** `offFrame` means the anchor was clamped and the leader points at nothing. */
+  /** `offFrame` means the anchor was clamped and the card sits away from its marker. */
   setPlacement: (x: number, y: number, side: LabelSide, offFrame?: boolean) => void
-  /** Body width in CSS pixels; narrower than LABEL_WIDTH_PX on small frames. */
+  /** Card width in CSS pixels; narrower than LABEL_WIDTH_PX on small frames. */
   setWidth: (px: number) => void
 }
 
@@ -20,10 +20,13 @@ type WaypointLabelProps = {
 }
 
 /**
- * A label tied to a waypoint marker in the scene, rather than parked at a
- * fixed screen position. The element itself sits *at* the marker's projected
- * position; the body is offset from there in CSS, so the per-frame transform
- * only ever carries the marker's own screen coordinates.
+ * A card tied to a waypoint marker in the scene. The element sits AT the
+ * marker's projected position; the card is offset from there in CSS, so the
+ * per-frame transform only ever carries the marker's own screen coordinates.
+ *
+ * No leader line. The card is a pane of dark glass beside the ring, close
+ * enough that the pairing is obvious, with a brass edge on the side that
+ * faces the marker — the edge points, so nothing else has to.
  */
 export const WaypointLabel = forwardRef<WaypointLabelHandle, WaypointLabelProps>(
   function WaypointLabel({ waypoint, isActive }, ref) {
@@ -60,11 +63,9 @@ export const WaypointLabel = forwardRef<WaypointLabelHandle, WaypointLabelProps>
         style={{ opacity: 0 }}
         aria-hidden={!isActive}
       >
-        <span className="waypoint-label__leader" aria-hidden="true" />
-        <div className="waypoint-label__body">
+        <div className="waypoint-label__card">
           <p className="waypoint-label__year">{waypoint.year}</p>
           <h3 className="waypoint-label__title">{waypoint.title}</h3>
-          <span className="waypoint-label__rule" aria-hidden="true" />
           <p className="waypoint-label__role">{waypoint.role}</p>
           <p className="waypoint-label__description">{waypoint.description}</p>
         </div>

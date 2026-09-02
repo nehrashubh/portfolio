@@ -15,6 +15,19 @@ import { useScrollFlight } from './useScrollFlight'
 import { smoothToward } from './scrollFlight'
 import { useDpr } from '../../shared/useDpr'
 
+/**
+ * Atmosphere, in the clouds' own dusk violet.
+ *
+ * `near` sits past the camera's orbit radius (3.3–3.85), so the ship itself
+ * is never hazed — only the cloud beyond it. This is what dissolves the
+ * shell's remaining hard silhouette into distance: smooth normals fix the
+ * facets, fog fixes the outline, and between them the low-poly mass reads
+ * as weather.
+ */
+const FOG_COLOUR = '#5b4f6b'
+const FOG_NEAR = 4.2
+const FOG_FAR = 14
+
 const WAYPOINT_TS = WAYPOINTS.map((waypoint) => waypoint.t)
 const WORLD_UP = new Vector3(0, 1, 0)
 /** A label may take this much of a narrow frame, so it never runs off an edge. */
@@ -154,6 +167,7 @@ export function JourneyScene({ stopId }: { stopId?: string }) {
           camera={{ position: [0, 0, 0], fov: 60, near: 0.05, far: 100 }}
         >
           <color attach="background" args={['#05050a']} />
+          <fog attach="fog" args={[FOG_COLOUR, FOG_NEAR, FOG_FAR]} />
           <CameraRig
             progressRef={progressRef}
             labelRefs={labelRefs}
@@ -192,6 +206,26 @@ export function JourneyScene({ stopId }: { stopId?: string }) {
         <p className="journey__cue" ref={cueRef} aria-hidden="true">
           Scroll
         </p>
+        {/* The route as a line of years. The bright one is where you are;
+            any of them is a place to go. */}
+        <nav className="journey__rail" aria-label="Stops on the route">
+          {WAYPOINTS.map((waypoint, index) => (
+            <button
+              key={waypoint.id}
+              type="button"
+              className="journey__stop"
+              data-active={index === activeIndex || undefined}
+              aria-current={index === activeIndex ? 'step' : undefined}
+              onClick={() => {
+                const el = containerRef.current
+                if (el) el.scrollTop = waypoint.t * (el.scrollHeight - el.clientHeight)
+              }}
+            >
+              <span className="journey__stop-year">{waypoint.year}</span>
+              <span className="journey__stop-title">{waypoint.title}</span>
+            </button>
+          ))}
+        </nav>
       </div>
       <div
         ref={containerRef}

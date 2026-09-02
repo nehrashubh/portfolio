@@ -43,15 +43,17 @@ export function chooseLabelSide(
   labelWidth: number,
   viewportWidth: number,
 ): LabelSide {
-  const overflowsRight = screenX + labelWidth > viewportWidth
-  const fitsLeft = screenX - labelWidth >= 0
+  const overflowsRight = screenX + CARD_GAP + labelWidth > viewportWidth
+  const fitsLeft = screenX - CARD_GAP - labelWidth >= 0
   return overflowsRight && fitsLeft ? 'left' : 'right'
 }
 
 /** Inset from every frame edge, in CSS pixels. */
 const EDGE_PAD = 16
-/** How far the body reaches above its anchor: the leader plus the tallest body. */
-const BODY_REACH = 230
+/** Half the tallest card: the card is centred on its anchor vertically. */
+const HALF_CARD = 96
+/** Gap between the ring and the card's near edge. */
+export const CARD_GAP = 22
 
 export type ClampedAnchor = { x: number; y: number; clamped: boolean }
 
@@ -72,12 +74,13 @@ export function clampAnchor(
   viewportWidth: number,
   viewportHeight: number,
 ): ClampedAnchor {
-  // Body geometry from overlay.css: right-side bodies start 16px left of the
-  // anchor; left-side bodies end at the anchor.
-  const minX = side === 'right' ? EDGE_PAD + 16 : EDGE_PAD + labelWidth
-  const maxX = side === 'right' ? viewportWidth - EDGE_PAD - labelWidth + 16 : viewportWidth - EDGE_PAD
-  const minY = BODY_REACH
-  const maxY = viewportHeight - EDGE_PAD
+  // Card geometry from journey.css: a right-side card starts CARD_GAP right
+  // of the anchor; a left-side card ends CARD_GAP left of it.
+  const minX = side === 'right' ? EDGE_PAD - CARD_GAP : EDGE_PAD + CARD_GAP + labelWidth
+  const maxX =
+    side === 'right' ? viewportWidth - EDGE_PAD - CARD_GAP - labelWidth : viewportWidth - EDGE_PAD + CARD_GAP
+  const minY = EDGE_PAD + HALF_CARD
+  const maxY = viewportHeight - EDGE_PAD - HALF_CARD
 
   const cx = Math.min(Math.max(x, minX), Math.max(minX, maxX))
   const cy = Math.min(Math.max(y, minY), Math.max(minY, maxY))
