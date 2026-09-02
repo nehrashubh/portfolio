@@ -95,15 +95,27 @@
   /* Overlaps the pale tail of the sky plate and fades up out of it. Both are
      the same colour there, so the overlap is invisible. */
   margin-top: -150vh;
-  /* Stretched, not covered — same reason as the sky. `cover` on a box this
-     tall crops the plate, and the row it crops away is the one whose colour
-     was matched to the sky's foot. */
-  background-size: 100% 100%;
   background-repeat: no-repeat;
   background-image: url('/plates/ground.webp');
   background-position: center bottom;
+  /* The meadow is 16:9 in a box a whole viewport tall, so it must never be
+     told to fill both axes: at 1440x900 that stretched it 1.9x vertically,
+     and on a phone 6.5x, which smeared the flowers into vertical streaks.
+     A portrait frame cannot show a landscape photograph without losing
+     something, so it loses the sides rather than the proportions. */
+  background-size: cover;
   -webkit-mask-image: linear-gradient(to bottom, transparent 0, #000 26vh);
   mask-image: linear-gradient(to bottom, transparent 0, #000 26vh);
+}
+
+/* Landscape frames have room for the whole picture: the meadow is sized to
+   the width, at its own aspect, and sits at the foot of the layer with the
+   sky continuing above it. Below about 11:10 that leaves a sliver of meadow
+   under a wall of sky, so those frames crop instead. */
+@media (min-aspect-ratio: 11 / 10) {
+  .descent__layer--ground {
+    background-size: 100% auto;
+  }
 }
 
 /* The branch has its own transparent layer, keyed off a green screen with the
