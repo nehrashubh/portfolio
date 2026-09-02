@@ -13,6 +13,13 @@ export default defineConfig({
     rollupOptions: {
       output: {
         manualChunks(id) {
+          // React gets its own chunk, and it must come FIRST. Without this
+          // the bundler puts React — shared by the landing and every
+          // section — inside the three chunk, and the landing then cannot
+          // render until all 1.1 MB of WebGL has downloaded. The whole
+          // point of the lazy sections is that it never downloads at all
+          // unless a card is opened.
+          if (/node_modules\/(react|react-dom|scheduler)\//.test(id)) return 'react'
           if (/node_modules\/(three|@react-three|@react-spring)\//.test(id)) return 'three'
         },
       },

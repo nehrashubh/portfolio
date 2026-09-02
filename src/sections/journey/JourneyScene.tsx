@@ -10,7 +10,7 @@ import { ShipCloudsScene } from './ShipCloudsScene'
 import { PathLine, type PathLineHandle } from './PathLine'
 import { WaypointTarget, type WaypointTargetHandle } from './WaypointTarget'
 import { WaypointLabel, type WaypointLabelHandle, LABEL_WIDTH_PX } from './WaypointLabel'
-import { projectToScreen, chooseLabelSide, clampAnchor } from './labelPlacement'
+import { projectToScreen, chooseLabelSide, clampAnchor, type LabelSide } from './labelPlacement'
 import { useScrollFlight } from './useScrollFlight'
 import { smoothToward } from './scrollFlight'
 import { useDpr } from '../../shared/useDpr'
@@ -58,6 +58,10 @@ function CameraRig({
   const markerWorld = useRef(new Vector3())
   const shown = useRef(0)
   const cueShown = useRef(true)
+  // Which side of its marker each stop's text sits on, held for as long as
+  // that stop is on screen. Recomputing it per frame made four of the five
+  // jump the width of the text as their marker crossed the frame's middle.
+  const heldSides = useRef<(LabelSide | null)[]>(WAYPOINTS.map(() => null))
 
   useFrame((state, delta) => {
     // Smoothed here, in the frame loop, with the same half-second catch-up
@@ -97,13 +101,19 @@ function CameraRig({
       const point = projectToScreen(markerWorld.current, camera, width, height)
       // A waypoint behind the camera projects to a mirrored on-screen position;
       // hide it rather than drawing it somewhere plausible-looking but wrong.
-      if (!point.visible) {
+      if (!point.visible || opacity <= 0) {
         label.setVisibility(0)
+        // Out of sight, so the next appearance picks its side afresh.
+        heldSides.current[index] = null
         return
       }
+      // Chosen once, when the stop appears, and held until it fades. A
+      // marker sweeps right across the frame as the camera orbits, so a
+      // per-frame choice flipped the text from one side to the other
+      // mid-read.
+      const side = (heldSides.current[index] ??= chooseLabelSide(point.x, labelWidth, width))
       // On a portrait phone the marker itself can sit outside the frame;
-      // the label is pulled back in so it can still be read.
-      const side = chooseLabelSide(point.x, labelWidth, width)
+      // the text is pulled back in so it can still be read.
       const anchor = clampAnchor(point.x, point.y, side, labelWidth, width, height)
       label.setWidth(labelWidth)
       label.setPlacement(anchor.x, anchor.y, side, anchor.clamped)

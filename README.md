@@ -53,8 +53,15 @@ three.js unpacks from the models. `public/_redirects` gives `/resume`,
 
 ## How it loads
 
-- The landing bundle (~62 KB gzipped) contains no three.js. Nothing 3D is
-  fetched until a card is opened.
+- A first visit downloads 65 KB of JavaScript, gzipped: the entry, React,
+  and the module runtime. No three.js, no models. Nothing 3D is fetched
+  until a card is opened.
+- **React has its own manual chunk, and that rule must stay.** React is
+  shared by the landing and every section, so without it the bundler files
+  React inside the three chunk and the landing cannot render until all
+  1.1 MB of WebGL has arrived — which defeats the whole lazy-section
+  design. `npm run build` prints the chunk list; the entry must import
+  only `react-*.js` and the runtime.
 - Scrolling the landing is damped: the scene and the panels follow the
   scrollbar at a walking pace (`src/landing/Landing.tsx`, DAMPING and
   MAX_SPEED), so a flick cannot throw the descent.
