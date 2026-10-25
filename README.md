@@ -116,24 +116,33 @@ Four faces, four jobs, all self-hosted woff2:
 
 ## Content
 
-Everything on the site comes from the résumé at `public/shubhankarnehra_resume.pdf`:
+Everything on the site comes from the software résumé,
+`~/internships/profile/resumes/swe.tex`, published as
+`public/shubhankarnehra_resume.pdf`. It is the broad computer-science one;
+`security.tex` beside it is the one to switch to once the focus is security
+alone, and the About copy in `src/theme.ts` says so where it would change.
 
-- `src/sections/projects/data/projects.ts` — the six projects
+- `src/sections/projects/data/projects.ts` — the seven projects
 - `src/sections/skills/fischerPosition.ts` — fifteen skills, each linked to the
   work that proves it
 - `src/sections/journey/waypoints.ts` — the five stops
 - `src/theme.ts` — facts, footer links, copy
 - `content/writeups/` — synced from the Obsidian vault by `npm run sync:writeups`
 
-Still to confirm: the footer's "open to summer 2027 internships" line, and a
-public repository for this site once it has one (the "This site" card links
-to the GitHub profile until then).
+Still to confirm: a public repository for this site once it has one (the
+"This site" card links to the GitHub profile until then).
 
-**The published résumé has the phone number removed on purpose.** The PDF in
-`public/` is a redacted copy: the number is gone from the file's bytes, not
-covered over, and the header line was re-centred with its link underlines and
-click targets shifted to match. Re-exporting the résumé from its source will
-put the number back, so redact it again before publishing.
+**The published résumé has no phone number, on purpose.** `swe.tex` has one
+in its header. The public PDF is built from a copy with that line deleted, so
+the number is not in the file at all and the header centres itself:
+
+    grep -vE '[0-9]{3}-[0-9]{3}-[0-9]{4}' ~/internships/profile/resumes/swe.tex > /tmp/swe-public.tex
+    cd ~/internships && .venv/bin/python -m scripts.build_resume \
+        /tmp/swe-public.tex ~/projects/portfolio/public/shubhankarnehra_resume.pdf
+    pdftotext ~/projects/portfolio/public/shubhankarnehra_resume.pdf - \
+        | grep -cE '[0-9]{3}-[0-9]{3}-[0-9]{4}'                # must print 0
+
+Never copy `Shubhankar_Nehra_SWE.pdf` straight in: that one has the number.
 
 ## URLs
 
@@ -168,12 +177,20 @@ paper, both in code, neither touching the model:
   silhouette into distance. `FOG_NEAR` sits past the camera's orbit radius
   so the ship itself is never hazed.
 
-Each stop's text sits in the sky beside its ring: no leader line and no
+Each stop is an anchor: drawn in outline ahead of you, stamped (ink on a
+pale disc) once you reach it, so the route behind reads as a row of stamps.
+Its text sits in the sky beside it: no leader line and no
 panel. A soft radial scrim behind it — inscribed in its box so it reaches
 full transparency on every side and can never be clipped into an edge —
 is what keeps it legible over cloud that runs from near-white to deep
 blue. Below 700px there is no room beside a marker, so the text settles at
 the foot of the frame as a caption instead.
+
+Each stop owns the stretch of the flight nearest it, midpoint to midpoint,
+and its text is at full strength across all of it
+(`src/sections/journey/revealWindow.ts`). It fades only at a handover, out
+before the next fades in, or on a wide screen as its anchor leaves the
+frame. The first and last stops hold through to either end.
 
 ## Touch
 
@@ -194,11 +211,48 @@ Every section is usable with a finger, and a few things exist only for one:
 `tools/cut_branch.py` keys the blossom branch off its green screen (source in
 `../hero/assets/plates/`) and writes `public/plates/branch.webp`. The sky and
 ground plates are carried over from the hero prototype as built there.
+`scripts/blur-ground.mjs` bakes `ground-blur.webp`, the soft meadow every
+section opens over, from the ground plate; it stands in for what used to be a
+live full-screen `backdrop-filter`.
+
+## Performance
+
+Measured in headless Chrome on the Intel iGPU of the machine this was built
+on, at 1622×900 and 1.56× (the laptop panel), since that GPU is what the
+browser actually renders on:
+
+- **Work & Education** was 19 fps. The model's materials are all black with a
+  white emissive map and the scene has no lights, so they are swapped for
+  unlit ones that draw the identical image (`ShipCloudsScene.tsx`); cloud
+  fragments under 3% alpha are discarded rather than blended; MSAA is off at
+  1.25× and up, where it was the largest single cost; and the canvas renders
+  only while the camera is moving, stepping its pixel ratio down if frames
+  run under 50 fps. It flies at 57–60 now and costs nothing while you read.
+- Sections open over a baked blurred plate, not a live backdrop blur.
+- Opening a section pins the landing where it was (`data-section-active`):
+  the descent trails the scrollbar by design, and the distance it still had
+  to cover used to play out after the section closed, as the cards jumping.
+
+These were measured by hand; there is no performance test in the suite.
+
+## Scrollbars
+
+There are no browser scrollbars anywhere (`src/index.css`). Where knowing
+your place matters, `src/shared/ScrollRail.tsx` draws the site's own: on
+the landing and in the flight it shows what is on screen, the glided
+position rather than the raw scroll, and a drag or a press on the track
+moves there; a writeup's reader gets one too (`ElementRail`). Everything
+still scrolls by wheel, touch and keyboard, and the rails are hidden from
+assistive tech as the duplicates they are. On touch screens they are an
+indicator only.
 
 ## Attribution
 
 Both Sketchfab models keep their credit embedded in the file (`asset.extras`),
-and both require attribution wherever the site is published:
+and both require attribution wherever the site is published. The site gives
+it in the footer (`CREDITS` in `src/theme.ts`), with links to each source and
+licence and a note that the models were adapted (compressed with
+glTF-Transform; the ship's materials re-shaded unlit).
 
 - `public/models/hands.glb` — "Damaged hands" by Coffeek
   (https://sketchfab.com/3d-models/damaged-hands-57df95d1c6e746fd9c414948f71de937),
@@ -206,9 +260,10 @@ and both require attribution wherever the site is published:
 - `public/models/ship.glb` — "Ship in Clouds" by Bastien Genbrugge
   (https://sketchfab.com/3d-models/ship-in-clouds-c475323dc7f24e26ba2009c08c8e1941),
   CC-BY-4.0.
-- `public/models/chess.glb` — the chess-scene spec describes its source as a
-  "Poly Haven-style" Blender export named `chess_set_2k.gltf`, which matches
-  Poly Haven's CC0 chess set. Confirm before publishing.
+- `public/models/chess.glb` — "Chess Set" by Riley Queen, Poly Haven
+  (https://polyhaven.com/a/chess_set), CC0. Its material and texture names
+  (`chess_set_board_diff`, `_nor_gl`, `_rough`) are Poly Haven's. CC0 asks
+  for nothing; it is credited in the footer anyway.
 - `public/draco/` — Google's Draco decoder, Apache-2.0.
 - Fonts: Gloock, Cormorant Garamond, JetBrains Mono and IBM Plex Sans are all
   under the SIL Open Font License 1.1.

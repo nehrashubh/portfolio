@@ -2,6 +2,7 @@ import { useEffect, useRef } from 'react'
 import { progressAt, columnOffsetPx, damp } from '../lib/descent'
 import { gust } from '../lib/wind'
 import { useReducedMotion } from '../shared/useReducedMotion'
+import { ScrollRail, type ScrollRailHandle } from '../shared/ScrollRail'
 import { Hero } from './Hero'
 import { About } from './About'
 import { Ground } from './Ground'
@@ -23,6 +24,13 @@ const DAMPING = 1.0
  *  This is what makes a flick of the wheel do almost nothing: the scroll is
  *  accepted in full, but the scene will not chase it faster than this. */
 const MAX_SPEED = 0.3
+
+/** The glide when the visitor names a place outright: Tab to something off
+ *  screen, or a drag of the scrollbar. The descent's own pace takes seconds
+ *  to cross the page, which is a long time to look at a focus ring you
+ *  cannot see, or to watch a thumb wait for the scene; this arrives in about
+ *  half a second. */
+const DIRECT_DAMPING = 6
 
 /** Share of the heading's window spent handing off from letter to letter.
  *  The first letter starts highest and falls first; each one after it sets
@@ -70,6 +78,10 @@ export function Landing() {
   const headingRef = useRef<HTMLHeadingElement>(null)
   const panelsRef = useRef<HTMLDivElement>(null)
   const branchRef = useRef<HTMLDivElement>(null)
+  const railRef = useRef<ScrollRailHandle>(null)
+  // Where a drag of the scrollbar goes depends on the track's measurements,
+  // which live in whichever effect is running; each one sets this.
+  const seekRef = useRef<(progress: number) => void>(() => {})
 
   useEffect(() => {
     if (reducedMotion) return
@@ -94,24 +106,85 @@ export function Landing() {
       track.style.height = `${panels.offsetHeight}px`
       trackTop = track.offsetTop
       scrollable = track.offsetHeight - window.innerHeight
+      railRef.current?.setVisibleFraction(window.innerHeight / track.offsetHeight)
     }
     measure()
     window.addEventListener('resize', measure)
 
+    let pinned = false
+
+    // Tab walks through the cards and the footer, all inside a frame that
+    // cannot scroll: what is on screen is the descent's call, so the browser
+    // has no way to bring a focused card into view. Move the page to it and
+    // let the descent follow, quickly. Tab only: focus handed back by a
+    // closing section, or left by a click, is on something already in view.
+    let tabbing = false
+    let hurry = false
+    const onKeyDown = (e: KeyboardEvent) => {
+      tabbing = e.key === 'Tab'
+    }
+    const onPointerDown = () => {
+      tabbing = false
+    }
+    const onFocusIn = (e: FocusEvent) => {
+      const panels = panelsRef.current
+      const el = e.target
+      if (!tabbing || !panels || !(el instanceof Element) || !panels.contains(el)) return
+      if (document.documentElement.hasAttribute('data-section-active')) return
+      const vh = window.innerHeight
+      const rect = el.getBoundingClientRect()
+      // Where it sits in the stack, and where the stack is headed: the
+      // panels travel exactly as far as the page scrolls.
+      const top = rect.top - panels.getBoundingClientRect().top
+      const headed = top - (window.scrollY - trackTop)
+      const margin = vh * 0.08
+      if (headed >= margin && headed + rect.height <= vh - margin) return
+      const to = Math.min(scrollable, Math.max(0, top - (vh - rect.height) / 2))
+      hurry = true
+      window.scrollTo(0, trackTop + to)
+    }
+    window.addEventListener('keydown', onKeyDown, true)
+    window.addEventListener('pointerdown', onPointerDown, true)
+    document.addEventListener('focusin', onFocusIn)
+
+    seekRef.current = (progress) => {
+      hurry = true
+      window.scrollTo(0, trackTop + progress * scrollable)
+    }
+
     const tick = (t: number) => {
       const dt = Math.min(0.05, (t - last) / 1000) // cap after a background tab
       last = t
+      const root = document.documentElement
+
+      // A section is opening. Move the page to what is on screen, so the
+      // scene has nowhere left to go: it stays exactly where the card was
+      // pressed, the title flies home to the row it left, and closing
+      // reveals the landing at rest. Once per open; the page cannot scroll
+      // again until the section closes.
+      if (root.hasAttribute('data-section-active')) {
+        if (!pinned) {
+          pinned = true
+          window.scrollTo(0, trackTop + shown * scrollable)
+        }
+      } else {
+        pinned = false
+      }
 
       // A section owns the viewport; the landing is covered and has nothing
       // to show for the work. Keep the loop alive, skip the frame.
-      if (document.documentElement.hasAttribute('data-section-open')) {
+      if (root.hasAttribute('data-section-open')) {
         raf = requestAnimationFrame(tick)
         return
       }
 
       const target = progressAt(window.scrollY - trackTop, scrollable)
-      shown = damp(shown, target, DAMPING, dt, MAX_SPEED)
+      shown = hurry
+        ? damp(shown, target, DIRECT_DAMPING, dt)
+        : damp(shown, target, DAMPING, dt, MAX_SPEED)
+      if (shown === target) hurry = false
       const p = shown
+      railRef.current?.setProgress(p)
       const vh = window.innerHeight
 
       const panels = panelsRef.current
@@ -182,43 +255,85 @@ export function Landing() {
     }
 
     raf = requestAnimationFrame(tick)
+    const track = trackRef.current
+    const hero = heroRef.current
+    const heading = headingRef.current
+    const written = [panelsRef.current, columnRef.current, branchRef.current, hero]
     return () => {
       cancelAnimationFrame(raf)
       window.removeEventListener('resize', measure)
+      window.removeEventListener('keydown', onKeyDown, true)
+      window.removeEventListener('pointerdown', onPointerDown, true)
+      document.removeEventListener('focusin', onFocusIn)
+      // Reduced motion can be switched on with the page open. Everything
+      // the loop wrote inline would outrank the stylesheet's still layout
+      // (the track's height, the panels' offset), so it is all taken back.
+      if (track) track.style.height = ''
+      for (const el of written) {
+        if (el) el.style.transform = ''
+      }
+      if (hero) hero.style.opacity = ''
+      heading?.querySelectorAll<HTMLElement>('.ground__letter').forEach((letter) => {
+        letter.style.transform = ''
+        letter.style.opacity = ''
+      })
+    }
+  }, [reducedMotion])
+
+  // Reduced motion: no descent and no loop. The page scrolls on its own, so
+  // the scrollbar reads the page directly and moves it without a glide.
+  useEffect(() => {
+    if (!reducedMotion) return
+    const root = document.documentElement
+    const range = () => root.scrollHeight - window.innerHeight
+    const update = () => {
+      railRef.current?.setVisibleFraction(window.innerHeight / root.scrollHeight)
+      railRef.current?.setProgress(range() > 0 ? window.scrollY / range() : 0)
+    }
+    seekRef.current = (progress) => window.scrollTo(0, progress * range())
+    update()
+    window.addEventListener('scroll', update, { passive: true })
+    window.addEventListener('resize', update)
+    return () => {
+      window.removeEventListener('scroll', update)
+      window.removeEventListener('resize', update)
     }
   }, [reducedMotion])
 
   return (
-    <div className="descent" ref={trackRef}>
-      {/* The scene: one continuous place you travel down. */}
-      <div className="descent__viewport">
-        <div className="descent__column" ref={columnRef}>
-          <div className="descent__layer descent__layer--sky" />
-          <div className="descent__branch" ref={branchRef} aria-hidden="true" />
-          <div className="descent__layer descent__layer--ground" />
-        </div>
-        {/* One weather system for the whole descent, not one per panel. */}
-        <PetalField count={30} reducedMotion={reducedMotion} />
+    <>
+      <div className="descent" ref={trackRef}>
+        {/* The scene: one continuous place you travel down. */}
+        <div className="descent__viewport">
+          <div className="descent__column" ref={columnRef}>
+            <div className="descent__layer descent__layer--sky" />
+            <div className="descent__branch" ref={branchRef} aria-hidden="true" />
+            <div className="descent__layer descent__layer--ground" />
+          </div>
+          {/* One weather system for the whole descent, not one per panel. */}
+          <PetalField count={30} reducedMotion={reducedMotion} />
 
-        {/* The content, riding the same damped progress as the scene. */}
-        <div className="descent__panels" ref={panelsRef}>
-          <section className="descent__panel descent__panel--hero">
-            <Hero progressRef={heroRef} />
-          </section>
-          <section className="descent__panel descent__panel--about">
-            <About />
-          </section>
-          <section className="descent__panel descent__panel--cards">
-            <Ground reducedMotion={reducedMotion} headingRef={headingRef} />
-          </section>
-          {/* Inside the damped stack too. Left in normal flow it rode raw
-              scroll, so it arrived while the damped panels were still a lag
-              behind and appeared before the cards had settled. */}
-          <div className="descent__panel descent__panel--footer">
-            <Footer />
+          {/* The content, riding the same damped progress as the scene. */}
+          <div className="descent__panels" ref={panelsRef}>
+            <section className="descent__panel descent__panel--hero">
+              <Hero progressRef={heroRef} />
+            </section>
+            <section className="descent__panel descent__panel--about">
+              <About />
+            </section>
+            <section className="descent__panel descent__panel--cards">
+              <Ground reducedMotion={reducedMotion} headingRef={headingRef} />
+            </section>
+            {/* Inside the damped stack too. Left in normal flow it rode raw
+                scroll, so it arrived while the damped panels were still a lag
+                behind and appeared before the cards had settled. */}
+            <div className="descent__panel descent__panel--footer">
+              <Footer />
+            </div>
           </div>
         </div>
       </div>
-    </div>
+      <ScrollRail ref={railRef} onSeek={(progress) => seekRef.current(progress)} />
+    </>
   )
 }

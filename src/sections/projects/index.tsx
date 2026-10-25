@@ -7,6 +7,7 @@ import { PROJECTS } from './data/projects';
 import Deck from './deck/Deck';
 import Scene from './scene/Scene';
 import { useIsNarrowViewport } from './scene/useIsNarrowViewport';
+import Doodles from './Doodles';
 import './projects.css';
 
 export default function ProjectsSection({ item }: SectionProps) {
@@ -34,6 +35,7 @@ export default function ProjectsSection({ item }: SectionProps) {
 
   return (
     <div ref={hostRef} className="scene-host" role="region" aria-label="Projects">
+      <Doodles />
       {webgl && (
         <Scene narrow={narrow} stateRef={carousel.stateRef} dimmed={openIndex !== null} />
       )}

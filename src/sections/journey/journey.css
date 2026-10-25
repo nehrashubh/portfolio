@@ -1,3 +1,14 @@
+/* Moonlight rather than brass: the text is near-white, and the small type
+   (the year, the role) takes a pale cool blue off the dusk, so it reads as
+   quieter than the title without leaning gold against violet cloud. */
+.journey,
+.journey-static {
+  --journey-ink: #f4f7fb;
+  --journey-text: rgba(236, 242, 250, 0.92);
+  --journey-accent: #b9cde6;
+  --journey-rule: rgba(236, 242, 250, 0.45);
+}
+
 /* The scene is pinned; only the transparent scroller over it moves. Its
    spacer gives the wheel eight viewport-heights to travel, as the old
    ScrollTrigger pin did, and the camera reads its scrollTop. */
@@ -23,9 +34,6 @@
   overflow-y: auto;
   overscroll-behavior: contain;
   outline: none;
-  /* Firefox paints a scrollbar track; keep the rail but let the art through. */
-  scrollbar-width: thin;
-  scrollbar-color: rgba(232, 184, 119, 0.35) transparent;
 }
 
 .journey__spacer {
@@ -46,9 +54,9 @@
   font-size: 10px;
   letter-spacing: 0.32em;
   text-transform: uppercase;
-  color: rgba(255, 240, 214, 0.9);
+  color: var(--journey-text);
   /* The cue sits wherever the cloud happens to be, which is near-white as
-     often as deep blue. Brass alone vanished on the bright half. */
+     often as deep blue. Colour alone vanished on the bright half. */
   text-shadow: 0 1px 10px rgba(0, 0, 0, 0.85);
 }
 
@@ -58,7 +66,7 @@
   place-items: center;
 }
 
-/* The hero's cue, in the section's brass: the word, then a line drawn
+/* The hero's cue: the word, then a line drawn
    downward, so it reads as an instruction rather than a label. */
 .journey__cue {
   left: 50%;
@@ -76,7 +84,7 @@
   content: '';
   width: 1px;
   height: 34px;
-  background: linear-gradient(to bottom, rgba(255, 240, 214, 0.9), transparent);
+  background: linear-gradient(to bottom, var(--journey-text), transparent);
   box-shadow: 0 0 6px rgba(0, 0, 0, 0.5);
   transform-origin: top;
   animation: journey-cue-fall 2.4s cubic-bezier(0.22, 1, 0.36, 1) infinite;
@@ -108,13 +116,15 @@
   font-family: var(--font-sans);
 }
 
-/* The type sits in the sky, centred on its ring. No panel, no leader: a
+/* The type sits in the sky, centred on its anchor. No panel, no leader: a
    soft radial scrim carries the legibility instead, and it has no edges to
    read as a box. */
 .waypoint-label__body {
   position: absolute;
   top: 0;
-  width: var(--label-w, 274px);
+  width: var(--label-w, 340px);
+  /* Clear of the stamp. CARD_GAP in labelPlacement.ts is the same. */
+  --card-gap: 54px;
   transform: translateY(-50%);
   /* Contain the scrim's negative z-index so it paints behind this text but
      not behind the canvas. */
@@ -128,7 +138,7 @@
 .waypoint-label__body::before {
   content: '';
   position: absolute;
-  inset: -40px -52px;
+  inset: -48px -60px;
   z-index: -1;
   pointer-events: none;
   background: radial-gradient(
@@ -141,13 +151,13 @@
 }
 
 .waypoint-label[data-side='right'] .waypoint-label__body {
-  left: 26px;
+  left: var(--card-gap);
   text-align: left;
 }
 
 /* Hanging off the marker's left, the text reads back toward it. */
 .waypoint-label[data-side='left'] .waypoint-label__body {
-  right: 26px;
+  right: var(--card-gap);
   text-align: right;
 }
 
@@ -158,30 +168,30 @@
 }
 
 .waypoint-label__year {
-  margin: 0 0 6px;
+  margin: 0 0 8px;
   font-family: var(--font-mono);
-  font-size: 0.78rem;
+  font-size: 0.9rem;
   letter-spacing: 0.24em;
-  color: #e8b877;
+  color: var(--journey-accent);
   text-shadow: 0 1px 12px rgba(0, 0, 0, 0.75);
 }
 
 .waypoint-label__title {
-  margin: 0 0 10px;
+  margin: 0 0 12px;
   font-family: var(--font-display);
-  font-size: 1.55rem;
+  font-size: 2rem;
   line-height: 1.08;
   font-weight: 400;
-  color: #fff6e8;
+  color: var(--journey-ink);
   text-shadow: 0 2px 16px rgba(0, 0, 0, 0.7);
 }
 
 .waypoint-label__rule {
   display: block;
-  width: 26px;
+  width: 32px;
   height: 1px;
-  margin: 0 0 10px;
-  background: rgba(232, 184, 119, 0.9);
+  margin: 0 0 12px;
+  background: var(--journey-rule);
 }
 
 .waypoint-label[data-side='left'] .waypoint-label__rule {
@@ -191,21 +201,21 @@
 /* A long role wraps; tracked tighter and given real leading so the second
    line reads as part of it rather than as an orphan above the description. */
 .waypoint-label__role {
-  margin: 0 0 10px;
+  margin: 0 0 12px;
   font-family: var(--font-mono);
-  font-size: 0.62rem;
+  font-size: 0.74rem;
   line-height: 1.6;
   letter-spacing: 0.1em;
   text-transform: uppercase;
-  color: #e8b877;
+  color: var(--journey-accent);
   text-shadow: 0 1px 12px rgba(0, 0, 0, 0.8);
 }
 
 .waypoint-label__description {
   margin: 0;
-  font-size: 0.84rem;
+  font-size: 1rem;
   line-height: 1.6;
-  color: rgba(255, 246, 232, 0.9);
+  color: var(--journey-text);
   text-shadow: 0 1px 12px rgba(0, 0, 0, 0.8);
 }
 
@@ -249,7 +259,7 @@
   }
 
   .waypoint-label__title {
-    font-size: 1.4rem;
+    font-size: 1.65rem;
   }
 }
 
@@ -269,7 +279,7 @@
   flex-direction: column;
   gap: 2rem;
   max-width: 40rem;
-  color: #fff6e8;
+  color: var(--journey-ink);
   font-family: var(--font-sans);
 }
 
@@ -278,7 +288,7 @@
   font-family: var(--font-mono);
   font-size: 0.85rem;
   letter-spacing: 0.18em;
-  color: #e8b877;
+  color: var(--journey-accent);
 }
 
 .reduced-motion-list__role {
@@ -287,7 +297,7 @@
   font-size: 0.7rem;
   letter-spacing: 0.14em;
   text-transform: uppercase;
-  color: #e8b877;
+  color: var(--journey-accent);
 }
 
 .reduced-motion-list__title {
@@ -300,5 +310,5 @@
 .reduced-motion-list__description {
   margin: 0;
   line-height: 1.5;
-  color: rgba(255, 246, 232, 0.86);
+  color: var(--journey-text);
 }

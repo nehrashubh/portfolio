@@ -1,6 +1,11 @@
-import { cleanup } from '@testing-library/react'
+import { cleanup, configure } from '@testing-library/react'
 import { afterEach, vi } from 'vitest'
 import '@testing-library/jest-dom/vitest'
+
+// Each project pill renders a hidden copy of its open card, purely so its
+// height can be measured. Nobody can see or reach it, so text queries skip it
+// the way a person would.
+configure({ defaultIgnore: 'script, style, .pill--sizer, .pill--sizer *' })
 
 // jsdom does not implement matchMedia. Every reduced-motion / media-query hook
 // calls it at mount, and tests that care override this with their own mock.

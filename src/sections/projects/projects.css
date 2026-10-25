@@ -17,6 +17,69 @@
   -webkit-font-smoothing: antialiased;
 }
 
+/* Behind everything: first in the host, and the canvas and deck after it are
+   positioned, so they stack over it. The sketches keep to the margins the
+   hands and the deck leave, and some are meant to run behind a hand. One
+   opacity for the lot, so a stroke drawn over another does not darken. */
+.doodles {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  color: #e2eeea;
+  opacity: 0.13;
+}
+
+.doodle {
+  position: absolute;
+  height: auto;
+  overflow: visible;
+  translate: -50% -50%; /* left/top below place each sketch's centre */
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.4;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+/* The same pen at any size: strokes stay 1.4px however large the sketch. */
+.doodle path {
+  vector-effect: non-scaling-stroke;
+}
+
+.doodle .doodle__dashed { stroke-dasharray: 3 4; }
+.doodle .doodle__faint { opacity: 0.55; }
+.doodle .doodle__filled { fill: currentColor; }
+
+/* Across the top and down the gaps either side of the deck, at a few
+   different sizes so they read as sketches rather than a set of icons. The
+   orbits, the cube and the network are meant to run partly behind a hand.
+   Sized by whichever side of the screen is shorter, so an ultrawide or a
+   phone on its side does not blow them up. */
+.doodle--prompt   { left: 6.5%; top: 19%; width: min(5.6vw, 10vh); rotate: -4deg; }
+.doodle--wave     { left: 26%;  top: 9%;  width: min(10vw, 18vh); rotate: 2deg; }
+.doodle--angle    { left: 41%;  top: 11%; width: min(5.6vw, 10vh); rotate: -3deg; }
+.doodle--orbits   { left: 81%;  top: 16%; width: min(15vw, 27vh); rotate: -6deg; }
+.doodle--cube     { left: 22.5%; top: 36%; width: min(7.5vw, 13.5vh); rotate: 5deg; }
+.doodle--lock     { left: 27%;  top: 61%; width: min(3.4vw, 6.1vh); rotate: -8deg; }
+.doodle--net      { left: 22%;  top: 83%; width: min(7vw, 12.6vh); rotate: 3deg; }
+.doodle--flag     { left: 73.5%; top: 37%; width: min(3.6vw, 6.5vh); rotate: 6deg; }
+.doodle--tree     { left: 72%;  top: 60%; width: min(7.5vw, 13.5vh); rotate: -3deg; }
+.doodle--database { left: 77%;  top: 79%; width: min(3.4vw, 6.1vh); rotate: 4deg; }
+.doodle--git      { left: 63%;  top: 89%; width: min(13vw, 23.4vh); rotate: -2deg; }
+.doodle--mark-1   { left: 16%;  top: 13%; width: min(1.1vw, 2vh); }
+.doodle--mark-2   { left: 34%;  top: 28%; width: min(1.1vw, 2vh); rotate: 12deg; }
+.doodle--mark-3   { left: 82%;  top: 41%; width: min(1.1vw, 2vh); rotate: -9deg; }
+
+/* A phone puts the hands and the deck straight down the middle, and draws
+   the hands faded, so a sketch behind one shows through it. Only the band
+   above the deck and the gap between the wrists are free. */
+@media (max-width: 900px) {
+  .doodle { display: none; }
+  .doodle--wave   { display: block; left: 24%; top: 12%; width: min(26vw, 15vh); }
+  .doodle--orbits { display: block; left: 66%; top: 13%; width: min(28vw, 16.5vh); }
+  .doodle--git    { display: block; left: 50%; top: 94%; width: min(34vw, 20vh); }
+}
+
 /* The deck is laid out in cqw to the pixel; the UA's list padding and
    paragraph margins have no place in it. :where() keeps this at zero
    specificity, so the deck's own .pill-role / .pill-blurb margins win. */

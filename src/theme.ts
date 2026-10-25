@@ -84,12 +84,16 @@ export const COPY = {
   name: 'Shubhankar Nehra',
   hook: 'I find the way in — before someone worse does.',
   /** The facts a recruiter needs in the first twenty seconds, under the hook. */
-  summary: 'Computer science at Virginia Tech, class of 2028 · offensive security',
+  summary: 'Computer science at Virginia Tech, class of 2028 · minor in cybersecurity',
+  // From the software résumé, the one the site follows while the major is the
+  // whole of computer science. Switch this back toward security when the
+  // security résumé takes over.
   about:
-    'I study computer science at Virginia Tech, with a focus on security. ' +
-    "Right now I'm working toward my CPTS and spending most of my time in " +
-    'offensive security — red teaming is where I want to end up. I build ' +
-    'things and I break them — usually in that order.',
+    'I study computer science at Virginia Tech, with a minor in cybersecurity. ' +
+    'This summer I built a CRM for a sales team of 20+, and before that I did ' +
+    'backend work on two research projects. Security runs through ' +
+    "most of it, and I'm working toward my CPTS. I build things and I break " +
+    'them, usually in that order.',
   bio: 'wannabe pentester. foodie. dog and cat person. jack of all trades.',
 } as const
 
@@ -110,7 +114,7 @@ export interface Link {
 
 /** From the résumé. The résumé itself is served from public/. */
 export const LINKS: readonly Link[] = [
-  { label: 'Email', href: 'mailto:shubhankarnehra@vt.edu' },
+  { label: 'Email', href: 'mailto:nehrashubh6@gmail.com' },
   { label: 'GitHub', href: 'https://github.com/nehrashubh' },
   { label: 'LinkedIn', href: 'https://www.linkedin.com/in/nehrashubh' },
   { label: 'Résumé', href: '/shubhankarnehra_resume.pdf' },
@@ -121,3 +125,34 @@ export const FOOTER = {
   heading: 'Say hello.',
   note: 'Blacksburg, VA · open to summer 2027 internships',
 } as const
+
+/** The 3D models the site is drawn with. The hands and the ship are CC BY 4.0,
+ *  which asks for credit where the work is shown, a link to the licence, and
+ *  word that it was changed: both were compressed, and the ship re-shaded.
+ *  The chess set is CC0 and needs nothing, so it is credited as a courtesy. */
+export const CREDITS = [
+  {
+    title: 'Damaged hands',
+    author: 'Coffeek',
+    href: 'https://sketchfab.com/3d-models/damaged-hands-57df95d1c6e746fd9c414948f71de937',
+    license: 'CC BY 4.0',
+    licenseHref: 'https://creativecommons.org/licenses/by/4.0/',
+    adapted: true,
+  },
+  {
+    title: 'Ship in Clouds',
+    author: 'Bastien Genbrugge',
+    href: 'https://sketchfab.com/3d-models/ship-in-clouds-c475323dc7f24e26ba2009c08c8e1941',
+    license: 'CC BY 4.0',
+    licenseHref: 'https://creativecommons.org/licenses/by/4.0/',
+    adapted: true,
+  },
+  {
+    title: 'Chess Set',
+    author: 'Riley Queen',
+    href: 'https://polyhaven.com/a/chess_set',
+    license: 'CC0',
+    licenseHref: 'https://creativecommons.org/publicdomain/zero/1.0/',
+    adapted: false,
+  },
+] as const

@@ -5,6 +5,7 @@ import { readableOnDark } from '../lib/color'
 import Markdown from './Markdown'
 import Tooltip from './Tooltip'
 import Book from './Book'
+import { ElementRail } from '../../../shared/ScrollRail'
 import './reader.css'
 
 interface Props {
@@ -22,6 +23,7 @@ export default function Reader({ writeup, glossary, onClose, onOpenWriteup }: Pr
   const [gloss, setGloss] = useState<{ slug: string; rect: DOMRect } | null>(null)
   const [closing, setClosing] = useState(false)
   const timer = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const panelRef = useRef<HTMLElement>(null)
 
   // Play the exit animation, then unmount. Reduced motion closes immediately.
   const requestClose = useCallback(() => {
@@ -83,6 +85,7 @@ export default function Reader({ writeup, glossary, onClose, onOpenWriteup }: Pr
     >
       <div className="reader__scrim" onClick={requestClose} />
       <article
+        ref={panelRef}
         className="reader__panel"
         style={{ '--cat': writeup.color, '--accent': accent } as React.CSSProperties}
       >
@@ -124,6 +127,7 @@ export default function Reader({ writeup, glossary, onClose, onOpenWriteup }: Pr
           />
         </div>
       </article>
+      <ElementRail target={panelRef} />
 
       {entry && gloss && (
         <Tooltip anchor={gloss.rect}>

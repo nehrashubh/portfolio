@@ -297,14 +297,14 @@
 }
 
 /* The card overtakes the hands rather than staying in the corridor.
-   Height is sized for the longest placeholder — a three-line blurb over four
-   stack chips — rather than the shortest, so the box never has to reflow. */
+   Its height is the content's own, measured by Pill from the sizer below and
+   handed over as --open-h, so the link always has the card's full bottom
+   padding under it whatever the blurb's length or the screen's shape. The
+   cqw values are only a first frame's fallback, before the measure lands. */
 .pill.is-open {
   width: 50cqw;
-  /* In cqw, like everything inside it, so the height follows the content on
-     any aspect ratio. In cqh it overflowed on wide, short screens. */
-  height: 34cqw;
-  padding: 3.6cqw 3.8cqw;
+  height: var(--open-h, 36cqw);
+  padding: 3.6cqw 3.8cqw 4.4cqw;
   border-radius: 1.9cqw;
   outline-color: transparent;
   background: radial-gradient(
@@ -319,8 +319,26 @@
     0 0 8cqw rgba(240, 160, 110, 0.12);
 }
 
-.pill.is-open .pill-body { opacity: 1; max-height: 34cqw; }
+.pill.is-open .pill-body { opacity: 1; max-height: var(--open-body-h, 36cqw); }
 .pill.is-open .pill-hit { cursor: default; }
+
+/* The measuring copy: an open card at its natural height, laid out where the
+   real one would be so its cqw resolve against the same deck, and never
+   painted. Pill reads its height and its body's. */
+.pill.pill--sizer {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: auto;
+  visibility: hidden;
+  pointer-events: none;
+  transition: none;
+}
+
+.pill.pill--sizer .pill-body {
+  max-height: none;
+  transition: none;
+}
 
 /* --- reduced motion ------------------------------------------------------- */
 /* Functional motion stays — the deck still moves, because that is the product.
@@ -351,12 +369,15 @@
 
   .pill.is-open {
     width: 88cqw;
-    height: 88cqw;
-    padding: 7cqw 6.5cqw;
+    height: var(--open-h, 92cqw);
+    padding: 7cqw 6.5cqw 8cqw;
     border-radius: 4cqw;
   }
 
-  .pill.is-open .pill-body { max-height: 88cqw; }
+  .pill.is-open .pill-body { max-height: var(--open-body-h, 92cqw); }
+
+  .pill.pill--sizer { height: auto; }
+  .pill.pill--sizer .pill-body { max-height: none; }
 
   .pill-role { font-size: 2.4cqw; margin-top: 2.8cqw; }
   .pill-blurb { font-size: 2.9cqw; max-width: none; margin-top: 6cqw; }

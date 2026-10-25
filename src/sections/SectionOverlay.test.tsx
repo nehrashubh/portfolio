@@ -153,6 +153,20 @@ describe('SectionOverlay section mount', () => {
     expect(document.documentElement.style.overflow).toBe('')
   })
 
+  it('holds the space the hidden scrollbar leaves, and lets it go after', () => {
+    // A classic 15px scrollbar: the window is wider than the root's client box.
+    const width = vi.spyOn(document.documentElement, 'clientWidth', 'get')
+      .mockReturnValue(window.innerWidth - 15)
+    const root = document.documentElement
+    const { unmount } = render(
+      <SectionOverlay section={skills} onClose={() => {}} reducedMotion />,
+    )
+    expect(root.style.getPropertyValue('--scroll-lock-gutter')).toBe('15px')
+    unmount()
+    expect(root.style.getPropertyValue('--scroll-lock-gutter')).toBe('')
+    width.mockRestore()
+  })
+
   it('stands the landing down once open, and wakes it the moment closing starts', async () => {
     const { rerender } = render(
       <SectionOverlay section={skills} onClose={() => {}} reducedMotion />,
@@ -162,6 +176,26 @@ describe('SectionOverlay section mount', () => {
     )
     rerender(<SectionOverlay section={skills} onClose={() => {}} reducedMotion closing />)
     expect(document.documentElement).not.toHaveAttribute('data-section-open')
+  })
+})
+
+describe('SectionOverlay holds the landing still', () => {
+  const skills = SECTIONS[0]
+
+  it('marks a section active from the first frame of opening, not after the grade', () => {
+    // The landing lags the scrollbar by design. A card pressed mid-glide must
+    // freeze it there at once; waiting for the veil grade let it keep
+    // drifting, and the rest of the drift played out after closing.
+    render(<SectionOverlay section={skills} onClose={() => {}} reducedMotion={false} />)
+    expect(document.documentElement).toHaveAttribute('data-section-active')
+  })
+
+  it('lets go the moment closing starts', () => {
+    const { rerender } = render(
+      <SectionOverlay section={skills} onClose={() => {}} reducedMotion={false} />,
+    )
+    rerender(<SectionOverlay section={skills} onClose={() => {}} reducedMotion={false} closing />)
+    expect(document.documentElement).not.toHaveAttribute('data-section-active')
   })
 })
 

@@ -10,7 +10,13 @@ import { scrollProgress } from './scrollFlight'
  * overlay with page scroll locked, so there is no document scroll to pin
  * against; the section scrolls itself instead.
  */
-export function useScrollFlight(containerRef: RefObject<HTMLElement | null>): RefObject<number> {
+export function useScrollFlight(
+  containerRef: RefObject<HTMLElement | null>,
+  /** Told whenever the progress may have moved, so an on-demand canvas can
+   *  ask for a frame. Pass a stable function: the listeners are rebound when
+   *  it changes. */
+  onUpdate?: () => void,
+): RefObject<number> {
   const progressRef = useRef(0)
 
   useEffect(() => {
@@ -18,6 +24,7 @@ export function useScrollFlight(containerRef: RefObject<HTMLElement | null>): Re
     if (!el) return
     const update = () => {
       progressRef.current = scrollProgress(el.scrollTop, el.scrollHeight, el.clientHeight)
+      onUpdate?.()
     }
     update()
     el.addEventListener('scroll', update, { passive: true })
@@ -27,7 +34,7 @@ export function useScrollFlight(containerRef: RefObject<HTMLElement | null>): Re
       el.removeEventListener('scroll', update)
       ro.disconnect()
     }
-  }, [containerRef])
+  }, [containerRef, onUpdate])
 
   return progressRef
 }

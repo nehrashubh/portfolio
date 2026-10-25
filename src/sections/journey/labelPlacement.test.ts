@@ -66,7 +66,9 @@ describe('clampAnchor', () => {
   const LABEL = 234
 
   it('leaves an anchor alone when the whole card already fits', () => {
-    expect(clampAnchor(100, 400, 'right', LABEL, W, H)).toEqual({ x: 100, y: 400, clamped: false })
+    // 20px to spare at the right edge, whatever the gap to the marker is.
+    const x = W - 16 - CARD_GAP - LABEL - 20
+    expect(clampAnchor(x, 400, 'right', LABEL, W, H)).toEqual({ x, y: 400, clamped: false })
   })
 
   it('pulls a right-side card back so its far edge is inside the frame', () => {

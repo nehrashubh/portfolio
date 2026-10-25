@@ -1,0 +1,66 @@
+/* The site's own scrollbar: a thumb and nothing else, no track drawn. White
+   with a soft dark edge, so it reads on the deep sky, the pale cloud, the
+   meadow and the footer alike. The element is a wider strip than the thumb,
+   so the thumb is easy to take hold of without looking heavy. */
+.scroll-rail {
+  position: fixed;
+  top: 12px;
+  bottom: 12px;
+  right: 2px;
+  width: 16px;
+  z-index: 30;
+  /* Set, not inherited: an ElementRail's box lets clicks through. */
+  pointer-events: auto;
+  touch-action: none;
+  opacity: 0.6;
+  transition: opacity 0.3s ease;
+}
+
+.scroll-rail[data-idle] {
+  display: none;
+}
+
+.scroll-rail:hover,
+.scroll-rail[data-held] {
+  opacity: 1;
+}
+
+.scroll-rail__thumb {
+  position: absolute;
+  top: 0;
+  right: 5px;
+  width: 4px;
+  border-radius: 3px;
+  background: rgba(255, 255, 255, 0.92);
+  box-shadow:
+    0 0 0 1px rgba(10, 24, 40, 0.16),
+    0 1px 8px rgba(10, 24, 40, 0.28);
+  will-change: transform;
+  transition: width 0.2s ease, right 0.2s ease;
+}
+
+.scroll-rail:hover .scroll-rail__thumb,
+.scroll-rail[data-held] .scroll-rail__thumb {
+  right: 4px;
+  width: 6px;
+}
+
+/* Inside a section rather than over the window. */
+.scroll-rail--inset {
+  position: absolute;
+}
+
+/* Laid over a scrolling element by ElementRail, which sizes it to match. */
+.element-rail {
+  position: absolute;
+  z-index: 2;
+  pointer-events: none;
+}
+
+/* A finger scrolls the page itself; a strip at the edge that caught swipes
+   would only get in the way. There it is an indicator and nothing more. */
+@media (pointer: coarse) {
+  .scroll-rail {
+    pointer-events: none;
+  }
+}

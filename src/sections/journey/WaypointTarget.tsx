@@ -12,44 +12,84 @@ type WaypointTargetProps = {
   position: [number, number, number]
 }
 
-// Drawn at 4x the on-screen size it ever needs, so the ring's thin stroke
-// stays clean rather than turning into a stair-stepped smear when the sprite
-// is scaled up on approach.
+// Drawn at 4x the on-screen size it ever needs, so the strokes stay clean
+// rather than turning into a stair-stepped smear when the sprite is scaled up
+// on approach.
 const TEXTURE_SIZE = 256
 
+const INK = '#f4f7fb'
+const STAMP_INK = '#1b2236'
+
 /**
- * A thin ring, optionally with a filled centre once the waypoint is behind
- * you. This replaces an earlier heavy square-with-an-X: at the sizes this
- * scene uses, a boxed X read as a "broken image" placeholder and fought the
- * painterly artwork for attention. A hairline ring reads as a survey marker
- * and stays quiet against the clouds.
+ * An anchor, in strokes, on the texture's own square: ring, shank, stock, and
+ * the arms as the foot of a circle with a barbed fluke at each tip. Traced as
+ * one path so the halo underneath and the ink on top are the same shape.
+ */
+function traceAnchor(ctx: CanvasRenderingContext2D) {
+  const s = TEXTURE_SIZE
+  const c = s / 2
+  ctx.beginPath()
+  ctx.moveTo(c + s * 0.06, s * 0.19)
+  ctx.arc(c, s * 0.19, s * 0.06, 0, Math.PI * 2)
+  ctx.moveTo(c, s * 0.25)
+  ctx.lineTo(c, s * 0.8)
+  ctx.moveTo(c - s * 0.16, s * 0.34)
+  ctx.lineTo(c + s * 0.16, s * 0.34)
+
+  const cy = s * 0.52
+  const r = s * 0.28
+  const ends = [Math.PI * 0.14, Math.PI * 0.86]
+  ctx.moveTo(c + r * Math.cos(ends[0]), cy + r * Math.sin(ends[0]))
+  ctx.arc(c, cy, r, ends[0], ends[1])
+  for (const [a, way] of [[ends[0], 1], [ends[1], -1]]) {
+    const tip = [c + r * Math.cos(a), cy + r * Math.sin(a)]
+    // Back down the arm from its tip, splayed either side into a barb.
+    const back = Math.atan2(way * Math.cos(a), -way * Math.sin(a))
+    for (const splay of [-0.7, 0.7]) {
+      ctx.moveTo(tip[0], tip[1])
+      ctx.lineTo(tip[0] + Math.cos(back + splay) * s * 0.08, tip[1] + Math.sin(back + splay) * s * 0.08)
+    }
+  }
+}
+
+/**
+ * An anchor, for the ship. Ahead of you it is drawn in outline; once you have
+ * reached the stop it is stamped, set in ink on a pale disc, so the route
+ * behind reads as a row of stamps. It replaced a hairline ring, which said
+ * "survey marker" and nothing about the ship.
  */
 function drawMarker(ctx: CanvasRenderingContext2D, reached: boolean) {
   const c = TEXTURE_SIZE / 2
-  const radius = TEXTURE_SIZE * 0.3
-
   ctx.clearRect(0, 0, TEXTURE_SIZE, TEXTURE_SIZE)
-
-  // Soft outer halo so the marker separates from bright cloud without
-  // needing a heavy stroke.
-  ctx.strokeStyle = 'rgba(0, 0, 0, 0.28)'
-  ctx.lineWidth = 10
-  ctx.beginPath()
-  ctx.arc(c, c, radius, 0, Math.PI * 2)
-  ctx.stroke()
-
-  ctx.strokeStyle = '#f2dcc0'
-  ctx.lineWidth = 5
-  ctx.beginPath()
-  ctx.arc(c, c, radius, 0, Math.PI * 2)
-  ctx.stroke()
+  ctx.lineCap = 'round'
+  ctx.lineJoin = 'round'
 
   if (reached) {
-    ctx.fillStyle = '#f2dcc0'
+    // A soft dark edge so the disc separates from bright cloud.
+    ctx.fillStyle = 'rgba(0, 0, 0, 0.28)'
     ctx.beginPath()
-    ctx.arc(c, c, radius * 0.42, 0, Math.PI * 2)
+    ctx.arc(c, c, TEXTURE_SIZE * 0.47, 0, Math.PI * 2)
     ctx.fill()
+    ctx.fillStyle = INK
+    ctx.beginPath()
+    ctx.arc(c, c, TEXTURE_SIZE * 0.44, 0, Math.PI * 2)
+    ctx.fill()
+    traceAnchor(ctx)
+    ctx.strokeStyle = STAMP_INK
+    ctx.lineWidth = 13
+    ctx.stroke()
+    return
   }
+
+  // Soft halo so the outline separates from bright cloud without needing a
+  // heavier stroke.
+  traceAnchor(ctx)
+  ctx.strokeStyle = 'rgba(0, 0, 0, 0.3)'
+  ctx.lineWidth = 22
+  ctx.stroke()
+  ctx.strokeStyle = INK
+  ctx.lineWidth = 12
+  ctx.stroke()
 }
 
 function createTexture(reached: boolean): CanvasTexture {
@@ -63,14 +103,15 @@ function createTexture(reached: boolean): CanvasTexture {
 
 // Shared across every marker instance - same texture content, no reason to
 // pay for N canvases/GPU uploads.
-const RING_TEXTURE = createTexture(false)
-const RING_FILLED_TEXTURE = createTexture(true)
+const ANCHOR_TEXTURE = createTexture(false)
+const STAMPED_TEXTURE = createTexture(true)
 
 // Markers sit ~1.9 units from the ship, viewed from a 3.3-3.85 unit orbit, so
 // this is deliberately small: the previous 0.5 put a marker roughly the height
-// of the ship itself in frame.
+// of the ship itself in frame. The stamp's disc is wider than the ring it
+// replaced, so the current stop grows by less on arrival.
 const BASE_SCALE = 0.16
-const EMPHASIS_GAIN = 0.5
+const EMPHASIS_GAIN = 0.35
 
 /**
  * Cloud billboards are depthWrite:false, so they never write to the depth
@@ -94,7 +135,7 @@ export const WaypointTarget = forwardRef<WaypointTargetHandle, WaypointTargetPro
         const sprite = spriteRef.current
         if (!sprite) return
         const material = sprite.material as SpriteMaterial
-        const next = reached ? RING_FILLED_TEXTURE : RING_TEXTURE
+        const next = reached ? STAMPED_TEXTURE : ANCHOR_TEXTURE
         if (material.map === next) return
         material.map = next
         material.needsUpdate = true
@@ -106,7 +147,7 @@ export const WaypointTarget = forwardRef<WaypointTargetHandle, WaypointTargetPro
         const scale = BASE_SCALE * (1 + clamped * EMPHASIS_GAIN)
         sprite.scale.set(scale, scale, scale)
         // Fade the marker with the label it belongs to, so inactive waypoints
-        // recede instead of dotting the sky with equal-weight rings.
+        // recede instead of dotting the sky with equal-weight anchors.
         const material = sprite.material as SpriteMaterial
         material.opacity = BASE_MARKER_OPACITY + clamped * (1 - BASE_MARKER_OPACITY)
       },
@@ -120,7 +161,7 @@ export const WaypointTarget = forwardRef<WaypointTargetHandle, WaypointTargetPro
         renderOrder={MARKER_RENDER_ORDER}
       >
         <spriteMaterial
-          map={RING_TEXTURE}
+          map={ANCHOR_TEXTURE}
           transparent
           depthWrite={false}
           toneMapped={false}

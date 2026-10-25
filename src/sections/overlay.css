@@ -22,10 +22,14 @@
   --title-top: 3.4vh;
 }
 
+/* The meadow, already blurred (scripts/blur-ground.mjs). It used to be the
+   sharp plate with a live backdrop-filter: blur(18px) over the whole
+   viewport on the veil above it, which is one of the most expensive things
+   a page can ask a GPU for, held for as long as any section was open. */
 .overlay__ground {
   position: absolute;
   inset: 0;
-  background-image: url('/plates/ground.webp');
+  background-image: url('/plates/ground-blur.webp');
   background-size: cover;
   background-position: center;
   opacity: 1;
@@ -38,7 +42,6 @@
 .overlay__veil {
   position: absolute;
   inset: 0;
-  backdrop-filter: blur(18px) saturate(1.05);
   background: var(--veil);
   opacity: 1;
   /* The veil arrives in its own hour, over the grade's full length. It used

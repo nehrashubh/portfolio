@@ -4,7 +4,7 @@ import type { Waypoint } from './waypoints'
 import type { LabelSide } from './labelPlacement'
 
 /** Text column width in CSS pixels. Callers pass this to `chooseLabelSide`. */
-export const LABEL_WIDTH_PX = 274
+export const LABEL_WIDTH_PX = 340
 
 export type WaypointLabelHandle = {
   setVisibility: (opacity: number) => void
@@ -24,7 +24,7 @@ type WaypointLabelProps = {
  * marker's projected position; the text is offset from there in CSS, so the
  * per-frame transform only ever carries the marker's own screen coordinates.
  *
- * No leader line and no panel. The type sits in the sky beside its ring,
+ * No leader line and no panel. The type sits in the sky beside its anchor,
  * close enough that the pairing is obvious, and a soft radial scrim behind
  * it — invisible over dark cloud, quietly darkening bright cloud — is what
  * keeps it legible without drawing a box around it.

@@ -1,11 +1,23 @@
 import type { Project } from './types';
 
 /**
- * From the résumé, newest first. Faith CRM, DBWorkout and SpaceNet have no
- * public repository — the first is client work, the other two research — so
- * they deep-link to where the site tells their story instead.
+ * From the software résumé, newest first. Faith CRM, DBWorkout and SpaceNet
+ * have no public repository — the first is client work, the other two
+ * research — so they deep-link to where the site tells their story instead.
+ * OneVoice was a team hackathon build; Devpost has the demo and the writeup.
  */
 export const PROJECTS: readonly Project[] = [
+  {
+    slug: 'onevoice',
+    title: 'OneVoice',
+    date: '2026',
+    role: 'Team of 4, VTHacks',
+    stack: ['Python', 'PyTorch', 'CUDA'],
+    description:
+      'Tap a face on camera and hear only that person, live, in your earbuds. I root-caused three GPU crashes to run the model at 212–223 ms a window.',
+    url: 'https://devpost.com/software/onevoice-r50odl',
+    linkLabel: 'See it on Devpost',
+  },
   {
     slug: 'faith-crm',
     title: 'Faith CRM',
@@ -13,7 +25,7 @@ export const PROJECTS: readonly Project[] = [
     role: 'Full-stack, solo',
     stack: ['Next.js 15', 'TypeScript', 'Supabase', 'PostgreSQL'],
     description:
-      'A CRM for a medical-equipment sales team, replacing spreadsheets: row-level security across three roles, two pipelines, and a migration off Zoho Bigin.',
+      "Replaced a 20+ person sales team's spreadsheets: an average 5.5 hours a week back each, full adoption in 60 days, row-level security for three roles.",
     url: '#work/faith',
     linkLabel: 'On the journey',
   },
@@ -24,7 +36,7 @@ export const PROJECTS: readonly Project[] = [
     role: 'Team, HackTheBox CTF',
     stack: ['Web', 'Reversing', 'HackTheBox'],
     description:
-      '571st of 6,744 teams. Hijacked sessions through broken session management in Gatery; stored XSS past a CSP with a Google APIs JSONP bypass in Massagold.',
+      'My first CTF: 571st of 6,744 teams, top 9%. I solved two web challenges, a session hijack in Gatery and stored XSS past a CSP in Massagold.',
     url: '#writeups/massagold',
     linkLabel: 'Read the writeups',
   },
@@ -33,9 +45,9 @@ export const PROJECTS: readonly Project[] = [
     title: 'SpaceNet',
     date: '2026',
     role: 'Backend, research',
-    stack: ['Flask', 'PostgreSQL', 'Next.js'],
+    stack: ['Python', 'Docker', 'Mininet', 'pytest'],
     description:
-      'Satellite-constellation simulation. Moved auth from a user-based model to direct resource access, and made deployment identical on Windows and Linux.',
+      'A testbed for 1,800+ moving low-Earth-orbit satellites. I brought it to Windows for the first time and stubbed its 18-hour run so tests take under 100 ms.',
     url: '#work/spacenet',
     linkLabel: 'On the journey',
   },
@@ -44,9 +56,9 @@ export const PROJECTS: readonly Project[] = [
     title: 'DBWorkout',
     date: '2025',
     role: 'Backend, research',
-    stack: ['RBAC', 'Hardening', 'Error tracing'],
+    stack: ['Flask', 'PostgreSQL', 'RBAC', 'Hardening'],
     description:
-      'Hardening a research backend: exception handling that never leaks a stack trace, sanitised error tracing keyed by UUID, and an RBAC refactor built to grow.',
+      'A gamified SQL platform for 300+ students. As its only security developer I hardened 60+ endpoints and swapped hard-coded role checks for RBAC decorators.',
     url: '#work/dbworkout',
     linkLabel: 'On the journey',
   },
@@ -57,7 +69,7 @@ export const PROJECTS: readonly Project[] = [
     role: 'Team, FusionHacks 2',
     stack: ['Python', 'TensorFlow', 'OpenCV', 'ResNet-50'],
     description:
-      'A CNN for brain-MRI tumour detection: ResNet-50 transfer learning, tuned to 92% validation accuracy. A hospital in Greater Noida asked to deploy it.',
+      'A CNN for brain-MRI tumour detection: ResNet-50 transfer learning, tuned to 92% validation accuracy. A hospital in Greater Noida asked about deploying it.',
     url: 'https://github.com/nehrashubh/Cancer-Scan',
     linkLabel: 'View on GitHub',
   },

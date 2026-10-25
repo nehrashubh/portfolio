@@ -37,6 +37,19 @@ html {
   overscroll-behavior-y: none;
 }
 
+/* No browser scrollbars, anywhere. They are the one piece of the browser's
+   own chrome inside the frame, and on the landing the bar ran ahead of a
+   picture that glides. ScrollRail draws the site's own where knowing your
+   place matters: the landing, the flight, a writeup. Everything still
+   scrolls by wheel, touch and keyboard. */
+* {
+  scrollbar-width: none;
+}
+
+*::-webkit-scrollbar {
+  display: none;
+}
+
 body {
   overflow-x: hidden;
   overscroll-behavior-y: none;

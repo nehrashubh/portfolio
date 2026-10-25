@@ -56,3 +56,25 @@
   margin: 0;
 }
 
+/* Who made the models. Sentence case and quieter than the note above: it is
+   owed, not announced. */
+.footer__credits {
+  margin: 1.2vh 0 0;
+  font-family: var(--font-sans);
+  font-size: 11px;
+  line-height: 1.6;
+  color: rgba(50, 80, 115, 0.55);
+}
+
+.footer__credits a {
+  color: inherit;
+  text-decoration: underline;
+  text-decoration-color: rgba(50, 80, 115, 0.3);
+  text-underline-offset: 2px;
+}
+
+.footer__credits a:hover,
+.footer__credits a:focus-visible {
+  color: rgba(50, 80, 115, 0.85);
+  text-decoration-color: currentColor;
+}

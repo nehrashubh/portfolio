@@ -129,6 +129,12 @@ export function SectionOverlay({
     // open, and a white screen for the whole of the close.
     const root = document.documentElement
     const prevHtml = root.style.overflow
+    // The scrollbar goes with the overflow, and the landing widened into the
+    // space it left: everything centred shifted sideways on open, and back
+    // again as the close finished. landing.css holds the landing to the
+    // width it had, so the scrollbar returns to the gap it left.
+    const gutter = window.innerWidth - root.clientWidth
+    root.style.setProperty('--scroll-lock-gutter', `${Math.max(0, gutter)}px`)
     root.style.overflow = 'hidden'
 
     // Focus lands on the cross, and goes back to the card the section came
@@ -139,9 +145,22 @@ export function SectionOverlay({
     return () => {
       window.removeEventListener('keydown', onKey)
       root.style.overflow = prevHtml
+      root.style.removeProperty('--scroll-lock-gutter')
       origin?.focus({ preventScroll: true })
     }
   }, [section, onClose, originRef])
+
+  // From the first frame of opening until closing starts, the landing holds
+  // still. It trails the scrollbar by design, so a card pressed mid-glide
+  // still had distance to cover: that played out behind the veil and then,
+  // after closing, in front of you, as the cards shooting up the screen.
+  // Landing.tsx reads this and pins the page to what it is showing.
+  useLayoutEffect(() => {
+    if (!section || closing) return
+    const root = document.documentElement
+    root.setAttribute('data-section-active', '')
+    return () => root.removeAttribute('data-section-active')
+  }, [section, closing])
 
   // Once the cascade has fully covered the landing, tell it to stand down:
   // the descent loop and thirty petals have nothing to show for a viewport

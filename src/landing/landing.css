@@ -43,15 +43,26 @@
    the root un-sticks a sticky element in both Chromium and Firefox (its
    top jumped to minus the scroll offset), and the landing vanished behind
    every section: a white flash on open, a white screen through the close.
-   A fixed element does not care. */
+   A fixed element does not care.
+
+   It does care about the scrollbar, though: locking the overflow hides it,
+   and a fixed box would grow into the space, moving everything centred on
+   open and back again at the end of the close. The lock publishes the
+   scrollbar's width, and the landing keeps out of it. */
 .descent__viewport {
   position: fixed;
   top: 0;
   left: 0;
-  right: 0;
+  right: var(--scroll-lock-gutter, 0px);
   height: 100vh;
   height: 100dvh;
+  /* Clipped, and not scrollable. Under overflow:hidden the frame could
+     still be scrolled from script, and Tab did exactly that: to show a
+     focused card the browser scrolled the frame itself, behind the
+     descent's back, and the landing came apart. Landing.tsx moves the page
+     to a focused card instead. hidden is the fallback before clip. */
   overflow: hidden;
+  overflow: clip;
   z-index: 0;
 }
 
@@ -187,8 +198,22 @@
   padding-bottom: 6vh;
 }
 
+/* No descent. The page scrolls on its own and the scene scrolls with it, one
+   tall picture behind the content rather than a frame onto it: no parallax
+   and no glide. Each panel is a viewport tall, so the hero still sits in the
+   sky, the About in the cloud and the cards on the meadow.
+
+   The frame has to join the page for that. Left fixed and a viewport tall,
+   it clipped the panels inside it, the page had nothing to scroll, and
+   nothing below the hero could be reached at all. */
 @media (prefers-reduced-motion: reduce) {
   .descent {
+    height: auto;
+  }
+
+  .descent__viewport {
+    position: relative;
+    right: auto; /* the scroll lock's gutter is the fixed frame's concern */
     height: auto;
   }
 
