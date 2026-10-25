@@ -122,9 +122,9 @@
 .waypoint-label__body {
   position: absolute;
   top: 0;
-  width: var(--label-w, 340px);
+  width: var(--label-w, 420px);
   /* Clear of the stamp. CARD_GAP in labelPlacement.ts is the same. */
-  --card-gap: 54px;
+  --card-gap: 44px;
   transform: translateY(-50%);
   /* Contain the scrim's negative z-index so it paints behind this text but
      not behind the canvas. */
@@ -138,7 +138,7 @@
 .waypoint-label__body::before {
   content: '';
   position: absolute;
-  inset: -48px -60px;
+  inset: -56px -72px;
   z-index: -1;
   pointer-events: none;
   background: radial-gradient(
@@ -170,16 +170,16 @@
 .waypoint-label__year {
   margin: 0 0 8px;
   font-family: var(--font-mono);
-  font-size: 0.9rem;
+  font-size: 1.05rem;
   letter-spacing: 0.24em;
   color: var(--journey-accent);
   text-shadow: 0 1px 12px rgba(0, 0, 0, 0.75);
 }
 
 .waypoint-label__title {
-  margin: 0 0 12px;
+  margin: 0 0 14px;
   font-family: var(--font-display);
-  font-size: 2rem;
+  font-size: 2.6rem;
   line-height: 1.08;
   font-weight: 400;
   color: var(--journey-ink);
@@ -188,9 +188,9 @@
 
 .waypoint-label__rule {
   display: block;
-  width: 32px;
+  width: 40px;
   height: 1px;
-  margin: 0 0 12px;
+  margin: 0 0 14px;
   background: var(--journey-rule);
 }
 
@@ -201,9 +201,9 @@
 /* A long role wraps; tracked tighter and given real leading so the second
    line reads as part of it rather than as an orphan above the description. */
 .waypoint-label__role {
-  margin: 0 0 12px;
+  margin: 0 0 14px;
   font-family: var(--font-mono);
-  font-size: 0.74rem;
+  font-size: 0.88rem;
   line-height: 1.6;
   letter-spacing: 0.1em;
   text-transform: uppercase;
@@ -213,7 +213,7 @@
 
 .waypoint-label__description {
   margin: 0;
-  font-size: 1rem;
+  font-size: 1.2rem;
   line-height: 1.6;
   color: var(--journey-text);
   text-shadow: 0 1px 12px rgba(0, 0, 0, 0.8);
@@ -259,7 +259,15 @@
   }
 
   .waypoint-label__title {
-    font-size: 1.65rem;
+    font-size: 2rem;
+  }
+
+  .waypoint-label__role {
+    font-size: 0.78rem;
+  }
+
+  .waypoint-label__description {
+    font-size: 1.05rem;
   }
 }
 

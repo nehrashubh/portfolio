@@ -6,9 +6,7 @@
 .skills-section {
   --bone: #eef5e8;
   --sage: #a9b8a3;
-  /* Pale celadon off the felt, where brass used to be: the one accent, for
-     headings, rules and whatever is selected. */
-  --accent: #c2e2d1;
+  --brass: #d9b36e;
   --hairline: rgba(238, 245, 232, 0.14);
   --glass: rgba(12, 24, 16, 0.66);
   --display: var(--font-display);
@@ -99,7 +97,7 @@
 .stage__label-square {
   font-family: var(--mono);
   font-size: 11px;
-  color: var(--accent);
+  color: var(--brass);
 }
 
 /* ---------- panel shell ---------- */
@@ -197,12 +195,12 @@
      line across all three columns. */
   min-height: 2.6em;
   padding-bottom: 8px;
-  border-bottom: 1px solid var(--accent);
+  border-bottom: 1px solid var(--brass);
   font-family: var(--mono);
   font-size: 10px;
   letter-spacing: 0.14em;
   text-transform: uppercase;
-  color: var(--accent);
+  color: var(--brass);
 }
 
 .column__count {
@@ -245,12 +243,12 @@
 }
 
 .skill:hover {
-  color: var(--accent);
+  color: var(--brass);
   padding-left: 6px;
 }
 
 .skill:focus-visible {
-  outline: 1px solid var(--accent);
+  outline: 1px solid var(--brass);
   outline-offset: 3px;
 }
 
@@ -264,7 +262,7 @@
 
 .skill--inline:hover {
   padding-left: 0;
-  border-bottom-color: var(--accent);
+  border-bottom-color: var(--brass);
 }
 
 /* ---------- detail ---------- */
@@ -298,12 +296,12 @@
 }
 
 .detail__back:hover {
-  color: var(--accent);
-  border-bottom-color: var(--accent);
+  color: var(--brass);
+  border-bottom-color: var(--brass);
 }
 
 .detail__back:focus-visible {
-  outline: 1px solid var(--accent);
+  outline: 1px solid var(--brass);
   outline-offset: 3px;
 }
 
@@ -328,7 +326,7 @@
 .detail__why {
   margin: 0 0 30px;
   padding-left: 14px;
-  border-left: 1px solid var(--accent);
+  border-left: 1px solid var(--brass);
   max-width: 46ch;
   font-family: var(--font-body);
   font-size: 19px;
@@ -341,12 +339,12 @@
 .detail__label {
   margin: 0 0 6px;
   padding-bottom: 8px;
-  border-bottom: 1px solid var(--accent);
+  border-bottom: 1px solid var(--brass);
   font-family: var(--mono);
   font-size: 10px;
   letter-spacing: 0.14em;
   text-transform: uppercase;
-  color: var(--accent);
+  color: var(--brass);
 }
 
 .detail__empty {
@@ -382,10 +380,10 @@
 }
 
 .link--static { cursor: default; }
-.link:not(.link--static):hover .link__label { color: var(--accent); }
+.link:not(.link--static):hover .link__label { color: var(--brass); }
 
 .link:focus-visible {
-  outline: 1px solid var(--accent);
+  outline: 1px solid var(--brass);
   outline-offset: 3px;
 }
 

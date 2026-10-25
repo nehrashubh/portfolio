@@ -108,10 +108,10 @@ const STAMPED_TEXTURE = createTexture(true)
 
 // Markers sit ~1.9 units from the ship, viewed from a 3.3-3.85 unit orbit, so
 // this is deliberately small: the previous 0.5 put a marker roughly the height
-// of the ship itself in frame. The stamp's disc is wider than the ring it
-// replaced, so the current stop grows by less on arrival.
-const BASE_SCALE = 0.16
-const EMPHASIS_GAIN = 0.35
+// of the ship itself in frame. The stamp is a mark beside the text, not the
+// subject, so it stays smaller than the type it belongs to.
+const BASE_SCALE = 0.11
+const EMPHASIS_GAIN = 0.3
 
 /**
  * Cloud billboards are depthWrite:false, so they never write to the depth

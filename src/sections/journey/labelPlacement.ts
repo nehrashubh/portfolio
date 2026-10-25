@@ -51,10 +51,10 @@ export function chooseLabelSide(
 /** Inset from every frame edge, in CSS pixels. */
 const EDGE_PAD = 16
 /** Half the tallest card: the card is centred on its anchor vertically. */
-const HALF_CARD = 120
+const HALF_CARD = 140
 /** Gap between the marker and the card's near edge; journey.css offsets the
  *  body by the same amount. Wide enough to clear a stamp at full size. */
-export const CARD_GAP = 54
+export const CARD_GAP = 44
 
 export type ClampedAnchor = { x: number; y: number; clamped: boolean }
 

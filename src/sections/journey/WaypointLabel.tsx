@@ -4,7 +4,7 @@ import type { Waypoint } from './waypoints'
 import type { LabelSide } from './labelPlacement'
 
 /** Text column width in CSS pixels. Callers pass this to `chooseLabelSide`. */
-export const LABEL_WIDTH_PX = 340
+export const LABEL_WIDTH_PX = 420
 
 export type WaypointLabelHandle = {
   setVisibility: (opacity: number) => void
