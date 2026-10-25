@@ -81,7 +81,7 @@ export const PROJECTS: readonly Project[] = [
     stack: ['React', 'three.js', 'TypeScript', 'Vite'],
     description:
       'The page you are on: a damped descent through a sky, three WebGL scenes lazy-loaded behind glass cards, and writeups synced from an Obsidian vault.',
-    url: 'https://github.com/nehrashubh',
-    linkLabel: 'GitHub',
+    url: 'https://github.com/nehrashubh/portfolio',
+    linkLabel: 'View the code',
   },
 ];
